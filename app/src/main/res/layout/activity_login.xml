@@ -10,7 +10,7 @@
         android:id="@+id/rc0fkyl4dwuf"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/gradientbglogin"
+        android:background="@drawable/bg_login"
         android:fillViewport="true">
         <LinearLayout
             android:layout_width="match_parent"
@@ -111,7 +111,7 @@
                         android:id="@+id/rl822png1s6q"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/gradientbg2"
+                        android:background="@drawable/bg_login2"
                         android:paddingVertical="10dp"
                         android:paddingHorizontal="51dp"
                         android:clickable="true"
