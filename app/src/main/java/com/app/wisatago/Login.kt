@@ -65,9 +65,15 @@ class Login : AppCompatActivity() {
                     if (respon.isSuccessful && respon.body() != null) {
                         val hasilData = respon.body()!!
 
-                        // Sementara sukses login kita tandai dengan Toast sapaan dulu,
-                        // karena MainActivity penampungnya sudah dihapus.
-                        Toast.makeText(this@Login, "Selamat datang, ${hasilData.full_name}! Login Berhasil.", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this@Login, "Selamat datang, ${hasilData.full_name}!", Toast.LENGTH_SHORT).show()
+
+                        // --- BAGIAN YANG DITAMBAHKAN (Koneksi ke Dashboard) ---
+                        val intent = Intent(this@Login, Dashboard::class.java)
+                        // Membawa nama pengguna ke DashboardActivity
+                        intent.putExtra("USERNAME_KEY", hasilData.full_name)
+                        startActivity(intent)
+                        finish() // Menutup halaman login agar user tidak bisa kembali dengan tombol back
+                        // -------------------------------------------------------
 
                     } else {
                         Toast.makeText(this@Login, "Login Gagal! Periksa akun kembali.", Toast.LENGTH_SHORT).show()
