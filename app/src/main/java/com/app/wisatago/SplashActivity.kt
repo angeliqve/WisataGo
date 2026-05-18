@@ -22,9 +22,14 @@ class SplashActivity : AppCompatActivity() {
             .setDuration(1500)
             .start()
 
+        // Handler untuk menahan layar splash selama 4 detik
         Handler(Looper.getMainLooper()).postDelayed({
 
-            startActivity(Intent(this, MainActivity::class.java))
+            // PERBAIKAN UTAMA: Arahkan ke Login::class.java, BUKAN MainActivity
+            val intentKeLogin = Intent(this, Login::class.java)
+            startActivity(intentKeLogin)
+
+            // Tutup SplashActivity agar tidak bisa kembali ke halaman loading saat tombol back ditekan
             finish()
 
         }, 4000)
