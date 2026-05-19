@@ -15,6 +15,11 @@
         android:theme="@style/Theme.WisataGo"
         android:usesCleartextTraffic="true"
         tools:targetApi="m">
+
+        <activity
+            android:name=".WisataActivity"
+            android:exported="false" />
+
         <activity
             android:name=".Dashboard"
             android:exported="false" />
