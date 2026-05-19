@@ -15,11 +15,15 @@
         android:theme="@style/Theme.WisataGo"
         android:usesCleartextTraffic="true"
         tools:targetApi="m">
-
         <activity
-            android:name=".WisataActivity"
+            android:name=".transport.TicketResultActivity"
             android:exported="false" />
-
+        <activity
+            android:name=".transport.TrainActivity"
+            android:exported="false" />
+        <activity
+            android:name=".attraction.WisataActivity"
+            android:exported="false" />
         <activity
             android:name=".Dashboard"
             android:exported="false" />

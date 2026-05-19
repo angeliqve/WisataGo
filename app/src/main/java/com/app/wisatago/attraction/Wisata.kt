@@ -1,4 +1,4 @@
-package com.app.wisatago
+package com.app.wisatago.attraction
 
 import com.google.gson.annotations.SerializedName
 

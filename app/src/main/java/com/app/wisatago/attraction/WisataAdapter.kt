@@ -1,4 +1,4 @@
-package com.app.wisatago
+package com.app.wisatago.attraction
 
 import android.view.LayoutInflater
 import android.view.View
@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.app.wisatago.R
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -28,13 +29,11 @@ class WisataAdapter(
     override fun onBindViewHolder(holder: WisataViewHolder, position: Int) {
         val wisata = listWisata[position]
 
-        // Mengubah Double angka mentah dari database menjadi IDR Rupiah rapi
         val formatRupiah = NumberFormat.getCurrencyInstance(Locale("id", "ID"))
 
         holder.tvNama.text = wisata.attractionName
         holder.tvHarga.text = formatRupiah.format(wisata.ticketPrice)
 
-        // Deteksi klik pada tombol Pesan
         holder.btnPesan.setOnClickListener { onPesanClick(wisata) }
     }
 
