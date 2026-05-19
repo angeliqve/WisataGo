@@ -1,5 +1,6 @@
 package com.app.wisatago.transport
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.ImageButton
 import android.widget.TextView
@@ -19,15 +20,13 @@ class TicketResultActivity : AppCompatActivity() {
     private lateinit var rvTrainList: RecyclerView
     private lateinit var adapter: TrainTicketAdapter
     private lateinit var tvSummaryLocation: TextView
-    private lateinit var tvSummaryDate: TextView // 🟢 Variabel baru untuk tanggal
+    private lateinit var tvSummaryDate: TextView
     private lateinit var tvSummaryDetails: TextView
     private lateinit var btnBackList: ImageButton
 
-    // Tambahkan chip filter
     private lateinit var chipHargaTerendah: Chip
     private lateinit var chipKeberangkatanPagi: Chip
 
-    // List untuk menyimpan data master asli dari server
     private var originalList: List<TicketResponse> = emptyList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,14 +36,22 @@ class TicketResultActivity : AppCompatActivity() {
         // 1. Tangkap data dari Intent
         val origin = intent.getStringExtra("EXTRA_ORIGIN") ?: ""
         val destination = intent.getStringExtra("EXTRA_DESTINATION") ?: ""
-
-        // 🟢 Tangkap data tanggal yang dikirim dari TrainActivity
         val datePergi = intent.getStringExtra("EXTRA_DATE_PERGI") ?: "Tanggal tidak diketahui"
         val datePulang = intent.getStringExtra("EXTRA_DATE_PULANG")
 
+        // 🟢 TANGKAP JUMLAH PENUMPANG (Default 1 jika tidak ada)
+        val passengerCount = intent.getIntExtra("EXTRA_PASSENGERS", 1)
+
+        // 🟢 TANGKAP STATUS: Apakah ini sedang mencari tiket pulang?
+        val isReturnTrip = intent.getBooleanExtra("EXTRA_IS_RETURN_TRIP", false)
+
+        // 🟢 TANGKAP DATA TIKET PERGI: Disimpan sementara jika ini adalah rute pulang
+        val tiketPergiName = intent.getStringExtra("TIKET_PERGI_NAME") ?: ""
+        val tiketPergiPrice = intent.getDoubleExtra("TIKET_PERGI_PRICE", 0.0)
+
         // 2. Hubungkan dengan komponen XML
         tvSummaryLocation = findViewById(R.id.tv_summary_location)
-        tvSummaryDate = findViewById(R.id.tv_summary_date) // 🟢 Hubungkan ke XML
+        tvSummaryDate = findViewById(R.id.tv_summary_date)
         tvSummaryDetails = findViewById(R.id.tv_summary_details)
         btnBackList = findViewById(R.id.btn_back_list)
         rvTrainList = findViewById(R.id.rv_train_list)
@@ -54,13 +61,15 @@ class TicketResultActivity : AppCompatActivity() {
         // 3. Set teks untuk Lokasi
         tvSummaryLocation.text = "$origin ➔ $destination"
 
-        // 🟢 4. Set teks untuk Tanggal (Logika Pulang-Pergi)
-        if (datePulang != null && datePulang.isNotEmpty() && !datePulang.contains("DD, 00")) {
-            // Jika ada tanggal pulang, tampilkan "Pergi - Pulang"
-            tvSummaryDate.text = "$datePergi - $datePulang"
+        // 🟢 4. Set teks untuk Tanggal & Petunjuk Visual
+        if (isReturnTrip) {
+            tvSummaryDate.text = "$datePergi (Pilih Tiket Pulang)"
         } else {
-            // Jika hanya sekali jalan, tampilkan tanggal pergi saja
-            tvSummaryDate.text = datePergi
+            if (datePulang != null && datePulang.isNotEmpty() && !datePulang.contains("DD, 00")) {
+                tvSummaryDate.text = "$datePergi (Pilih Tiket Pergi)"
+            } else {
+                tvSummaryDate.text = datePergi
+            }
         }
 
         tvSummaryDetails.text = "Mencari tiket..."
@@ -70,25 +79,56 @@ class TicketResultActivity : AppCompatActivity() {
         }
 
         rvTrainList.layoutManager = LinearLayoutManager(this)
-        adapter = TrainTicketAdapter(emptyList()) { tiketTerpilih ->
-            Toast.makeText(this, "Memesan tiket: ${tiketTerpilih.train_name} kelas ${tiketTerpilih.class_type}", Toast.LENGTH_SHORT).show()
+
+        // ========================================================
+        // 🟢 LOGIKA KLIK TIKET: Penentuan Alur Pulang-Pergi
+        // 🟢 TAMBAHAN: Masukkan passengerCount ke dalam Adapter
+        // ========================================================
+        adapter = TrainTicketAdapter(emptyList(), passengerCount) { tiketTerpilih ->
+
+            // CEK KONDISI: Jika ada tanggal pulang DAN saat ini sedang mencari tiket pergi
+            if (!datePulang.isNullOrEmpty() && !datePulang.contains("DD, 00") && !isReturnTrip) {
+
+                Toast.makeText(this, "Menyimpan tiket pergi. Silakan pilih tiket pulang!", Toast.LENGTH_SHORT).show()
+
+                // Buka kembali halaman ini tapi dengan rute yang dibalik
+                val intentPulang = Intent(this, TicketResultActivity::class.java)
+
+                intentPulang.putExtra("EXTRA_ORIGIN", destination)
+                intentPulang.putExtra("EXTRA_DESTINATION", origin)
+
+                // Tanggal pulang dijadikan parameter utama untuk pencarian
+                intentPulang.putExtra("EXTRA_DATE_PERGI", datePulang)
+                intentPulang.putExtra("EXTRA_DATE_PULANG", "") // Kosongkan agar tidak looping
+                intentPulang.putExtra("EXTRA_IS_RETURN_TRIP", true)
+
+                // Teruskan juga jumlah penumpangnya!
+                intentPulang.putExtra("EXTRA_PASSENGERS", passengerCount)
+
+                // Simpan info tiket pergi yang baru saja dipilih
+                intentPulang.putExtra("TIKET_PERGI_NAME", tiketTerpilih.train_name)
+                intentPulang.putExtra("TIKET_PERGI_PRICE", tiketTerpilih.price)
+
+                startActivity(intentPulang)
+
+            } else {
+                // USER MEMILIH SEKALI JALAN ATAU BARU SAJA MEMILIH TIKET PULANG
+                Toast.makeText(this, "Melanjutkan ke Pembayaran...", Toast.LENGTH_SHORT).show()
+
+                // TODO: Di sini nanti kita akan memanggil CheckoutActivity
+            }
         }
         rvTrainList.adapter = adapter
 
-        // Setup Listener untuk aksi Filter klik
         setupFilterListeners()
 
-        // Panggil API untuk mencari jadwal reguler
+        // Panggil API dengan parameter tanggal pencarian saat ini
         cariJadwalTiket(origin, destination, datePergi)
     }
 
-    // 🟢 1. Tambahkan parameter tanggalRaw di dalam kurung
     private fun cariJadwalTiket(asal: String, tujuan: String, tanggalRaw: String) {
-
-        // Konversi format "Sel, 19 Mei 2026" menjadi "2026-05-19" agar dimengerti database
         val formatDatabase = konversiTanggalKeFormatDatabase(tanggalRaw)
 
-        // 🟢 2. Masukkan formatDatabase sebagai parameter ketiga di searchTickets
         ApiClient.instance.searchTickets(asal, tujuan, formatDatabase).enqueue(object : Callback<List<TicketResponse>> {
             override fun onResponse(
                 call: Call<List<TicketResponse>>,
@@ -117,18 +157,14 @@ class TicketResultActivity : AppCompatActivity() {
         })
     }
 
-    // 🟢 3. Tambahkan fungsi pembantu ini tepat di bawah fungsi cariJadwalTiket
     private fun konversiTanggalKeFormatDatabase(tanggalLokal: String): String {
         return try {
-            // Membaca format dari Android (contoh: "Sel, 19 Mei 2026")
             val formatInput = java.text.SimpleDateFormat("EEE, dd MMM yyyy", java.util.Locale("id", "ID"))
-            // Mengubah ke format PostgreSQL (contoh: "2026-05-19")
             val formatOutput = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US)
-
             val date = formatInput.parse(tanggalLokal)
             formatOutput.format(date!!)
         } catch (e: Exception) {
-            "" // Jika terjadi error parsing, kembalikan string kosong
+            ""
         }
     }
 
@@ -136,12 +172,10 @@ class TicketResultActivity : AppCompatActivity() {
         val filterAction = {
             var filteredList = originalList
 
-            // 1. Jika chip "Harga Terendah" aktif (Checked)
             if (chipHargaTerendah.isChecked) {
                 filteredList = filteredList.sortedBy { it.price }
             }
 
-            // 2. Jika chip "Berangkat Pagi" aktif (Jam keberangkatan di bawah 11:00)
             if (chipKeberangkatanPagi.isChecked) {
                 filteredList = filteredList.filter { tiket ->
                     val jam = tiket.departure_time.split(":").firstOrNull()?.toIntOrNull() ?: 24
@@ -149,7 +183,6 @@ class TicketResultActivity : AppCompatActivity() {
                 }
             }
 
-            // Update data ke RecyclerView adapter
             adapter.updateData(filteredList)
             tvSummaryDetails.text = "${filteredList.size} Tiket Kereta Tersedia"
         }

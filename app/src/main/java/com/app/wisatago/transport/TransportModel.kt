@@ -27,6 +27,7 @@ data class TicketResponse(
     val origin: String,
     val destination: String,
     val price: Double,
-    val class_type: String? // 🟢 Wajib ditambahkan di sini
+    val class_type: String?, // 🟢 Wajib ditambahkan di sini
+    val available_seats: Int
 )
 

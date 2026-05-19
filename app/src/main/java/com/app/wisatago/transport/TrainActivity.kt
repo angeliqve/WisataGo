@@ -158,8 +158,6 @@ class TrainActivity : AppCompatActivity() {
                     return@setOnClickListener
                 }
             }
-
-            // Jika semua lolos validasi, pindah halaman
             // Jika semua lolos validasi, pindah halaman
             val intent = Intent(this, TicketResultActivity::class.java)
             intent.putExtra("EXTRA_ORIGIN", asal)

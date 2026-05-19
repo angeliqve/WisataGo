@@ -66,7 +66,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="20dp"
             android:text="00:00"
             android:textColor="#212121"
             android:textSize="18sp"
@@ -95,15 +95,53 @@
             android:textColor="#212121"
             android:textSize="18sp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@id/tv_arrow"
+            app:layout_constraintBottom_toBottomOf="@id/tv_departure_time"
             app:layout_constraintStart_toEndOf="@id/tv_arrow"
-            app:layout_constraintTop_toTopOf="@id/tv_arrow" />
+            app:layout_constraintTop_toTopOf="@id/tv_departure_time" />
+
+        <TextView
+            android:id="@+id/tv_seat_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:text="Tersedia"
+            android:textColor="#4CAF50"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/tv_departure_time"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tv_departure_time" />
+
+        <TextView
+            android:id="@+id/tv_next_day"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="+1 hari"
+            android:textColor="#FF9800"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:visibility="gone"
+            app:layout_constraintBottom_toTopOf="@id/tv_arrow"
+            app:layout_constraintEnd_toEndOf="@id/tv_arrow"
+            app:layout_constraintStart_toStartOf="@id/tv_arrow" />
+
+        <TextView
+            android:id="@+id/tv_duration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0j 0m"
+            android:textColor="#9E9E9E"
+            android:textSize="10sp"
+            app:layout_constraintEnd_toEndOf="@id/tv_arrow"
+            app:layout_constraintStart_toStartOf="@id/tv_arrow"
+            app:layout_constraintTop_toBottomOf="@id/tv_arrow" />
+
 
         <TextView
             android:id="@+id/tv_train_price"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="24dp"
             android:text="Rp 0"
             android:textColor="#FF5722"
             android:textSize="20sp"
