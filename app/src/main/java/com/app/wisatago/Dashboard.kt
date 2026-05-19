@@ -1,5 +1,6 @@
 package com.app.wisatago // Pastikan nama package sesuai dengan proyek Anda
 
+import android.content.Intent // 🟢 TAMBAHAN: Wajib di-import untuk fitur perpindahan halaman
 import android.os.Bundle
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -16,7 +17,6 @@ class Dashboard : AppCompatActivity() {
         val greetingText = findViewById<TextView>(R.id.greetingText)
 
         // 2. Inisialisasi Tombol Menu Utama
-        // INI OBATNYA: Sekarang kita menggunakan LinearLayout, BUKAN MaterialCardView lagi!
         val wisataButton = findViewById<LinearLayout>(R.id.wisataButton)
         val transportButton = findViewById<LinearLayout>(R.id.transportButton)
 
@@ -38,8 +38,10 @@ class Dashboard : AppCompatActivity() {
         // AKSI KLIK (ON CLICK LISTENER)
         // ==========================================
 
+        // 🟢 PERBAIKAN UTAMA: Mengarahkan tombol Wisata ke WisataActivity
         wisataButton.setOnClickListener {
-            Toast.makeText(this, "Membuka Menu Wisata...", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, WisataActivity::class.java)
+            startActivity(intent)
         }
 
         transportButton.setOnClickListener {
