@@ -1,13 +1,10 @@
-package com.app.wisatago
+package com.app.wisatago // Pastikan nama package sesuai dengan proyek Anda
 
-import android.content.Intent
 import android.os.Bundle
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.app.wisatago.attraction.WisataActivity
-import com.app.wisatago.transport.TrainActivity
 
 class Dashboard : AppCompatActivity() {
 
@@ -15,11 +12,20 @@ class Dashboard : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dashboard)
 
+        // 1. Inisialisasi Teks & Avatar
         val greetingText = findViewById<TextView>(R.id.greetingText)
+
+        // 2. Inisialisasi Tombol Menu Utama
+        // INI OBATNYA: Sekarang kita menggunakan LinearLayout, BUKAN MaterialCardView lagi!
         val wisataButton = findViewById<LinearLayout>(R.id.wisataButton)
         val transportButton = findViewById<LinearLayout>(R.id.transportButton)
+
+        // 3. Inisialisasi Search Bar
         val searchBar = findViewById<LinearLayout>(R.id.searchBarContainer)
 
+        // ==========================================
+        // LOGIKA PENYAPAAN USER (Dari Login)
+        // ==========================================
         val username = intent.getStringExtra("USERNAME_KEY")
 
         if (!username.isNullOrEmpty()) {
@@ -28,33 +34,35 @@ class Dashboard : AppCompatActivity() {
             greetingText.text = "Halo, User! Mau liburan ke mana?"
         }
 
+        // ==========================================
+        // AKSI KLIK (ON CLICK LISTENER)
+        // ==========================================
+
         wisataButton.setOnClickListener {
-            val intent = Intent(this, WisataActivity::class.java)
-            startActivity(intent)
+            Toast.makeText(this, "Membuka Menu Wisata...", Toast.LENGTH_SHORT).show()
         }
 
         transportButton.setOnClickListener {
-            val intent = Intent(this, TrainActivity::class.java)
-            startActivity(intent)
+            Toast.makeText(this, "Membuka Menu Transportasi...", Toast.LENGTH_SHORT).show()
         }
 
         searchBar.setOnClickListener {
             Toast.makeText(this, "Membuka pencarian...", Toast.LENGTH_SHORT).show()
         }
 
+        // ==========================================
+        // AKSI KLIK TOMBOL KAPSUL TRANSPORTASI
+        // ==========================================
         val btnKereta = findViewById<TextView>(R.id.keretaFilterButton)
         val btnPesawat = findViewById<TextView>(R.id.pesawatFilterButton)
         val btnBus = findViewById<TextView>(R.id.busFilterButton)
 
         btnKereta.setOnClickListener {
-            val intent = Intent(this, TrainActivity::class.java)
-            startActivity(intent)
+            Toast.makeText(this, "Menampilkan tiket Kereta", Toast.LENGTH_SHORT).show()
         }
-
         btnPesawat.setOnClickListener {
             Toast.makeText(this, "Menampilkan tiket Pesawat", Toast.LENGTH_SHORT).show()
         }
-
         btnBus.setOnClickListener {
             Toast.makeText(this, "Menampilkan tiket Bus", Toast.LENGTH_SHORT).show()
         }
