@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.app.wisatago.ApiClient
 import com.app.wisatago.R
-import com.app.wisatago.attraction.WisataAdapter
 import kotlinx.coroutines.launch
 
 class WisataActivity : AppCompatActivity() {

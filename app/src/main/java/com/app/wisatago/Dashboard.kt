@@ -5,6 +5,9 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.app.wisatago.attraction.WisataActivity
+import com.app.wisatago.transport.TrainActivity
+import android.content.Intent
 
 class Dashboard : AppCompatActivity() {
 
@@ -39,32 +42,21 @@ class Dashboard : AppCompatActivity() {
         // ==========================================
 
         wisataButton.setOnClickListener {
-            Toast.makeText(this, "Membuka Menu Wisata...", Toast.LENGTH_SHORT).show()
+            // 🟢 Pindah ke menu Wisata
+            // Catatan: Ganti "WisataActivity" jika nama file halaman wisatamu berbeda!
+            val intent = Intent(this, WisataActivity::class.java)
+            startActivity(intent)
         }
 
         transportButton.setOnClickListener {
-            Toast.makeText(this, "Membuka Menu Transportasi...", Toast.LENGTH_SHORT).show()
+            // 🟢 Pindah ke menu Transportasi (TrainActivity)
+            val intent = Intent(this, TrainActivity::class.java)
+            startActivity(intent)
         }
 
         searchBar.setOnClickListener {
             Toast.makeText(this, "Membuka pencarian...", Toast.LENGTH_SHORT).show()
         }
 
-        // ==========================================
-        // AKSI KLIK TOMBOL KAPSUL TRANSPORTASI
-        // ==========================================
-        val btnKereta = findViewById<TextView>(R.id.keretaFilterButton)
-        val btnPesawat = findViewById<TextView>(R.id.pesawatFilterButton)
-        val btnBus = findViewById<TextView>(R.id.busFilterButton)
-
-        btnKereta.setOnClickListener {
-            Toast.makeText(this, "Menampilkan tiket Kereta", Toast.LENGTH_SHORT).show()
-        }
-        btnPesawat.setOnClickListener {
-            Toast.makeText(this, "Menampilkan tiket Pesawat", Toast.LENGTH_SHORT).show()
-        }
-        btnBus.setOnClickListener {
-            Toast.makeText(this, "Menampilkan tiket Bus", Toast.LENGTH_SHORT).show()
-        }
     }
 }

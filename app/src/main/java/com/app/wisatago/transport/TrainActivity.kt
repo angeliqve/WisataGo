@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.app.wisatago.R
+import com.google.android.material.switchmaterial.SwitchMaterial
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -24,7 +25,7 @@ class TrainActivity : AppCompatActivity() {
         val btnTanggalPulang = findViewById<View>(R.id.btn_tanggal_pulang)
         val tvTanggalPergi = findViewById<TextView>(R.id.tv_tanggal_pergi)
         val tvTanggalPulang = findViewById<TextView>(R.id.tv_tanggal_pulang)
-        val switchPulangPergi = findViewById<com.google.android.material.switchmaterial.SwitchMaterial>(R.id.switch_pulang_pergi)
+        val switchPulangPergi = findViewById<SwitchMaterial>(R.id.switch_pulang_pergi)
         val btnSelectPassengers = findViewById<LinearLayout>(R.id.btnSelectPassengers)
         val tvPassengers = findViewById<TextView>(R.id.tvPassengers)
 
@@ -78,12 +79,18 @@ class TrainActivity : AppCompatActivity() {
         }
 
         btnTanggalPergi.setOnClickListener {
-            DatePickerDialog(this, { _, year, month, dayOfMonth ->
-                calendarPergi.set(Calendar.YEAR, year)
-                calendarPergi.set(Calendar.MONTH, month)
-                calendarPergi.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-                tvTanggalPergi.text = dateFormat.format(calendarPergi.time)
-            }, calendarPergi.get(Calendar.YEAR), calendarPergi.get(Calendar.MONTH), calendarPergi.get(Calendar.DAY_OF_MONTH)).show()
+            DatePickerDialog(
+                this,
+                { _, year, month, dayOfMonth ->
+                    calendarPergi.set(Calendar.YEAR, year)
+                    calendarPergi.set(Calendar.MONTH, month)
+                    calendarPergi.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+                    tvTanggalPergi.text = dateFormat.format(calendarPergi.time)
+                },
+                calendarPergi.get(Calendar.YEAR),
+                calendarPergi.get(Calendar.MONTH),
+                calendarPergi.get(Calendar.DAY_OF_MONTH)
+            ).show()
         }
 
         switchPulangPergi.setOnCheckedChangeListener { _, isChecked ->
@@ -96,12 +103,18 @@ class TrainActivity : AppCompatActivity() {
         }
 
         btnTanggalPulang.setOnClickListener {
-            DatePickerDialog(this, { _, year, month, dayOfMonth ->
-                calendarPulang.set(Calendar.YEAR, year)
-                calendarPulang.set(Calendar.MONTH, month)
-                calendarPulang.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-                tvTanggalPulang.text = dateFormat.format(calendarPulang.time)
-            }, calendarPulang.get(Calendar.YEAR), calendarPulang.get(Calendar.MONTH), calendarPulang.get(Calendar.DAY_OF_MONTH)).show()
+            DatePickerDialog(
+                this,
+                { _, year, month, dayOfMonth ->
+                    calendarPulang.set(Calendar.YEAR, year)
+                    calendarPulang.set(Calendar.MONTH, month)
+                    calendarPulang.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+                    tvTanggalPulang.text = dateFormat.format(calendarPulang.time)
+                },
+                calendarPulang.get(Calendar.YEAR),
+                calendarPulang.get(Calendar.MONTH),
+                calendarPulang.get(Calendar.DAY_OF_MONTH)
+            ).show()
         }
 
         btnSelectPassengers.setOnClickListener {
