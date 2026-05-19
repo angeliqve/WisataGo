@@ -1,6 +1,5 @@
-package com.app.wisatago
+package com.app.wisatago // Pastikan nama package sesuai dengan proyek Anda
 
-import android.content.Intent
 import android.os.Bundle
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -13,18 +12,22 @@ class Dashboard : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dashboard)
 
-        // 1. Inisialisasi View berdasarkan ID di XML terbaru
+        // 1. Inisialisasi Teks & Avatar
         val greetingText = findViewById<TextView>(R.id.greetingText)
 
-        // 🟢 PERBAIKAN: Disesuaikan dengan XML kamu yang menggunakan LinearLayout
+        // 2. Inisialisasi Tombol Menu Utama
+        // INI OBATNYA: Sekarang kita menggunakan LinearLayout, BUKAN MaterialCardView lagi!
         val wisataButton = findViewById<LinearLayout>(R.id.wisataButton)
         val transportButton = findViewById<LinearLayout>(R.id.transportButton)
+
+        // 3. Inisialisasi Search Bar
         val searchBar = findViewById<LinearLayout>(R.id.searchBarContainer)
 
-        // 2. Menangkap data username yang dikirim dari halaman Login
+        // ==========================================
+        // LOGIKA PENYAPAAN USER (Dari Login)
+        // ==========================================
         val username = intent.getStringExtra("USERNAME_KEY")
 
-        // 3. Mengatur teks sapaan dinamis
         if (!username.isNullOrEmpty()) {
             greetingText.text = "Halo, $username! Mau liburan ke mana?"
         } else {
@@ -32,34 +35,30 @@ class Dashboard : AppCompatActivity() {
         }
 
         // ==========================================
-        // 4. MEMBERIKAN AKSI KLIK (ON CLICK LISTENER)
+        // AKSI KLIK (ON CLICK LISTENER)
         // ==========================================
 
-        // Aksi klik Menu Wisata
         wisataButton.setOnClickListener {
-            val intent = Intent(this, WisataActivity::class.java)
-            startActivity(intent)
+            Toast.makeText(this, "Membuka Menu Wisata...", Toast.LENGTH_SHORT).show()
         }
 
-        // Aksi klik Menu Transportasi
         transportButton.setOnClickListener {
             Toast.makeText(this, "Membuka Menu Transportasi...", Toast.LENGTH_SHORT).show()
         }
 
-        // Aksi klik Kolom Pencarian (Search Bar)
         searchBar.setOnClickListener {
-            Toast.makeText(this, "Membuka fitur pencarian...", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Membuka pencarian...", Toast.LENGTH_SHORT).show()
         }
 
         // ==========================================
-        // 5. PERBAIKAN: Filter Transportasi (Bentuk Kapsul di XML adalah LinearLayout)
+        // AKSI KLIK TOMBOL KAPSUL TRANSPORTASI
         // ==========================================
-        val btnKereta = findViewById<LinearLayout>(R.id.keretaFilterButton)
-        val btnPesawat = findViewById<LinearLayout>(R.id.pesawatFilterButton)
-        val btnBus = findViewById<LinearLayout>(R.id.busFilterButton)
+        val btnKereta = findViewById<TextView>(R.id.keretaFilterButton)
+        val btnPesawat = findViewById<TextView>(R.id.pesawatFilterButton)
+        val btnBus = findViewById<TextView>(R.id.busFilterButton)
 
         btnKereta.setOnClickListener {
-            Toast.makeText(this, "Menampilkan tiket Kereta Api", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Menampilkan tiket Kereta", Toast.LENGTH_SHORT).show()
         }
         btnPesawat.setOnClickListener {
             Toast.makeText(this, "Menampilkan tiket Pesawat", Toast.LENGTH_SHORT).show()
