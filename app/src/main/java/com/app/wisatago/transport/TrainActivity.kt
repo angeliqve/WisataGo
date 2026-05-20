@@ -26,13 +26,14 @@ class TrainActivity : AppCompatActivity() {
         val tvTanggalPergi = findViewById<TextView>(R.id.tv_tanggal_pergi)
         val tvTanggalPulang = findViewById<TextView>(R.id.tv_tanggal_pulang)
         val switchPulangPergi = findViewById<SwitchMaterial>(R.id.switch_pulang_pergi)
+
+        // 🟢 Variabel ini namanya tvPassengers
         val btnSelectPassengers = findViewById<LinearLayout>(R.id.btnSelectPassengers)
         val tvPassengers = findViewById<TextView>(R.id.tvPassengers)
 
         val tvOrigin = findViewById<TextView>(R.id.tvOrigin)
         val tvDestination = findViewById<TextView>(R.id.tvDestination)
 
-        // 🟢 Inisialisasi LinearLayout pembungkus asal & tujuan dari XML Anda
         val containerOrigin = findViewById<LinearLayout>(R.id.containerOrigin)
         val containerDestination = findViewById<LinearLayout>(R.id.containerDestination)
 
@@ -44,15 +45,12 @@ class TrainActivity : AppCompatActivity() {
         val calendarPulang = Calendar.getInstance()
         val dateFormat = SimpleDateFormat("EEE, dd MMM yyyy", Locale("id", "ID"))
 
-        // 🟢 Daftar stasiun pilihan untuk dimunculkan di Dialog
-        // Pastikan tulisan sebelum tanda kurung adalah "Gambir" dan "Bandung"
         val daftarStasiun = arrayOf("Gambir (GMR)", "Bandung (BD)","Cirebon (CN)", "Surabaya Pasar Turi (SGU)", "Tugu (YK)", "Semarang Tawang (SMT)")
 
         btnBack.setOnClickListener {
             finish()
         }
 
-        // 🟢 Logika klik memilih Stasiun Asal
         containerOrigin.setOnClickListener {
             AlertDialog.Builder(this)
                 .setTitle("Pilih Stasiun Asal")
@@ -62,7 +60,6 @@ class TrainActivity : AppCompatActivity() {
                 .show()
         }
 
-        // 🟢 Logika klik memilih Stasiun Tujuan
         containerDestination.setOnClickListener {
             AlertDialog.Builder(this)
                 .setTitle("Pilih Stasiun Tujuan")
@@ -133,20 +130,21 @@ class TrainActivity : AppCompatActivity() {
             val tanggalPergi = tvTanggalPergi.text.toString().trim()
             val tanggalPulang = tvTanggalPulang.text.toString().trim()
 
+            // 🟢 PERBAIKAN 1: Panggil tvPassengers, bukan tvJumlahPenumpang
+            val teksPenumpang = tvPassengers.text.toString().trim()
+
             // Validasi Asal dan Tujuan
             if (asal.contains("Pilih") || tujuan.contains("Pilih") || asal.isEmpty() || tujuan.isEmpty()) {
                 Toast.makeText(this, "Harap pilih lokasi asal dan tujuan!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            // Validasi Asal dan Tujuan tidak boleh sama
             if (asal == tujuan) {
                 Toast.makeText(this, "Lokasi asal dan tujuan tidak boleh sama!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            // Validasi Tanggal Pergi
-            // Sesuaikan kata "Pilih" atau "DD, 00" dengan teks bawaan yang ada di XML kamu
+            // Validasi Tanggal
             if (tanggalPergi.isEmpty() || tanggalPergi.contains("Pilih") || tanggalPergi.contains("DD, 00")) {
                 Toast.makeText(this, "Harap pilih tanggal keberangkatan!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
@@ -158,18 +156,21 @@ class TrainActivity : AppCompatActivity() {
                     return@setOnClickListener
                 }
             }
-            // Jika semua lolos validasi, pindah halaman
+
+            // Memecah teks "2 Dewasa" menjadi angka 2
+            val jumlahPenumpang = teksPenumpang.split(" ")[0].toIntOrNull() ?: 1
+
             val intent = Intent(this, TicketResultActivity::class.java)
             intent.putExtra("EXTRA_ORIGIN", asal)
             intent.putExtra("EXTRA_DESTINATION", tujuan)
-
-            // 🟢 Kirim tanggal pergi
             intent.putExtra("EXTRA_DATE_PERGI", tanggalPergi)
 
-            // 🟢 Kirim tanggal pulang JIKA switch menyala
             if (switchPulangPergi.isChecked) {
                 intent.putExtra("EXTRA_DATE_PULANG", tanggalPulang)
             }
+
+            // 🟢 PERBAIKAN 2: Kirim jumlah penumpang ke halaman berikutnya
+            intent.putExtra("EXTRA_PASSENGERS", jumlahPenumpang)
 
             startActivity(intent)
         }

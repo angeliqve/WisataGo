@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_marginBottom="16dp">
+
+    <TextView
+        android:id="@+id/tv_passenger_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Penumpang 1 (Kursi: 1A)"
+        android:textColor="#FF9800"
+        android:textStyle="bold"
+        android:textSize="14sp"
+        android:layout_marginBottom="8dp"/>
+
+    <EditText
+        android:id="@+id/et_passenger_name"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="#F8F9FA"
+        android:hint="Nama Lengkap Penumpang"
+        android:inputType="textPersonName"
+        android:paddingHorizontal="16dp"
+        android:textColor="#212121"
+        android:textSize="14sp" />
+
+    <EditText
+        android:id="@+id/et_passenger_phone"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="12dp"
+        android:background="#F8F9FA"
+        android:hint="Nomor Telepon / WhatsApp"
+        android:inputType="phone"
+        android:paddingHorizontal="16dp"
+        android:textColor="#212121"
+        android:textSize="14sp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="16dp"
+        android:background="#E9ECEF" />
+</LinearLayout>

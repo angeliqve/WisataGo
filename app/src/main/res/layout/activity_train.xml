@@ -11,6 +11,7 @@
         android:layout_height="wrap_content"
         android:background="#2DA0F5"
         android:orientation="vertical"
+        android:paddingTop="16dp"
         android:paddingBottom="24dp">
 
         <RelativeLayout
@@ -456,7 +457,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="KA Argo Parahyangan"
+                            android:text="KA Parahyangan"
                             android:textColor="#1E1E1E"
                             android:textSize="14sp"
                             android:textStyle="bold" />
@@ -514,7 +515,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="KA Argo Bromo Anggrek"
+                            android:text="KA Anggrek"
                             android:textColor="#1E1E1E"
                             android:textSize="14sp"
                             android:textStyle="bold" />
