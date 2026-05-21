@@ -12,6 +12,7 @@ import com.app.wisatago.R
 import com.google.android.material.button.MaterialButton
 import java.text.NumberFormat
 import java.util.Locale
+import android.content.Intent
 
 class CheckoutActivity : AppCompatActivity() {
 
@@ -174,8 +175,40 @@ class CheckoutActivity : AppCompatActivity() {
 
         // 5. TOMBOL
         findViewById<ImageButton>(R.id.btn_back_checkout).setOnClickListener { finish() }
+
         findViewById<MaterialButton>(R.id.btn_co_pay).setOnClickListener {
-            Toast.makeText(this, "Memproses pembayaran Rp ${formatter.format(totalAll)}", Toast.LENGTH_SHORT).show()
+            // Membuat Intent untuk berpindah ke PaymentActivity
+            val paymentIntent = Intent(this, PaymentActivity::class.java)
+
+            // 1. Kirim Identitas Perjalanan Utama
+            paymentIntent.putExtra("EXTRA_PERGI_NAME", pergiName)
+            paymentIntent.putExtra("EXTRA_ORIGIN", pergiOrigin)
+            paymentIntent.putExtra("EXTRA_DESTINATION", pergiDest)
+            paymentIntent.putExtra("EXTRA_PASSENGERS", passengerCount)
+            paymentIntent.putExtra("EXTRA_IS_RETURN_TRIP", isReturnTrip)
+
+            // 2. Hitung & Kirim Harga Total Pergi (Harga satuan x Jumlah Penumpang)
+            val totalPergi = pergiPrice * passengerCount
+            paymentIntent.putExtra("EXTRA_PRICE_PERGI_TOTAL", totalPergi)
+
+            // 3. Ambil ulang, Hitung & Kirim Harga Pulang (Jika statusnya PP)
+            if (isReturnTrip) {
+                // Kita ambil ulang dari intent sebelumnya agar bisa diakses di blok ini
+                val pulangName = intent.getStringExtra("EXTRA_PULANG_NAME") ?: ""
+                val pulangPrice = intent.getDoubleExtra("EXTRA_PULANG_PRICE", 0.0)
+                val totalPulang = pulangPrice * passengerCount
+
+                paymentIntent.putExtra("EXTRA_PULANG_NAME", pulangName)
+                paymentIntent.putExtra("EXTRA_PRICE_PULANG_TOTAL", totalPulang)
+            }
+
+            // 4. Kirim Rincian Total Keseluruhan
+            paymentIntent.putExtra("EXTRA_SUBTOTAL", subTotal)
+            paymentIntent.putExtra("EXTRA_TAX", tax)
+            paymentIntent.putExtra("EXTRA_GRAND_TOTAL", totalAll)
+
+            // Mulai pindah halaman
+            startActivity(paymentIntent)
         }
     }
 

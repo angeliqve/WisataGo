@@ -16,6 +16,9 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="m">
         <activity
+            android:name=".transport.PaymentActivity"
+            android:exported="false" />
+        <activity
             android:name=".transport.CheckoutActivity"
             android:exported="false" />
         <activity
