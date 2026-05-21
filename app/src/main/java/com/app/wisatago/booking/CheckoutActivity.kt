@@ -1,4 +1,4 @@
-package com.app.wisatago.transport
+package com.app.wisatago.booking
 
 import android.os.Bundle
 import android.view.View
@@ -6,13 +6,14 @@ import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.app.wisatago.R
 import com.google.android.material.button.MaterialButton
 import java.text.NumberFormat
 import java.util.Locale
 import android.content.Intent
+import android.text.Editable
+import android.text.TextWatcher
 
 class CheckoutActivity : AppCompatActivity() {
 
@@ -138,7 +139,7 @@ class CheckoutActivity : AppCompatActivity() {
                 val etPergi = listEtPergi[i]
                 val etPulang = listEtPulang[i]
 
-                etPergi.addTextChangedListener(object : android.text.TextWatcher {
+                etPergi.addTextChangedListener(object : TextWatcher {
                     override fun beforeTextChanged(
                         s: CharSequence?,
                         start: Int,
@@ -159,7 +160,7 @@ class CheckoutActivity : AppCompatActivity() {
                         }
                     }
 
-                    override fun afterTextChanged(s: android.text.Editable?) {}
+                    override fun afterTextChanged(s: Editable?) {}
                 })
             }
         }
@@ -177,37 +178,65 @@ class CheckoutActivity : AppCompatActivity() {
         findViewById<ImageButton>(R.id.btn_back_checkout).setOnClickListener { finish() }
 
         findViewById<MaterialButton>(R.id.btn_co_pay).setOnClickListener {
-            // Membuat Intent untuk berpindah ke PaymentActivity
             val paymentIntent = Intent(this, PaymentActivity::class.java)
 
-            // 1. Kirim Identitas Perjalanan Utama
+            // 🟢 TAMBAHKAN BARIS INI: Kirim tipe transportasi ke PaymentActivity
+            paymentIntent.putExtra("EXTRA_TRANSPORT_TYPE", transportType)
+
+            // 🟢 AMBIL NAMA & KURSI PENUMPANG DARI FORMULIR
+            val daftarNamaPenumpang = ArrayList<String>()
+            val daftarKursiPergi = ArrayList<String>()
+            val daftarKursiPulang = ArrayList<String>()
+
+            for (i in 0 until passengerCount) {
+                // Ambil teks asli yang diketik user di EditText
+                val nama = listEtPergi[i].text.toString().ifEmpty { "Penumpang ${i + 1}" }
+                daftarNamaPenumpang.add(nama)
+                daftarKursiPergi.add(seatsPergi[i])
+
+                if (isReturnTrip) {
+                    daftarKursiPulang.add(seatsPulang[i])
+                }
+            }
+
+            // Kirim daftar nama dan kursi ke PaymentActivity
+            paymentIntent.putStringArrayListExtra("EXTRA_PASSENGER_NAMES", daftarNamaPenumpang)
+            paymentIntent.putStringArrayListExtra("EXTRA_SEATS_PERGI", daftarKursiPergi)
+            if (isReturnTrip) paymentIntent.putStringArrayListExtra("EXTRA_SEATS_PULANG", daftarKursiPulang)
+
+            // Kirim Identitas Perjalanan Utama
+            paymentIntent.putExtra("EXTRA_TRANSPORT_TYPE", transportType)
+            paymentIntent.putExtra("EXTRA_PERGI_NAME", pergiName)
+
+            // 🟢 TAMBAHKAN INI: Tangkap dan lempar ID Pergi
+            val pergiScheduleId = intent.getStringExtra("EXTRA_PERGI_SCHEDULE_ID") ?: ""
+            paymentIntent.putExtra("EXTRA_PERGI_SCHEDULE_ID", pergiScheduleId)
             paymentIntent.putExtra("EXTRA_PERGI_NAME", pergiName)
             paymentIntent.putExtra("EXTRA_ORIGIN", pergiOrigin)
             paymentIntent.putExtra("EXTRA_DESTINATION", pergiDest)
             paymentIntent.putExtra("EXTRA_PASSENGERS", passengerCount)
             paymentIntent.putExtra("EXTRA_IS_RETURN_TRIP", isReturnTrip)
 
-            // 2. Hitung & Kirim Harga Total Pergi (Harga satuan x Jumlah Penumpang)
+            // Hitung & Kirim Harga
             val totalPergi = pergiPrice * passengerCount
             paymentIntent.putExtra("EXTRA_PRICE_PERGI_TOTAL", totalPergi)
 
-            // 3. Ambil ulang, Hitung & Kirim Harga Pulang (Jika statusnya PP)
             if (isReturnTrip) {
-                // Kita ambil ulang dari intent sebelumnya agar bisa diakses di blok ini
                 val pulangName = intent.getStringExtra("EXTRA_PULANG_NAME") ?: ""
                 val pulangPrice = intent.getDoubleExtra("EXTRA_PULANG_PRICE", 0.0)
                 val totalPulang = pulangPrice * passengerCount
+                val pulangScheduleId = intent.getStringExtra("EXTRA_PULANG_SCHEDULE_ID") ?: ""
 
+                paymentIntent.putExtra("EXTRA_PULANG_SCHEDULE_ID", pulangScheduleId)
                 paymentIntent.putExtra("EXTRA_PULANG_NAME", pulangName)
                 paymentIntent.putExtra("EXTRA_PRICE_PULANG_TOTAL", totalPulang)
             }
 
-            // 4. Kirim Rincian Total Keseluruhan
+            // Kirim Rincian Total Keseluruhan
             paymentIntent.putExtra("EXTRA_SUBTOTAL", subTotal)
             paymentIntent.putExtra("EXTRA_TAX", tax)
             paymentIntent.putExtra("EXTRA_GRAND_TOTAL", totalAll)
 
-            // Mulai pindah halaman
             startActivity(paymentIntent)
         }
     }

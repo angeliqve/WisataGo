@@ -9,6 +9,7 @@ data class LoginRequest(
 // Struktur data yang diterima dari Node.js saat login berhasil
 data class LoginResponse(
     val message: String,
+    val user_id: String,
     val role: String?,
     val full_name: String?
 )
@@ -23,4 +24,10 @@ data class SignUpRequest(
 // Struktur data jawaban dari Node.js setelah berhasil mendaftar
 data class SignUpResponse(
     val message: String
+)
+
+data class ResponseBooking(
+    val message: String,
+    val booking_code: String,
+    val error: String? = null
 )

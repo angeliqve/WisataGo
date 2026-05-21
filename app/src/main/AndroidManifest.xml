@@ -16,10 +16,13 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="m">
         <activity
-            android:name=".transport.PaymentActivity"
+            android:name=".booking.PaymentSuccessActivity"
             android:exported="false" />
         <activity
-            android:name=".transport.CheckoutActivity"
+            android:name=".booking.PaymentActivity"
+            android:exported="false" />
+        <activity
+            android:name=".booking.CheckoutActivity"
             android:exported="false" />
         <activity
             android:name=".transport.TicketResultActivity"

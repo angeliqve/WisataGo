@@ -65,15 +65,22 @@ class Login : AppCompatActivity() {
                     if (respon.isSuccessful && respon.body() != null) {
                         val hasilData = respon.body()!!
 
+                        // ========================================================
+                        // 🟢 TAMBAHAN BARU: SIMPAN USER ID KE DALAM MEMORI HP
+                        // ========================================================
+                        val sharedPref = getSharedPreferences("USER_SESSION", MODE_PRIVATE)
+                        with(sharedPref.edit()) {
+                            putString("USER_ID", hasilData.user_id) // Mengambil ID dari server Node.js
+                            apply() // Simpan secara permanen
+                        }
+                        // ========================================================
+
                         Toast.makeText(this@Login, "Selamat datang, ${hasilData.full_name}!", Toast.LENGTH_SHORT).show()
 
-                        // --- BAGIAN YANG DITAMBAHKAN (Koneksi ke Dashboard) ---
                         val intent = Intent(this@Login, Dashboard::class.java)
-                        // Membawa nama pengguna ke DashboardActivity
                         intent.putExtra("USERNAME_KEY", hasilData.full_name)
                         startActivity(intent)
-                        finish() // Menutup halaman login agar user tidak bisa kembali dengan tombol back
-                        // -------------------------------------------------------
+                        finish()
 
                     } else {
                         Toast.makeText(this@Login, "Login Gagal! Periksa akun kembali.", Toast.LENGTH_SHORT).show()

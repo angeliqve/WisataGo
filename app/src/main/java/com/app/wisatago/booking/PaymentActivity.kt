@@ -1,6 +1,13 @@
-package com.app.wisatago.transport
+package com.app.wisatago.booking
 
+import android.content.Intent
+import com.app.wisatago.ApiClient
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
@@ -25,6 +32,7 @@ class PaymentActivity : AppCompatActivity() {
         setContentView(R.layout.activity_payment)
 
         // 1. AMBIL DATA DARI CHECKOUT
+        val transportType = intent.getStringExtra("EXTRA_TRANSPORT_TYPE") ?: ""
         val pergiName = intent.getStringExtra("EXTRA_PERGI_NAME") ?: "Nama Armada"
         val origin = intent.getStringExtra("EXTRA_ORIGIN") ?: ""
         val destination = intent.getStringExtra("EXTRA_DESTINATION") ?: ""
@@ -74,7 +82,6 @@ class PaymentActivity : AppCompatActivity() {
         val tvPaymentAccountNumber = findViewById<TextView>(R.id.tv_payment_account_number)
         val imgPaymentIcon = findViewById<ImageView>(R.id.img_payment_method_icon)
 
-        // 🟢 Daftar Bank dan E-Wallet (Sudah diganti menggunakan logo buatan sendiri di folder drawable)
         val paymentList = listOf(
             PaymentMethod("BCA Virtual Account", R.drawable.logo_bca),
             PaymentMethod("BNI Virtual Account", R.drawable.logo_bni),
@@ -98,7 +105,6 @@ class PaymentActivity : AppCompatActivity() {
                 tvPaymentMethodName.text = selectedMethod.name
                 imgPaymentIcon.setImageResource(selectedMethod.iconResId)
 
-                // 🟢 Generate Nomor Rekening / VA Acak yang disesuaikan dengan Bank
                 val randomSuffix = (100000..999999).random()
                 val instruction = when (selectedPaymentMethod) {
                     "BCA Virtual Account" -> "8077 00$randomSuffix"
@@ -110,7 +116,6 @@ class PaymentActivity : AppCompatActivity() {
                 }
 
                 tvPaymentAccountNumber.text = instruction
-                // Ubah warna text jadi biru tua agar terlihat seperti nomor rekening yang bisa disalin
                 tvPaymentAccountNumber.setTextColor(resources.getColor(android.R.color.holo_blue_dark))
 
                 bottomSheetDialog.dismiss()
@@ -122,17 +127,132 @@ class PaymentActivity : AppCompatActivity() {
         }
 
         // ==========================================
-        // 4. AKSI TOMBOL BAYAR
+        // 4. AKSI TOMBOL BACK & UTAMA
         // ==========================================
         findViewById<ImageButton>(R.id.btn_back_payment).setOnClickListener { finish() }
 
         findViewById<MaterialButton>(R.id.btn_finish_payment).setOnClickListener {
             if (selectedPaymentMethod.isEmpty()) {
                 Toast.makeText(this, "Silakan pilih metode pembayaran terlebih dahulu!", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(this, "Memproses pembayaran Rp ${formatter.format(grandTotal)} via $selectedPaymentMethod...", Toast.LENGTH_LONG).show()
-                // TODO: Arahkan ke halaman Sukses/E-Tiket
+                return@setOnClickListener
             }
+
+            // 1. LOGIKA KODE PEMESANAN DINAMIS
+            val prefix = when {
+                transportType.contains("Kereta", ignoreCase = true) -> "TR"
+                transportType.contains("Pesawat", ignoreCase = true) -> "AI"
+                transportType.contains("Bus", ignoreCase = true) -> "BU"
+                else -> "WGO"
+            }
+
+            val randomCode = "$prefix-${(100000..999999).random()}"
+
+            // 2. Tangkap Array Nama & Kursi dari Checkout
+            val passengerNames = intent.getStringArrayListExtra("EXTRA_PASSENGER_NAMES") ?: arrayListOf()
+            val seatsPergi = intent.getStringArrayListExtra("EXTRA_SEATS_PERGI") ?: arrayListOf()
+            val seatsPulang = intent.getStringArrayListExtra("EXTRA_SEATS_PULANG") ?: arrayListOf()
+
+            // 3. Susun Penumpang untuk Tiket Pergi
+            val listPenumpangPergi = mutableListOf<PassengerRequest>()
+            for (i in 0 until passengerCount) {
+                listPenumpangPergi.add(
+                    PassengerRequest(
+                        passenger_name = passengerNames.getOrElse(i) { "Penumpang ${i + 1}" },
+                        seat_number = seatsPergi.getOrElse(i) { "-" }
+                    )
+                )
+            }
+
+            // 4. Susun Rincian Transportasi Pergi
+            val detailPergi = TransportDetailRequest(
+                schedule_id = intent.getStringExtra("EXTRA_PERGI_SCHEDULE_ID") ?: "",
+                num_seats = passengerCount,
+                subtotal = pricePergiTotal,
+                passengers = listPenumpangPergi
+            )
+
+            val transportDetailsList = mutableListOf(detailPergi)
+
+            // 5. Susun Rincian Transportasi Pulang (Jika PP)
+            if (isReturnTrip) {
+                val listPenumpangPulang = mutableListOf<PassengerRequest>()
+                for (i in 0 until passengerCount) {
+                    listPenumpangPulang.add(
+                        PassengerRequest(
+                            passenger_name = passengerNames.getOrElse(i) { "Penumpang ${i + 1}" },
+                            seat_number = seatsPulang.getOrElse(i) { "-" }
+                        )
+                    )
+                }
+
+                val detailPulang = TransportDetailRequest(
+                    schedule_id = intent.getStringExtra("EXTRA_PULANG_SCHEDULE_ID") ?: "",
+                    num_seats = passengerCount,
+                    subtotal = intent.getDoubleExtra("EXTRA_PRICE_PULANG_TOTAL", 0.0),
+                    passengers = listPenumpangPulang
+                )
+                transportDetailsList.add(detailPulang)
+            }
+
+            val sharedPref = getSharedPreferences("USER_SESSION", MODE_PRIVATE)
+            val realUserId = sharedPref.getString("USER_ID", "") ?: ""
+
+            // 6. Bungkus Semua Data Payload
+            val bookingPayload = BookingRequest(
+                user_id = realUserId,
+                booking_code = randomCode,
+                total_amount = grandTotal,
+                tax_amount = tax,
+                payment_method = selectedPaymentMethod,
+                transport_details = transportDetailsList
+            )
+
+            // 7. Ubah Tampilan Tombol (Mencegah Double Click)
+            val btnPay = findViewById<MaterialButton>(R.id.btn_finish_payment)
+            btnPay.isEnabled = false
+            btnPay.text = "Memproses..."
+
+            // 8. KIRIM KE API NODE.JS MENGGUNAKAN RETROFIT
+            ApiClient.instance.createBooking(bookingPayload).enqueue(object : Callback<ResponseBooking> {
+
+                override fun onResponse(call: Call<ResponseBooking>, response: Response<ResponseBooking>) {
+                    btnPay.isEnabled = true
+                    btnPay.text = "Bayar Sekarang"
+
+                    if (response.isSuccessful && response.body() != null) {
+                        val serverMessage = response.body()?.message ?: "Pembayaran Berhasil!"
+                        Toast.makeText(this@PaymentActivity, serverMessage, Toast.LENGTH_SHORT).show()
+
+                        btnPay.text = "Berhasil! Mengalihkan..."
+
+                        // Jeda 2 detik agar user sempat membaca Toast sukses
+                        Handler(Looper.getMainLooper()).postDelayed({
+                            val successIntent = Intent(this@PaymentActivity, PaymentSuccessActivity::class.java)
+                            successIntent.putExtra("EXTRA_BOOKING_CODE", response.body()?.booking_code ?: randomCode)
+                            successIntent.putExtra("EXTRA_PERGI_NAME", pergiName)
+                            successIntent.putExtra("EXTRA_PULANG_NAME", intent.getStringExtra("EXTRA_PULANG_NAME"))
+                            successIntent.putExtra("EXTRA_ORIGIN", origin)
+                            successIntent.putExtra("EXTRA_DESTINATION", destination)
+                            successIntent.putExtra("EXTRA_PASSENGERS", passengerCount)
+                            successIntent.putExtra("EXTRA_IS_RETURN_TRIP", isReturnTrip)
+                            successIntent.putExtra("EXTRA_GRAND_TOTAL", grandTotal)
+
+                            startActivity(successIntent)
+
+                            finish()
+                        }, 2000)
+
+                    } else {
+                        Toast.makeText(this@PaymentActivity, "Gagal: Kursi mungkin sudah habis dipesan.", Toast.LENGTH_LONG).show()
+                    }
+                }
+
+                override fun onFailure(call: Call<ResponseBooking>, t: Throwable) {
+                    btnPay.isEnabled = true
+                    btnPay.text = "Bayar Sekarang"
+                    Toast.makeText(this@PaymentActivity, "Koneksi Bermasalah: ${t.message}", Toast.LENGTH_LONG).show()
+                }
+            })
         }
     }
 }

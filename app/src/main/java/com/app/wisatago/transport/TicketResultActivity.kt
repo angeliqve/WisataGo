@@ -10,10 +10,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.app.wisatago.ApiClient
 import com.app.wisatago.R
+import com.app.wisatago.booking.CheckoutActivity
 import com.google.android.material.chip.Chip
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class TicketResultActivity : AppCompatActivity() {
 
@@ -70,12 +73,19 @@ class TicketResultActivity : AppCompatActivity() {
 
             if (!datePulang.isNullOrEmpty() && !datePulang.contains("DD, 00") && !isReturnTrip) {
                 // TAHAP 1: SIMPAN TIKET PERGI DAN BUKA PENCARIAN TIKET PULANG
-                Toast.makeText(this, "Menyimpan tiket pergi. Silakan pilih tiket pulang!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this,
+                    "Menyimpan tiket pergi. Silakan pilih tiket pulang!",
+                    Toast.LENGTH_SHORT
+                ).show()
 
                 val intentPulang = Intent(this, TicketResultActivity::class.java)
                 intentPulang.putExtra("EXTRA_ORIGIN", destination)
                 intentPulang.putExtra("EXTRA_DESTINATION", origin)
-                intentPulang.putExtra("EXTRA_DATE_PERGI", datePulang) // Jadikan tgl pulang sbg tgl utama pencarian
+                intentPulang.putExtra(
+                    "EXTRA_DATE_PERGI",
+                    datePulang
+                ) // Jadikan tgl pulang sbg tgl utama pencarian
                 intentPulang.putExtra("EXTRA_DATE_PULANG", "")
                 intentPulang.putExtra("EXTRA_IS_RETURN_TRIP", true)
                 intentPulang.putExtra("EXTRA_PASSENGERS", passengerCount)
@@ -87,7 +97,7 @@ class TicketResultActivity : AppCompatActivity() {
                 intentPulang.putExtra("TIKET_PERGI_ARR_TIME", tiketTerpilih.arrival_time)
                 intentPulang.putExtra("TIKET_PERGI_PRICE", tiketTerpilih.price)
                 intentPulang.putExtra("TIKET_PERGI_DATE", datePergi)
-
+                intentPulang.putExtra("TIKET_PERGI_SCHEDULE_ID", tiketTerpilih.ticket_id)
                 startActivity(intentPulang)
 
             } else {
@@ -101,27 +111,63 @@ class TicketResultActivity : AppCompatActivity() {
 
                 if (isReturnTrip) {
                     // 🟢 MENGIRIM TIKET PERGI
-                    intentCheckout.putExtra("EXTRA_PERGI_NAME", intent.getStringExtra("TIKET_PERGI_NAME"))
-                    intentCheckout.putExtra("EXTRA_PERGI_CLASS", intent.getStringExtra("TIKET_PERGI_CLASS"))
-                    intentCheckout.putExtra("EXTRA_PERGI_DEP_TIME", intent.getStringExtra("TIKET_PERGI_DEP_TIME"))
-                    intentCheckout.putExtra("EXTRA_PERGI_ARR_TIME", intent.getStringExtra("TIKET_PERGI_ARR_TIME"))
-                    intentCheckout.putExtra("EXTRA_PERGI_PRICE", intent.getDoubleExtra("TIKET_PERGI_PRICE", 0.0))
-                    intentCheckout.putExtra("EXTRA_PERGI_DATE", intent.getStringExtra("TIKET_PERGI_DATE"))
-                    intentCheckout.putExtra("EXTRA_PERGI_ORIGIN", destination) // Origin tiket pergi = Destination tiket pulang
+                    intentCheckout.putExtra(
+                        "EXTRA_PERGI_NAME",
+                        intent.getStringExtra("TIKET_PERGI_NAME")
+                    )
+                    intentCheckout.putExtra(
+                        "EXTRA_PERGI_SCHEDULE_ID",
+                        intent.getStringExtra("TIKET_PERGI_SCHEDULE_ID")
+                    )
+                    intentCheckout.putExtra(
+                        "EXTRA_PERGI_NAME",
+                        intent.getStringExtra("TIKET_PERGI_NAME")
+                    )
+                    intentCheckout.putExtra(
+                        "EXTRA_PERGI_CLASS",
+                        intent.getStringExtra("TIKET_PERGI_CLASS")
+                    )
+                    intentCheckout.putExtra(
+                        "EXTRA_PERGI_DEP_TIME",
+                        intent.getStringExtra("TIKET_PERGI_DEP_TIME")
+                    )
+                    intentCheckout.putExtra(
+                        "EXTRA_PERGI_ARR_TIME",
+                        intent.getStringExtra("TIKET_PERGI_ARR_TIME")
+                    )
+                    intentCheckout.putExtra(
+                        "EXTRA_PERGI_PRICE",
+                        intent.getDoubleExtra("TIKET_PERGI_PRICE", 0.0)
+                    )
+                    intentCheckout.putExtra(
+                        "EXTRA_PERGI_DATE",
+                        intent.getStringExtra("TIKET_PERGI_DATE")
+                    )
+                    intentCheckout.putExtra(
+                        "EXTRA_PERGI_ORIGIN",
+                        destination
+                    ) // Origin tiket pergi = Destination tiket pulang
                     intentCheckout.putExtra("EXTRA_PERGI_DESTINATION", origin)
 
                     // 🟢 MENGIRIM TIKET PULANG (Yang baru saja diklik)
+                    intentCheckout.putExtra("EXTRA_PULANG_NAME", tiketTerpilih.train_name)
+                    intentCheckout.putExtra("EXTRA_PULANG_SCHEDULE_ID", tiketTerpilih.ticket_id)
                     intentCheckout.putExtra("EXTRA_PULANG_NAME", tiketTerpilih.train_name)
                     intentCheckout.putExtra("EXTRA_PULANG_CLASS", tiketTerpilih.class_type)
                     intentCheckout.putExtra("EXTRA_PULANG_DEP_TIME", tiketTerpilih.departure_time)
                     intentCheckout.putExtra("EXTRA_PULANG_ARR_TIME", tiketTerpilih.arrival_time)
                     intentCheckout.putExtra("EXTRA_PULANG_PRICE", tiketTerpilih.price)
-                    intentCheckout.putExtra("EXTRA_PULANG_DATE", datePergi) // datePergi di hal. ini adalah tgl pulang
+                    intentCheckout.putExtra(
+                        "EXTRA_PULANG_DATE",
+                        datePergi
+                    ) // datePergi di hal. ini adalah tgl pulang
                     intentCheckout.putExtra("EXTRA_PULANG_ORIGIN", origin)
                     intentCheckout.putExtra("EXTRA_PULANG_DESTINATION", destination)
 
                 } else {
                     // 🟢 MENGIRIM TIKET PERGI (SATU ARAH)
+                    intentCheckout.putExtra("EXTRA_PERGI_NAME", tiketTerpilih.train_name)
+                    intentCheckout.putExtra("EXTRA_PERGI_SCHEDULE_ID", tiketTerpilih.ticket_id)
                     intentCheckout.putExtra("EXTRA_PERGI_NAME", tiketTerpilih.train_name)
                     intentCheckout.putExtra("EXTRA_PERGI_CLASS", tiketTerpilih.class_type)
                     intentCheckout.putExtra("EXTRA_PERGI_DEP_TIME", tiketTerpilih.departure_time)
@@ -142,7 +188,8 @@ class TicketResultActivity : AppCompatActivity() {
 
     private fun cariJadwalTiket(asal: String, tujuan: String, tanggalRaw: String) {
         val formatDatabase = konversiTanggalKeFormatDatabase(tanggalRaw)
-        ApiClient.instance.searchTickets(asal, tujuan, formatDatabase).enqueue(object : Callback<List<TicketResponse>> {
+        ApiClient.instance.searchTickets(asal, tujuan, formatDatabase).enqueue(object :
+            Callback<List<TicketResponse>> {
             override fun onResponse(call: Call<List<TicketResponse>>, response: Response<List<TicketResponse>>) {
                 if (response.isSuccessful && response.body() != null) {
                     originalList = response.body()!!
@@ -163,8 +210,8 @@ class TicketResultActivity : AppCompatActivity() {
 
     private fun konversiTanggalKeFormatDatabase(tanggalLokal: String): String {
         return try {
-            val formatInput = java.text.SimpleDateFormat("EEE, dd MMM yyyy", java.util.Locale("id", "ID"))
-            val formatOutput = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US)
+            val formatInput = SimpleDateFormat("EEE, dd MMM yyyy", Locale("id", "ID"))
+            val formatOutput = SimpleDateFormat("yyyy-MM-dd", Locale.US)
             formatOutput.format(formatInput.parse(tanggalLokal)!!)
         } catch (e: Exception) { "" }
     }

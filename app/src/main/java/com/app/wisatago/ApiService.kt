@@ -1,6 +1,8 @@
 package com.app.wisatago
 
 import com.app.wisatago.attraction.Wisata
+import com.app.wisatago.booking.BookingRequest
+import com.app.wisatago.booking.ResponseBooking
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -8,7 +10,7 @@ import retrofit2.http.POST
 import retrofit2.Call
 import retrofit2.http.Query
 
-// Mengundang model dari package transport yang baru Anda buat
+// Mengundang model dari package transport
 import com.app.wisatago.transport.LocationResponse
 import com.app.wisatago.transport.TicketResponse
 import com.app.wisatago.transport.TrainSchedule
@@ -46,4 +48,8 @@ interface ApiService {
         @Query("destination") destination: String,
         @Query("date") date: String
     ): Call<List<TicketResponse>>
+
+    // 🟢 Rute untuk membuat pemesanan baru
+    @POST("/create-booking") // Tambahkan garis miring '/' agar seragam dengan yang atas
+    fun createBooking(@Body request: BookingRequest): Call<ResponseBooking>
 }
