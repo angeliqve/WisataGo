@@ -19,15 +19,12 @@ class Login : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-        // 1. Sinkronisasi ID XML dengan Objek Kotlin
         val etUsername = findViewById<EditText>(R.id.etUsername)
         val etPassword = findViewById<EditText>(R.id.etPassword)
         val btnLogin = findViewById<LinearLayout>(R.id.rl822png1s6q)
 
-        // TARGET: Langsung menembak ke TextView target di activity_login.xml
         val tvSignUpDirect = findViewById<TextView>(R.id.rmbtfuctunlg)
 
-        // 2. Logika eksekusi Otentikasi Masuk
         btnLogin.setOnClickListener {
             val emailInput = etUsername.text.toString().trim()
             val passwordInput = etPassword.text.toString().trim()
@@ -40,7 +37,6 @@ class Login : AppCompatActivity() {
             jalankanFungsiLogin(emailInput, passwordInput)
         }
 
-        // 3. Logika Transisi Halaman ke Sign Up
         tvSignUpDirect.setOnClickListener {
             Log.d("WisataGO_Klik", "SISTEM MENDETEKSI: TextView Berhasil Disentuh!")
             Toast.makeText(this, "Membuka halaman pendaftaran...", Toast.LENGTH_SHORT).show()
@@ -65,15 +61,11 @@ class Login : AppCompatActivity() {
                     if (respon.isSuccessful && respon.body() != null) {
                         val hasilData = respon.body()!!
 
-                        // ========================================================
-                        // 🟢 TAMBAHAN BARU: SIMPAN USER ID KE DALAM MEMORI HP
-                        // ========================================================
                         val sharedPref = getSharedPreferences("USER_SESSION", MODE_PRIVATE)
                         with(sharedPref.edit()) {
-                            putString("USER_ID", hasilData.user_id) // Mengambil ID dari server Node.js
-                            apply() // Simpan secara permanen
+                            putString("USER_ID", hasilData.user_id.toString())
+                            apply()
                         }
-                        // ========================================================
 
                         Toast.makeText(this@Login, "Selamat datang, ${hasilData.full_name}!", Toast.LENGTH_SHORT).show()
 
@@ -88,7 +80,11 @@ class Login : AppCompatActivity() {
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(this@Login, "Gagal terhubung ke server backend", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this@Login,
+                        "ERROR: ${e.message}",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
             }
         }

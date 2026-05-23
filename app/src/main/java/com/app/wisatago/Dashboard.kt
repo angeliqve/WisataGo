@@ -1,4 +1,4 @@
-package com.app.wisatago // Pastikan nama package sesuai dengan proyek Anda
+package com.app.wisatago
 
 import android.os.Bundle
 import android.widget.LinearLayout
@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.app.wisatago.attraction.WisataActivity
 import com.app.wisatago.transport.TrainActivity
 import android.content.Intent
+import android.widget.ImageView
 
 class Dashboard : AppCompatActivity() {
 
@@ -15,20 +16,14 @@ class Dashboard : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dashboard)
 
-        // 1. Inisialisasi Teks & Avatar
         val greetingText = findViewById<TextView>(R.id.greetingText)
 
-        // 2. Inisialisasi Tombol Menu Utama
-        // INI OBATNYA: Sekarang kita menggunakan LinearLayout, BUKAN MaterialCardView lagi!
         val wisataButton = findViewById<LinearLayout>(R.id.wisataButton)
         val transportButton = findViewById<LinearLayout>(R.id.transportButton)
+        val btnProfile = findViewById<ImageView>(R.id.btnProfile)
 
-        // 3. Inisialisasi Search Bar
         val searchBar = findViewById<LinearLayout>(R.id.searchBarContainer)
 
-        // ==========================================
-        // LOGIKA PENYAPAAN USER (Dari Login)
-        // ==========================================
         val username = intent.getStringExtra("USERNAME_KEY")
 
         if (!username.isNullOrEmpty()) {
@@ -37,19 +32,12 @@ class Dashboard : AppCompatActivity() {
             greetingText.text = "Halo, User! Mau liburan ke mana?"
         }
 
-        // ==========================================
-        // AKSI KLIK (ON CLICK LISTENER)
-        // ==========================================
-
         wisataButton.setOnClickListener {
-            // 🟢 Pindah ke menu Wisata
-            // Catatan: Ganti "WisataActivity" jika nama file halaman wisatamu berbeda!
             val intent = Intent(this, WisataActivity::class.java)
             startActivity(intent)
         }
 
         transportButton.setOnClickListener {
-            // 🟢 Pindah ke menu Transportasi (TrainActivity)
             val intent = Intent(this, TrainActivity::class.java)
             startActivity(intent)
         }
@@ -58,5 +46,9 @@ class Dashboard : AppCompatActivity() {
             Toast.makeText(this, "Membuka pencarian...", Toast.LENGTH_SHORT).show()
         }
 
+        btnProfile.setOnClickListener {
+            val intent = Intent(this, Profile::class.java)
+            startActivity(intent)
+        }
     }
 }

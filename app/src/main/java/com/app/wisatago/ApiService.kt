@@ -52,4 +52,9 @@ interface ApiService {
     // 🟢 Rute untuk membuat pemesanan baru
     @POST("/create-booking") // Tambahkan garis miring '/' agar seragam dengan yang atas
     fun createBooking(@Body request: BookingRequest): Call<ResponseBooking>
+
+    @GET("/profile")
+    suspend fun getProfile(
+        @Query("user_id") userId: String
+    ): Response<ProfileResponse>
 }
