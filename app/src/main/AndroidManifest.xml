@@ -46,6 +46,9 @@
             android:name=".Profile"
             android:exported="false"
             />
+        <activity android:name=".InformasiAkun"
+            android:exported="false"
+            />
         <activity
             android:name=".SplashActivity"
             android:exported="true"

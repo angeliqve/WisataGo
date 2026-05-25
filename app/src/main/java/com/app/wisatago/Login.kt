@@ -63,7 +63,12 @@ class Login : AppCompatActivity() {
 
                         val sharedPref = getSharedPreferences("USER_SESSION", MODE_PRIVATE)
                         with(sharedPref.edit()) {
-                            putString("USER_ID", hasilData.user_id.toString())
+
+                            putString("USER_ID", hasilData.user_id)
+                            putString("FULL_NAME", hasilData.full_name)
+                            putString("EMAIL", email)
+                            putString("ROLE", hasilData.role)
+
                             apply()
                         }
 

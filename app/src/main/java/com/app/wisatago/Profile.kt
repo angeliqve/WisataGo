@@ -21,6 +21,8 @@ class Profile : AppCompatActivity() {
     private lateinit var btnPemesanan: ImageView
     private lateinit var btnLogout: LinearLayout
 
+    private lateinit var btnInformasiAkun: LinearLayout
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
@@ -31,6 +33,7 @@ class Profile : AppCompatActivity() {
         btnHome = findViewById(R.id.btnHome)
         btnPemesanan = findViewById(R.id.btnPemesanan)
         btnLogout = findViewById(R.id.btnLogout)
+        btnInformasiAkun = findViewById(R.id.btnInformasiAkun)
 
         val sharedPref = getSharedPreferences("USER_SESSION", MODE_PRIVATE)
         val userId = sharedPref.getString("USER_ID", null)
@@ -58,6 +61,12 @@ class Profile : AppCompatActivity() {
             val intent = Intent(this, Login::class.java)
             startActivity(intent)
             finish()
+        }
+
+        val btnInformasiAkun = findViewById<LinearLayout>(R.id.btnInformasiAkun)
+
+        btnInformasiAkun.setOnClickListener {
+            startActivity(Intent(this, InformasiAkun::class.java))
         }
     }
 

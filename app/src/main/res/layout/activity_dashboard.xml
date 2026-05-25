@@ -566,7 +566,7 @@
 
             <TextView
                 android:id="@+id/tvProfile"
-                android:textColor="#FFFFFF"
+                android:textColor="#0A4181"
                 android:textSize="10sp"
                 android:textStyle="bold"
                 android:layout_height="wrap_content"
