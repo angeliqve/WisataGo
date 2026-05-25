@@ -54,13 +54,21 @@ class Profile : AppCompatActivity() {
 
         btnLogout.setOnClickListener {
 
-            sharedPref.edit().clear().apply()
+            androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Logout")
+                .setMessage("Yakin ingin logout dari akun?")
+                .setPositiveButton("Ya") { _, _ ->
 
-            Toast.makeText(this, "Logout berhasil", Toast.LENGTH_SHORT).show()
+                    sharedPref.edit().clear().apply()
 
-            val intent = Intent(this, Login::class.java)
-            startActivity(intent)
-            finish()
+                    Toast.makeText(this, "Logout berhasil", Toast.LENGTH_SHORT).show()
+
+                    val intent = Intent(this, Login::class.java)
+                    startActivity(intent)
+                    finish()
+                }
+                .setNegativeButton("Batal", null)
+                .show()
         }
 
         val btnInformasiAkun = findViewById<LinearLayout>(R.id.btnInformasiAkun)
