@@ -22,6 +22,7 @@ class Profile : AppCompatActivity() {
     private lateinit var btnLogout: LinearLayout
 
     private lateinit var btnInformasiAkun: LinearLayout
+    private lateinit var btnBantuan: LinearLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,6 +35,7 @@ class Profile : AppCompatActivity() {
         btnPemesanan = findViewById(R.id.btnPemesanan)
         btnLogout = findViewById(R.id.btnLogout)
         btnInformasiAkun = findViewById(R.id.btnInformasiAkun)
+        btnBantuan = findViewById(R.id.btnBantuan)
 
         val sharedPref = getSharedPreferences("USER_SESSION", MODE_PRIVATE)
         val userId = sharedPref.getString("USER_ID", null)
@@ -69,6 +71,10 @@ class Profile : AppCompatActivity() {
                 }
                 .setNegativeButton("Batal", null)
                 .show()
+        }
+
+        btnBantuan.setOnClickListener {
+            startActivity(Intent(this, BantuanPanduan::class.java))
         }
 
         val btnInformasiAkun = findViewById<LinearLayout>(R.id.btnInformasiAkun)
