@@ -40,7 +40,6 @@ class BusActivity : AppCompatActivity() {
         val btnSwapLocation = findViewById<View>(R.id.btnSwapLocation)
         val btnBack = findViewById<View>(R.id.btnBack)
 
-        // Tab navigasi
         val tabKereta = findViewById<TextView>(R.id.tabKereta)
         val tabPesawat = findViewById<TextView>(R.id.tabPesawat)
         val tabBus = findViewById<TextView>(R.id.tabBus)
@@ -59,7 +58,6 @@ class BusActivity : AppCompatActivity() {
 
         btnBack.setOnClickListener { finish() }
 
-        // Navigasi Tab
         tabKereta.setOnClickListener {
             startActivity(Intent(this, TrainActivity::class.java))
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
@@ -69,7 +67,6 @@ class BusActivity : AppCompatActivity() {
             Toast.makeText(this, "Fitur Pesawat akan segera hadir", Toast.LENGTH_SHORT).show()
         }
 
-        // Kota Asal
         containerOrigin.setOnClickListener {
             AlertDialog.Builder(this)
                 .setTitle("Pilih Kota Asal")
@@ -79,7 +76,6 @@ class BusActivity : AppCompatActivity() {
                 .show()
         }
 
-        // Kota Tujuan
         containerDestination.setOnClickListener {
             AlertDialog.Builder(this)
                 .setTitle("Pilih Kota Tujuan")
@@ -149,7 +145,6 @@ class BusActivity : AppCompatActivity() {
             val tanggalPulang = tvTanggalPulang.text.toString().trim()
             val teksPenumpang = tvPassengers.text.toString().trim()
 
-            // Validasi Asal dan Tujuan
             if (asal.contains("Pilih") || tujuan.contains("Pilih") || asal.isEmpty() || tujuan.isEmpty()) {
                 Toast.makeText(this, "Harap pilih kota asal dan tujuan!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
@@ -160,7 +155,6 @@ class BusActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            // Validasi Tanggal
             if (tanggalPergi.isEmpty() || tanggalPergi.contains("Pilih") || tanggalPergi.contains("DD, 00")) {
                 Toast.makeText(this, "Harap pilih tanggal keberangkatan!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
@@ -175,12 +169,11 @@ class BusActivity : AppCompatActivity() {
 
             val jumlahPenumpang = teksPenumpang.split(" ")[0].toIntOrNull() ?: 1
 
-            // Ambil hanya nama kota (tanpa nama terminal) untuk dikirim ke API
             val asalKota = asal.split(" - ")[0].trim()
             val tujuanKota = tujuan.split(" - ")[0].trim()
 
             val intent = Intent(this, TicketResultActivity::class.java)
-            intent.putExtra("EXTRA_TRANSPORT_TYPE", "bus")
+            intent.putExtra("EXTRA_TRANSPORT_TYPE", "bus")  // 🔥 SUDAH ADA
             intent.putExtra("EXTRA_ORIGIN", asalKota)
             intent.putExtra("EXTRA_DESTINATION", tujuanKota)
             intent.putExtra("EXTRA_DATE_PERGI", tanggalPergi)

@@ -10,7 +10,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.app.wisatago.R
-import com.app.wisatago.transport.TicketResultActivity
 import com.google.android.material.switchmaterial.SwitchMaterial
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -28,7 +27,6 @@ class TrainActivity : AppCompatActivity() {
         val tvTanggalPulang = findViewById<TextView>(R.id.tv_tanggal_pulang)
         val switchPulangPergi = findViewById<SwitchMaterial>(R.id.switch_pulang_pergi)
 
-        // Variabel ini namanya tvPassengers
         val btnSelectPassengers = findViewById<LinearLayout>(R.id.btnSelectPassengers)
         val tvPassengers = findViewById<TextView>(R.id.tvPassengers)
 
@@ -42,7 +40,6 @@ class TrainActivity : AppCompatActivity() {
         val btnSwapLocation = findViewById<View>(R.id.btnSwapLocation)
         val btnBack = findViewById<View>(R.id.btnBack)
 
-        // Inisialisasi Tab
         val tabKereta = findViewById<TextView>(R.id.tabKereta)
         val tabBus = findViewById<TextView>(R.id.tabBus)
 
@@ -52,9 +49,7 @@ class TrainActivity : AppCompatActivity() {
 
         val daftarStasiun = arrayOf("Gambir (GMR)", "Bandung (BD)","Cirebon (CN)", "Surabaya Pasar Turi (SGU)", "Tugu (YK)", "Semarang Tawang (SMT)")
 
-        btnBack.setOnClickListener {
-            finish()
-        }
+        btnBack.setOnClickListener { finish() }
 
         containerOrigin.setOnClickListener {
             AlertDialog.Builder(this)
@@ -129,7 +124,6 @@ class TrainActivity : AppCompatActivity() {
                 .show()
         }
 
-         // Saat tab Bus diklik, pindah ke BusActivity
         tabBus.setOnClickListener {
             val intent = Intent(this, BusActivity::class.java)
             startActivity(intent)
@@ -141,11 +135,8 @@ class TrainActivity : AppCompatActivity() {
             val tujuan = tvDestination.text.toString().trim()
             val tanggalPergi = tvTanggalPergi.text.toString().trim()
             val tanggalPulang = tvTanggalPulang.text.toString().trim()
-
-            // 🟢 PERBAIKAN 1: Panggil tvPassengers, bukan tvJumlahPenumpang
             val teksPenumpang = tvPassengers.text.toString().trim()
 
-            // Validasi Asal dan Tujuan
             if (asal.contains("Pilih") || tujuan.contains("Pilih") || asal.isEmpty() || tujuan.isEmpty()) {
                 Toast.makeText(this, "Harap pilih lokasi asal dan tujuan!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
@@ -156,7 +147,6 @@ class TrainActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            // Validasi Tanggal
             if (tanggalPergi.isEmpty() || tanggalPergi.contains("Pilih") || tanggalPergi.contains("DD, 00")) {
                 Toast.makeText(this, "Harap pilih tanggal keberangkatan!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
@@ -169,10 +159,10 @@ class TrainActivity : AppCompatActivity() {
                 }
             }
 
-            // Memecah teks "2 Dewasa" menjadi angka 2
             val jumlahPenumpang = teksPenumpang.split(" ")[0].toIntOrNull() ?: 1
 
             val intent = Intent(this, TicketResultActivity::class.java)
+            intent.putExtra("EXTRA_TRANSPORT_TYPE", "train")
             intent.putExtra("EXTRA_ORIGIN", asal)
             intent.putExtra("EXTRA_DESTINATION", tujuan)
             intent.putExtra("EXTRA_DATE_PERGI", tanggalPergi)

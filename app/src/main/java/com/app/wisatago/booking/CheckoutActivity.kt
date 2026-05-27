@@ -36,7 +36,7 @@ class CheckoutActivity : AppCompatActivity() {
         val pergiPrice = intent.getDoubleExtra("EXTRA_PERGI_PRICE", 0.0)
         val pergiScheduleId = intent.getStringExtra("EXTRA_PERGI_SCHEDULE_ID") ?: ""
 
-        // 🟢 TAMBAHAN: Untuk Bus (bisa custom icon atau title)
+        // Untuk Bus (bisa custom icon atau title)
         val transportIcon = when {
             transportType.contains("Bus", ignoreCase = true) -> "🚌"
             transportType.contains("Kereta", ignoreCase = true) -> "🚆"
