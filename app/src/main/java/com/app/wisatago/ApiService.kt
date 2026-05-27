@@ -14,6 +14,7 @@ import retrofit2.http.Query
 import com.app.wisatago.transport.LocationResponse
 import com.app.wisatago.transport.TicketResponse
 import com.app.wisatago.transport.TrainSchedule
+import com.app.wisatago.transport.BusSchedule  // 🟢 TAMBAHKAN IMPORT BUS
 
 interface ApiService {
     // Menghubungkan langsung ke app.post('/login') di Node.js
@@ -41,7 +42,7 @@ interface ApiService {
         @Query("destination") destination: String
     ): Call<List<TrainSchedule>>
 
-    // Rute untuk mencari tiket berdasarkan Asal dan Tujuan
+    // Rute untuk mencari tiket KERETA berdasarkan Asal, Tujuan, dan Tanggal
     @GET("/search-tickets")
     fun searchTickets(
         @Query("origin") origin: String,
@@ -49,8 +50,22 @@ interface ApiService {
         @Query("date") date: String
     ): Call<List<TicketResponse>>
 
+    // Rute untuk mencari jadwal BUS berdasarkan Asal, Tujuan, dan Tanggal
+    @GET("/bus/schedules")
+    fun searchBusSchedules(
+        @Query("origin") origin: String,
+        @Query("destination") destination: String,
+        @Query("date") date: String
+    ): Call<List<BusSchedule>>
+
+    // Rute untuk mendapatkan detail jadwal BUS berdasarkan schedule_id
+    @GET("/bus/detail")
+    fun getBusDetail(
+        @Query("schedule_id") scheduleId: String
+    ): Call<BusSchedule>
+
     // 🟢 Rute untuk membuat pemesanan baru
-    @POST("/create-booking") // Tambahkan garis miring '/' agar seragam dengan yang atas
+    @POST("/create-booking")
     fun createBooking(@Body request: BookingRequest): Call<ResponseBooking>
 
     @GET("/profile")

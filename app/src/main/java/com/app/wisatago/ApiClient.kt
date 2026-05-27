@@ -10,7 +10,7 @@ object ApiClient {
     val instance: ApiService by lazy {
         Retrofit.Builder()
             .baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create()) // Mengurus konversi JSON otomatis
+            .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(ApiService::class.java)
     }

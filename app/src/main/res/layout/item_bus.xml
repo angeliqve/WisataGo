@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginVertical="8dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="2dp"
+    app:strokeWidth="0dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="16dp">
+
+        <View
+            android:id="@+id/view_header_bus"
+            android:layout_width="match_parent"
+            android:layout_height="65dp"
+            android:background="#00A3FF"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_bus_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="12dp"
+            android:text="Nama Bus"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_company_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="PO. Sinar Jaya"
+            android:textColor="#E0E0E0"
+            android:textSize="12sp"
+            app:layout_constraintStart_toStartOf="@id/tv_bus_name"
+            app:layout_constraintTop_toBottomOf="@id/tv_bus_name" />
+
+        <TextView
+            android:id="@+id/tv_class_type"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="16dp"
+            android:background="#33FFFFFF"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="4dp"
+            android:text="Ekonomi"
+            android:textColor="#FFFFFF"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_departure_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="20dp"
+            android:text="00:00"
+            android:textColor="#212121"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/view_header_bus" />
+
+        <TextView
+            android:id="@+id/tv_arrow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:text="➔"
+            android:textColor="#757575"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="@id/tv_departure_time"
+            app:layout_constraintStart_toEndOf="@id/tv_departure_time"
+            app:layout_constraintTop_toTopOf="@id/tv_departure_time" />
+
+        <TextView
+            android:id="@+id/tv_arrival_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:text="00:00"
+            android:textColor="#212121"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/tv_departure_time"
+            app:layout_constraintStart_toEndOf="@id/tv_arrow"
+            app:layout_constraintTop_toTopOf="@id/tv_departure_time" />
+
+        <TextView
+            android:id="@+id/tv_seat_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:text="Tersedia"
+            android:textColor="#4CAF50"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/tv_departure_time"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tv_departure_time" />
+
+        <TextView
+            android:id="@+id/tv_next_day"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="+1 hari"
+            android:textColor="#FF9800"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:visibility="gone"
+            app:layout_constraintBottom_toTopOf="@id/tv_arrow"
+            app:layout_constraintEnd_toEndOf="@id/tv_arrow"
+            app:layout_constraintStart_toStartOf="@id/tv_arrow" />
+
+        <TextView
+            android:id="@+id/tv_duration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0j 0m"
+            android:textColor="#9E9E9E"
+            android:textSize="10sp"
+            app:layout_constraintEnd_toEndOf="@id/tv_arrow"
+            app:layout_constraintStart_toStartOf="@id/tv_arrow"
+            app:layout_constraintTop_toBottomOf="@id/tv_arrow" />
+
+        <TextView
+            android:id="@+id/tv_bus_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Rp 0"
+            android:textColor="#FF5722"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="@id/tv_departure_time"
+            app:layout_constraintTop_toBottomOf="@id/tv_departure_time" />
+
+        <TextView
+            android:id="@+id/tv_per_seat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:text="/ orang"
+            android:textColor="#757575"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="@id/tv_bus_price"
+            app:layout_constraintStart_toEndOf="@id/tv_bus_price" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_pesan_item"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:text="Pesan"
+            android:textAllCaps="false"
+            android:textSize="12sp"
+            android:backgroundTint="#FF9800"
+            app:cornerRadius="8dp"
+            app:layout_constraintBottom_toBottomOf="@id/tv_bus_price"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tv_bus_price" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

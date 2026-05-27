@@ -31,6 +31,13 @@
             android:name=".transport.TrainActivity"
             android:exported="false" />
         <activity
+            android:name=".transport.BusActivity"
+            android:exported="false" />
+        <activity
+            android:name=".transport.BusResultActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".attraction.WisataActivity"
             android:exported="false" />
         <activity
@@ -44,21 +51,19 @@
             android:exported="false" />
         <activity
             android:name=".Profile"
-            android:exported="false"
-            />
-        <activity android:name=".InformasiAkun"
-            android:exported="false"
-            />
-        <activity android:name=".BantuanPanduan"
-            android:exported="false"
-            />
+            android:exported="false" />
+        <activity
+            android:name=".InformasiAkun"
+            android:exported="false" />
+        <activity
+            android:name=".BantuanPanduan"
+            android:exported="false" />
         <activity
             android:name=".SplashActivity"
             android:exported="true"
             android:theme="@style/Theme.WisataGo">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

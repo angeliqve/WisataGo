@@ -10,17 +10,16 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.app.wisatago.R
-import com.app.wisatago.transport.TicketResultActivity
 import com.google.android.material.switchmaterial.SwitchMaterial
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
-class TrainActivity : AppCompatActivity() {
+class BusActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_train)
+        setContentView(R.layout.activity_bus)
 
         val btnTanggalPergi = findViewById<View>(R.id.btn_tanggal_pergi)
         val btnTanggalPulang = findViewById<View>(R.id.btn_tanggal_pulang)
@@ -28,7 +27,6 @@ class TrainActivity : AppCompatActivity() {
         val tvTanggalPulang = findViewById<TextView>(R.id.tv_tanggal_pulang)
         val switchPulangPergi = findViewById<SwitchMaterial>(R.id.switch_pulang_pergi)
 
-        // Variabel ini namanya tvPassengers
         val btnSelectPassengers = findViewById<LinearLayout>(R.id.btnSelectPassengers)
         val tvPassengers = findViewById<TextView>(R.id.tvPassengers)
 
@@ -42,34 +40,51 @@ class TrainActivity : AppCompatActivity() {
         val btnSwapLocation = findViewById<View>(R.id.btnSwapLocation)
         val btnBack = findViewById<View>(R.id.btnBack)
 
-        // Inisialisasi Tab
+        // Tab navigasi
         val tabKereta = findViewById<TextView>(R.id.tabKereta)
+        val tabPesawat = findViewById<TextView>(R.id.tabPesawat)
         val tabBus = findViewById<TextView>(R.id.tabBus)
 
         val calendarPergi = Calendar.getInstance()
         val calendarPulang = Calendar.getInstance()
         val dateFormat = SimpleDateFormat("EEE, dd MMM yyyy", Locale("id", "ID"))
 
-        val daftarStasiun = arrayOf("Gambir (GMR)", "Bandung (BD)","Cirebon (CN)", "Surabaya Pasar Turi (SGU)", "Tugu (YK)", "Semarang Tawang (SMT)")
+        val daftarKotaBus = arrayOf(
+            "Jakarta - Terminal Pulo Gebang",
+            "Surabaya - Terminal Purabaya (Bungurasih)",
+            "Yogyakarta - Terminal Giwangan",
+            "Cirebon - Terminal Harjamukti",
+            "Denpasar - Terminal Mengwi"
+        )
 
-        btnBack.setOnClickListener {
+        btnBack.setOnClickListener { finish() }
+
+        // Navigasi Tab
+        tabKereta.setOnClickListener {
+            startActivity(Intent(this, TrainActivity::class.java))
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
             finish()
         }
+        tabPesawat.setOnClickListener {
+            Toast.makeText(this, "Fitur Pesawat akan segera hadir", Toast.LENGTH_SHORT).show()
+        }
 
+        // Kota Asal
         containerOrigin.setOnClickListener {
             AlertDialog.Builder(this)
-                .setTitle("Pilih Stasiun Asal")
-                .setItems(daftarStasiun) { _, which ->
-                    tvOrigin.text = daftarStasiun[which]
+                .setTitle("Pilih Kota Asal")
+                .setItems(daftarKotaBus) { _, which ->
+                    tvOrigin.text = daftarKotaBus[which]
                 }
                 .show()
         }
 
+        // Kota Tujuan
         containerDestination.setOnClickListener {
             AlertDialog.Builder(this)
-                .setTitle("Pilih Stasiun Tujuan")
-                .setItems(daftarStasiun) { _, which ->
-                    tvDestination.text = daftarStasiun[which]
+                .setTitle("Pilih Kota Tujuan")
+                .setItems(daftarKotaBus) { _, which ->
+                    tvDestination.text = daftarKotaBus[which]
                 }
                 .show()
         }
@@ -96,10 +111,8 @@ class TrainActivity : AppCompatActivity() {
         }
 
         switchPulangPergi.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                btnTanggalPulang.visibility = View.VISIBLE
-            } else {
-                btnTanggalPulang.visibility = View.GONE
+            btnTanggalPulang.visibility = if (isChecked) View.VISIBLE else View.GONE
+            if (!isChecked) {
                 tvTanggalPulang.text = "DD, 00 0000 0000"
             }
         }
@@ -120,7 +133,7 @@ class TrainActivity : AppCompatActivity() {
         }
 
         btnSelectPassengers.setOnClickListener {
-            val opsiPenumpang = arrayOf("1 Dewasa", "2 Dewasa", "3 Dewasa", "4 Dewasa")
+            val opsiPenumpang = arrayOf("1 Dewasa", "2 Dewasa", "3 Dewasa", "4 Dewasa", "5 Dewasa")
             AlertDialog.Builder(this)
                 .setTitle("Pilih Jumlah Penumpang")
                 .setItems(opsiPenumpang) { _, which ->
@@ -129,30 +142,21 @@ class TrainActivity : AppCompatActivity() {
                 .show()
         }
 
-         // Saat tab Bus diklik, pindah ke BusActivity
-        tabBus.setOnClickListener {
-            val intent = Intent(this, BusActivity::class.java)
-            startActivity(intent)
-            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
-        }
-
         btnCariTiket.setOnClickListener {
             val asal = tvOrigin.text.toString().trim()
             val tujuan = tvDestination.text.toString().trim()
             val tanggalPergi = tvTanggalPergi.text.toString().trim()
             val tanggalPulang = tvTanggalPulang.text.toString().trim()
-
-            // 🟢 PERBAIKAN 1: Panggil tvPassengers, bukan tvJumlahPenumpang
             val teksPenumpang = tvPassengers.text.toString().trim()
 
             // Validasi Asal dan Tujuan
             if (asal.contains("Pilih") || tujuan.contains("Pilih") || asal.isEmpty() || tujuan.isEmpty()) {
-                Toast.makeText(this, "Harap pilih lokasi asal dan tujuan!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Harap pilih kota asal dan tujuan!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
             if (asal == tujuan) {
-                Toast.makeText(this, "Lokasi asal dan tujuan tidak boleh sama!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Kota asal dan tujuan tidak boleh sama!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
@@ -169,12 +173,16 @@ class TrainActivity : AppCompatActivity() {
                 }
             }
 
-            // Memecah teks "2 Dewasa" menjadi angka 2
             val jumlahPenumpang = teksPenumpang.split(" ")[0].toIntOrNull() ?: 1
 
+            // Ambil hanya nama kota (tanpa nama terminal) untuk dikirim ke API
+            val asalKota = asal.split(" - ")[0].trim()
+            val tujuanKota = tujuan.split(" - ")[0].trim()
+
             val intent = Intent(this, TicketResultActivity::class.java)
-            intent.putExtra("EXTRA_ORIGIN", asal)
-            intent.putExtra("EXTRA_DESTINATION", tujuan)
+            intent.putExtra("EXTRA_TRANSPORT_TYPE", "bus")
+            intent.putExtra("EXTRA_ORIGIN", asalKota)
+            intent.putExtra("EXTRA_DESTINATION", tujuanKota)
             intent.putExtra("EXTRA_DATE_PERGI", tanggalPergi)
 
             if (switchPulangPergi.isChecked) {
@@ -182,7 +190,6 @@ class TrainActivity : AppCompatActivity() {
             }
 
             intent.putExtra("EXTRA_PASSENGERS", jumlahPenumpang)
-
             startActivity(intent)
         }
     }

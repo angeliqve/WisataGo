@@ -25,7 +25,7 @@ class CheckoutActivity : AppCompatActivity() {
         val passengerCount = intent.getIntExtra("EXTRA_PASSENGERS", 1)
         val isReturnTrip = intent.getBooleanExtra("EXTRA_IS_RETURN_TRIP", false)
 
-        // 1. DATA TIKET PERGI
+        // 1. DATA TIKET PERGI (Support Kereta & Bus)
         val pergiName = intent.getStringExtra("EXTRA_PERGI_NAME") ?: "Nama Armada"
         val pergiClass = intent.getStringExtra("EXTRA_PERGI_CLASS") ?: "Kelas"
         val pergiOrigin = intent.getStringExtra("EXTRA_PERGI_ORIGIN") ?: ""
@@ -34,9 +34,18 @@ class CheckoutActivity : AppCompatActivity() {
         val pergiDep = intent.getStringExtra("EXTRA_PERGI_DEP_TIME") ?: "00:00"
         val pergiArr = intent.getStringExtra("EXTRA_PERGI_ARR_TIME") ?: "00:00"
         val pergiPrice = intent.getDoubleExtra("EXTRA_PERGI_PRICE", 0.0)
+        val pergiScheduleId = intent.getStringExtra("EXTRA_PERGI_SCHEDULE_ID") ?: ""
 
-        // Set UI Tiket Pergi
-        findViewById<TextView>(R.id.tv_co_transport_type_pergi).text = "Tiket Pergi"
+        // 🟢 TAMBAHAN: Untuk Bus (bisa custom icon atau title)
+        val transportIcon = when {
+            transportType.contains("Bus", ignoreCase = true) -> "🚌"
+            transportType.contains("Kereta", ignoreCase = true) -> "🚆"
+            transportType.contains("Pesawat", ignoreCase = true) -> "✈️"
+            else -> "🎫"
+        }
+
+        // Set UI Tiket Pergi dengan icon transportasi
+        findViewById<TextView>(R.id.tv_co_transport_type_pergi).text = "$transportIcon Tiket Pergi"
         findViewById<TextView>(R.id.tv_co_transport_name_pergi).text = pergiName
         findViewById<TextView>(R.id.tv_co_class_pergi).text = pergiClass
         findViewById<TextView>(R.id.tv_co_route_pergi).text = "$pergiOrigin ➔ $pergiDest"
@@ -48,10 +57,10 @@ class CheckoutActivity : AppCompatActivity() {
         val seatsPergi = generateRandomSeatsList(passengerCount)
         findViewById<TextView>(R.id.tv_co_seats_pergi).text = "Kursi: ${seatsPergi.joinToString(", ")}"
 
-        // 2. DATA TIKET PULANG (Jika Ada)
+        // 2. DATA TIKET PULANG (Jika Ada) - Support Bus juga
         var totalTicketPricePerPerson = pergiPrice
-
         var seatsPulang: List<String> = emptyList()
+        var pulangScheduleId = ""
 
         if (isReturnTrip) {
             findViewById<View>(R.id.card_tiket_pulang).visibility = View.VISIBLE
@@ -64,10 +73,11 @@ class CheckoutActivity : AppCompatActivity() {
             val pulangDep = intent.getStringExtra("EXTRA_PULANG_DEP_TIME") ?: "00:00"
             val pulangArr = intent.getStringExtra("EXTRA_PULANG_ARR_TIME") ?: "00:00"
             val pulangPrice = intent.getDoubleExtra("EXTRA_PULANG_PRICE", 0.0)
+            pulangScheduleId = intent.getStringExtra("EXTRA_PULANG_SCHEDULE_ID") ?: ""
 
-            totalTicketPricePerPerson += pulangPrice // Gabungkan harga 1 orang (Pergi + Pulang)
+            totalTicketPricePerPerson += pulangPrice
 
-            // Set UI Tiket Pulang
+            // Set UI Tiket Pulang dengan icon transportasi
             findViewById<TextView>(R.id.tv_co_transport_name_pulang).text = pulangName
             findViewById<TextView>(R.id.tv_co_class_pulang).text = pulangClass
             findViewById<TextView>(R.id.tv_co_route_pulang).text = "$pulangOrigin ➔ $pulangDest"
@@ -88,11 +98,9 @@ class CheckoutActivity : AppCompatActivity() {
             assignedNames.add(baseNames[i % baseNames.size])
         }
 
-
         val llPassengerContainer = findViewById<LinearLayout>(R.id.ll_passenger_container)
         llPassengerContainer.removeAllViews()
 
-        // Daftar list untuk menampung referensi EditText agar bisa di-sync
         val listEtPergi = mutableListOf<EditText>()
         val listEtPulang = mutableListOf<EditText>()
 
@@ -103,24 +111,21 @@ class CheckoutActivity : AppCompatActivity() {
             val tvTitle = formView.findViewById<TextView>(R.id.tv_passenger_title)
             val etName = formView.findViewById<EditText>(R.id.et_passenger_name)
 
-            // Logika untuk menentukan apakah ini form untuk perjalanan Pulang
             val isPulang = isReturnTrip && i >= passengerCount
             val tripLabel = if (isPulang) "Pulang" else "Pergi"
 
-            // Mengambil nomor kursi yang tepat
             val seatNumber = if (isPulang) {
                 seatsPulang[i % passengerCount]
             } else {
                 seatsPergi[i]
             }
 
-            // Set judul formulir
-            tvTitle.text = "Penumpang ${ (i % passengerCount) + 1 } ($tripLabel) - Kursi: $seatNumber"
+            // Tambahkan icon transportasi di judul form
+            val tripIcon = if (isPulang) "🔁" else transportIcon
+            tvTitle.text = "$tripIcon Penumpang ${(i % passengerCount) + 1} ($tripLabel) - Kursi: $seatNumber"
 
-            // Masukkan nama acak
             etName.setText(assignedNames[i % passengerCount])
 
-            // Simpan referensi ke list untuk keperluan sinkronisasi
             if (isPulang) {
                 listEtPulang.add(etName)
             } else {
@@ -130,41 +135,26 @@ class CheckoutActivity : AppCompatActivity() {
             llPassengerContainer.addView(formView)
         }
 
-        // Jika tiket PP, setiap ketikan di form Pergi akan mengupdate form Pulang
+        // Sinkronisasi nama penumpang PP
         if (isReturnTrip) {
-            // Kita pastikan jumlah list sama
             val minSize = minOf(listEtPergi.size, listEtPulang.size)
-
             for (i in 0 until minSize) {
                 val etPergi = listEtPergi[i]
                 val etPulang = listEtPulang[i]
 
                 etPergi.addTextChangedListener(object : TextWatcher {
-                    override fun beforeTextChanged(
-                        s: CharSequence?,
-                        start: Int,
-                        count: Int,
-                        after: Int
-                    ) {
-                    }
-
-                    override fun onTextChanged(
-                        s: CharSequence?,
-                        start: Int,
-                        before: Int,
-                        count: Int
-                    ) {
-                        // Saat teks di tiket pergi berubah, langsung update tiket pulang
+                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                         if (etPulang.text.toString() != s.toString()) {
                             etPulang.setText(s.toString())
                         }
                     }
-
                     override fun afterTextChanged(s: Editable?) {}
                 })
             }
         }
-        // 4. KALKULASI TOTAL BIAYA KESELURUHAN
+
+        // 4. KALKULASI TOTAL BIAYA
         val subTotal = totalTicketPricePerPerson * passengerCount
         val tax = subTotal * 0.12
         val totalAll = subTotal + tax
@@ -174,22 +164,22 @@ class CheckoutActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.tv_co_tax).text = "Rp ${formatter.format(tax)}"
         findViewById<TextView>(R.id.tv_co_total_all).text = "Rp ${formatter.format(totalAll)}"
 
-        // 5. TOMBOL
+        // 5. TOMBOL BACK
         findViewById<ImageButton>(R.id.btn_back_checkout).setOnClickListener { finish() }
 
+        // 6. TOMBOL BAYAR
         findViewById<MaterialButton>(R.id.btn_co_pay).setOnClickListener {
             val paymentIntent = Intent(this, PaymentActivity::class.java)
 
-            // 🟢 TAMBAHKAN BARIS INI: Kirim tipe transportasi ke PaymentActivity
+            // Kirim tipe transportasi
             paymentIntent.putExtra("EXTRA_TRANSPORT_TYPE", transportType)
 
-            // 🟢 AMBIL NAMA & KURSI PENUMPANG DARI FORMULIR
+            // Ambil nama penumpang dari form
             val daftarNamaPenumpang = ArrayList<String>()
             val daftarKursiPergi = ArrayList<String>()
             val daftarKursiPulang = ArrayList<String>()
 
             for (i in 0 until passengerCount) {
-                // Ambil teks asli yang diketik user di EditText
                 val nama = listEtPergi[i].text.toString().ifEmpty { "Penumpang ${i + 1}" }
                 daftarNamaPenumpang.add(nama)
                 daftarKursiPergi.add(seatsPergi[i])
@@ -199,17 +189,14 @@ class CheckoutActivity : AppCompatActivity() {
                 }
             }
 
-            // Kirim daftar nama dan kursi ke PaymentActivity
+            // Kirim data ke PaymentActivity
             paymentIntent.putStringArrayListExtra("EXTRA_PASSENGER_NAMES", daftarNamaPenumpang)
             paymentIntent.putStringArrayListExtra("EXTRA_SEATS_PERGI", daftarKursiPergi)
-            if (isReturnTrip) paymentIntent.putStringArrayListExtra("EXTRA_SEATS_PULANG", daftarKursiPulang)
+            if (isReturnTrip) {
+                paymentIntent.putStringArrayListExtra("EXTRA_SEATS_PULANG", daftarKursiPulang)
+            }
 
-            // Kirim Identitas Perjalanan Utama
-            paymentIntent.putExtra("EXTRA_TRANSPORT_TYPE", transportType)
-            paymentIntent.putExtra("EXTRA_PERGI_NAME", pergiName)
-
-            // 🟢 TAMBAHKAN INI: Tangkap dan lempar ID Pergi
-            val pergiScheduleId = intent.getStringExtra("EXTRA_PERGI_SCHEDULE_ID") ?: ""
+            // Kirim identitas perjalanan
             paymentIntent.putExtra("EXTRA_PERGI_SCHEDULE_ID", pergiScheduleId)
             paymentIntent.putExtra("EXTRA_PERGI_NAME", pergiName)
             paymentIntent.putExtra("EXTRA_ORIGIN", pergiOrigin)
@@ -225,14 +212,13 @@ class CheckoutActivity : AppCompatActivity() {
                 val pulangName = intent.getStringExtra("EXTRA_PULANG_NAME") ?: ""
                 val pulangPrice = intent.getDoubleExtra("EXTRA_PULANG_PRICE", 0.0)
                 val totalPulang = pulangPrice * passengerCount
-                val pulangScheduleId = intent.getStringExtra("EXTRA_PULANG_SCHEDULE_ID") ?: ""
 
                 paymentIntent.putExtra("EXTRA_PULANG_SCHEDULE_ID", pulangScheduleId)
                 paymentIntent.putExtra("EXTRA_PULANG_NAME", pulangName)
                 paymentIntent.putExtra("EXTRA_PRICE_PULANG_TOTAL", totalPulang)
             }
 
-            // Kirim Rincian Total Keseluruhan
+            // Kirim rincian total
             paymentIntent.putExtra("EXTRA_SUBTOTAL", subTotal)
             paymentIntent.putExtra("EXTRA_TAX", tax)
             paymentIntent.putExtra("EXTRA_GRAND_TOTAL", totalAll)
