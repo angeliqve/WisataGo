@@ -1,10 +1,14 @@
 package com.app.wisatago
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.os.Bundle
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -15,6 +19,8 @@ import java.util.Locale
 class InformasiAkun : AppCompatActivity() {
 
     private lateinit var btnBack: ImageView
+    private lateinit var btnCopyId: ImageView
+    private lateinit var btnChangePasswordMenu: MaterialButton
 
     private lateinit var tvUserName: TextView
     private lateinit var tvUserEmail: TextView
@@ -22,71 +28,58 @@ class InformasiAkun : AppCompatActivity() {
     private lateinit var tvUserId: TextView
     private lateinit var tvFullName: TextView
     private lateinit var tvEmail: TextView
-    private lateinit var tvRole: TextView
-    private lateinit var tvPassword: TextView
-    private lateinit var btnShowPassword: ImageView
     private lateinit var tvCreatedAt: TextView
-
-    private var isPasswordVisible = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_informasi_akun)
 
-        btnBack = findViewById(R.id.btnBack)
-
         tvUserName = findViewById(R.id.tvUserName)
         tvUserEmail = findViewById(R.id.tvUserEmail)
-
         tvUserId = findViewById(R.id.tvUserId)
         tvFullName = findViewById(R.id.tvFullName)
         tvEmail = findViewById(R.id.tvEmail)
-        tvRole = findViewById(R.id.tvRole)
         tvCreatedAt = findViewById(R.id.tvCreatedAt)
+
+        btnBack = findViewById(R.id.btnBack)
+        btnCopyId = findViewById(R.id.btnCopyId)
+        btnChangePasswordMenu = findViewById(R.id.btnChangePasswordMenu)
 
         val sharedPref = getSharedPreferences("USER_SESSION", MODE_PRIVATE)
         val userId = sharedPref.getString("USER_ID", null)
 
         if (userId != null) {
             ambilDataUser(userId)
+        } else {
+            Toast.makeText(this, "Sesi habis, silakan login kembali", Toast.LENGTH_SHORT).show()
         }
 
         btnBack.setOnClickListener {
             finish()
         }
 
-        tvPassword = findViewById(R.id.tvPassword)
-        btnShowPassword = findViewById(R.id.btnShowPassword)
-
-        btnShowPassword.setOnClickListener {
-
-            if (isPasswordVisible) {
-
-                tvPassword.text = "••••••••"
-
-                isPasswordVisible = false
-
-            } else {
-
-                tvPassword.text = "password123"
-
-                isPasswordVisible = true
+        btnCopyId.setOnClickListener {
+            val textToCopy = tvUserId.text.toString()
+            if (textToCopy.isNotEmpty() && textToCopy != "UUID USER") {
+                val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                val clip = ClipData.newPlainText("User ID WisataGO", textToCopy)
+                clipboard.setPrimaryClip(clip)
+                Toast.makeText(this, "User ID berhasil disalin!", Toast.LENGTH_SHORT).show()
             }
+        }
+
+        btnChangePasswordMenu.setOnClickListener {
+            Toast.makeText(this, "Fitur Ubah Password sedang dikembangkan", Toast.LENGTH_SHORT).show()
         }
     }
 
     private fun ambilDataUser(userId: String) {
-
         CoroutineScope(Dispatchers.IO).launch {
-
             try {
-
                 val response = ApiClient.instance.getProfile(userId)
 
                 withContext(Dispatchers.Main) {
-
                     if (response.isSuccessful && response.body() != null) {
-
                         val user = response.body()!!
 
                         tvUserId.text = user.user_id.toString()
@@ -96,14 +89,11 @@ class InformasiAkun : AppCompatActivity() {
                         tvEmail.text = user.email
                         tvUserEmail.text = user.email
 
-                        tvRole.text = user.role ?: "user"
-
                         try {
                             val parser = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
                             val formatter = SimpleDateFormat("dd MMMM yyyy", Locale("id", "ID"))
 
                             val date = parser.parse(user.created_at)
-
                             tvCreatedAt.text = formatter.format(date!!)
 
                         } catch (e: Exception) {
@@ -111,7 +101,6 @@ class InformasiAkun : AppCompatActivity() {
                         }
 
                     } else {
-
                         Toast.makeText(
                             this@InformasiAkun,
                             "Gagal mengambil data",
@@ -121,9 +110,7 @@ class InformasiAkun : AppCompatActivity() {
                 }
 
             } catch (e: Exception) {
-
                 withContext(Dispatchers.Main) {
-
                     Toast.makeText(
                         this@InformasiAkun,
                         "Error: ${e.message}",

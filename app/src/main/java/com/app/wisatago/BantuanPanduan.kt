@@ -21,23 +21,22 @@ class BantuanPanduan : AppCompatActivity() {
         btnCall = findViewById(R.id.btnCall)
         btnEmail = findViewById(R.id.btnEmail)
 
+        // Kembali ke halaman sebelumnya (Profil)
         btnBack.setOnClickListener {
             finish()
         }
 
         btnCall.setOnClickListener {
-
-            val intent = Intent(Intent.ACTION_DIAL)
-            intent.data = Uri.parse("tel:+6281234567890")
-
+            val intent = Intent(Intent.ACTION_DIAL).apply {
+                data = Uri.parse("tel:+6281234567890")
+            }
             startActivity(intent)
         }
 
         btnEmail.setOnClickListener {
-
-            val intent = Intent(Intent.ACTION_SENDTO)
-            intent.data = Uri.parse("mailto:support@wisatago.com")
-
+            val intent = Intent(Intent.ACTION_SENDTO).apply {
+                data = Uri.parse("mailto:support@wisatago.com")
+            }
             startActivity(intent)
         }
     }

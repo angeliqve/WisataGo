@@ -1,368 +1,323 @@
-<LinearLayout
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="#FFFFFF"
-    android:orientation="vertical"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#F8FAFC"
+    tools:context=".Profile">
 
-    <ScrollView
-        android:id="@+id/scrollProfile"
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:background="#FFFFFF">
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@id/layoutNavbar"
+        app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <LinearLayout
-                android:id="@+id/layoutHeader"
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="#2DA0F5"
-                android:paddingVertical="25dp"
-                android:paddingLeft="30dp"
-                android:layout_marginBottom="37dp"
-                android:orientation="vertical">
+                android:paddingHorizontal="24dp"
+                android:paddingTop="32dp"
+                android:paddingBottom="40dp">
 
                 <TextView
                     android:id="@+id/tvTitleProfile"
-                    android:textColor="#FFFFFF"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:layout_height="wrap_content"
                     android:layout_width="wrap_content"
-                    android:text="Profil Saya"/>
-            </LinearLayout>
+                    android:layout_height="wrap_content"
+                    android:text="Profil Saya"
+                    android:textColor="#FFFFFF"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-            <LinearLayout
-                android:id="@+id/layoutUserProfile"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="33dp"
-                android:layout_marginStart="30dp"
-                android:orientation="horizontal">
-
-                <ImageView
+                <com.google.android.material.imageview.ShapeableImageView
                     android:id="@+id/imgProfile"
-                    android:layout_width="88dp"
-                    android:layout_height="88dp"
-                    android:layout_marginEnd="15dp"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_marginTop="24dp"
+                    android:scaleType="centerCrop"
                     android:src="@drawable/avatar_placeholder"
-                    android:scaleType="fitXY"/>
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tvTitleProfile"
+                    app:shapeAppearanceOverlay="@style/CircleImageView" />
 
                 <LinearLayout
-                    android:id="@+id/layoutProfileInfo"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:paddingRight="2dp"
-                    android:orientation="vertical">
+                    android:layout_marginStart="16dp"
+                    android:orientation="vertical"
+                    app:layout_constraintBottom_toBottomOf="@id/imgProfile"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/imgProfile"
+                    app:layout_constraintTop_toTopOf="@id/imgProfile">
 
                     <TextView
                         android:id="@+id/tvUserName"
-                        android:textColor="#0294F2"
-                        android:textSize="20sp"
-                        android:textStyle="bold"
-                        android:layout_height="wrap_content"
                         android:layout_width="wrap_content"
-                        android:text="User Ke Satu"/>
+                        android:layout_height="wrap_content"
+                        android:text="User Ke Satu"
+                        android:textColor="#FFFFFF"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/tvUserEmail"
-                        android:textColor="#0061CC"
-                        android:textSize="14sp"
-                        android:layout_marginBottom="10dp"
-                        android:layout_marginStart="2dp"
-                        android:layout_height="wrap_content"
                         android:layout_width="wrap_content"
-                        android:text="userke1@gmail.com"/>
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="userke1@gmail.com"
+                        android:textColor="#E0F2FE"
+                        android:textSize="14sp" />
 
-                    <LinearLayout
+                    <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnEditProfile"
+                        style="@style/Widget.Material3.Button.TextButton"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/bg_login2"
-                        android:paddingVertical="3dp"
-                        android:paddingLeft="8dp"
-                        android:paddingRight="31dp"
-                        android:layout_marginStart="1dp"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:orientation="vertical">
+                        android:layout_height="32dp"
+                        android:layout_marginTop="8dp"
+                        android:backgroundTint="#FFFFFF"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:paddingHorizontal="12dp"
+                        android:text="Edit Profile"
+                        android:textColor="#2DA0F5"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        app:cornerRadius="8dp" />
+                </LinearLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
-                        <TextView
-                            android:id="@+id/tvEditProfile"
-                            android:textColor="#FFFFFF"
-                            android:textSize="14sp"
-                            android:layout_height="wrap_content"
-                            android:layout_width="wrap_content"
-                            android:text="Edit Profile"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="-20dp"
+                android:background="@drawable/bg_profile_content"
+                android:orientation="vertical"
+                android:paddingHorizontal="20dp"
+                android:paddingTop="24dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Pengaturan"
+                    android:textColor="#64748B"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="24dp"
+                    app:cardBackgroundColor="#FFFFFF"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="6dp"
+                    app:cardUseCompatPadding="true"
+                    app:strokeWidth="0dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="8dp">
+
+                        <LinearLayout
+                            android:id="@+id/btnInformasiAkun"
+                            android:layout_width="match_parent"
+                            android:layout_height="56dp"
+                            android:background="?attr/selectableItemBackground"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center_vertical"
+                            android:paddingHorizontal="12dp">
+
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/icon_informasiakun"
+                                app:tint="#2DA0F5" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="16dp"
+                                android:layout_weight="1"
+                                android:text="Informasi Akun"
+                                android:textColor="#1E293B"
+                                android:textSize="15sp" />
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:src="@drawable/icon_arrowright"
+                                app:tint="#94A3B8" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/layoutSuara"
+                            android:layout_width="match_parent"
+                            android:layout_height="56dp"
+                            android:gravity="center_vertical"
+                            android:paddingHorizontal="12dp">
+
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/icon_suaradanefek"
+                                app:tint="#2DA0F5" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="16dp"
+                                android:layout_weight="1"
+                                android:text="Suara &amp; Efek"
+                                android:textColor="#1E293B"
+                                android:textSize="15sp" />
+
+                            <androidx.appcompat.widget.SwitchCompat
+                                android:id="@+id/switchSuara"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/layoutNotifikasi"
+                            android:layout_width="match_parent"
+                            android:layout_height="56dp"
+                            android:gravity="center_vertical"
+                            android:paddingHorizontal="12dp">
+
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/icon_notifikasi"
+                                app:tint="#2DA0F5" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="16dp"
+                                android:layout_weight="1"
+                                android:text="Notifikasi"
+                                android:textColor="#1E293B"
+                                android:textSize="15sp" />
+
+                            <androidx.appcompat.widget.SwitchCompat
+                                android:id="@+id/switchNotifikasi"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="" />
+                        </LinearLayout>
                     </LinearLayout>
-                </LinearLayout>
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/layoutPengaturan"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/bg_login2"
-                android:paddingVertical="21dp"
-                android:paddingRight="18dp"
-                android:layout_marginBottom="28dp"
-                android:layout_marginHorizontal="30dp"
-                android:orientation="vertical">
+                </com.google.android.material.card.MaterialCardView>
 
                 <TextView
-                    android:id="@+id/tvPengaturan"
-                    android:textColor="#FFFFFF"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="10dp"
-                    android:layout_marginStart="25dp"
-                    android:layout_height="wrap_content"
-                    android:layout_width="wrap_content"
-                    android:text="Pengaturan"/>
-
-                <LinearLayout
-                    android:id="@+id/linePengaturan"
-                    android:layout_width="match_parent"
-                    android:layout_height="2dp"
-                    android:background="#FFFFFF"
-                    android:layout_marginBottom="12dp"
-                    android:layout_marginStart="18dp"/>
-
-                <LinearLayout
-                    android:id="@+id/btnInformasiAkun"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:layout_marginBottom="18dp"
-                    android:layout_marginStart="25dp"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:id="@+id/imgInformasiAkun"
-                        android:layout_width="25dp"
-                        android:layout_height="25dp"
-                        android:layout_marginEnd="10dp"
-                        android:src="@drawable/icon_informasiakun"
-                        android:scaleType="fitXY"/>
-
-                    <TextView
-                        android:id="@+id/tvInformasiAkun"
-                        android:textColor="#FFFFFF"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:layout_height="wrap_content"
-                        android:layout_width="wrap_content"
-                        android:text="Informasi Akun"/>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"/>
-
-                    <ImageView
-                        android:id="@+id/imgArrowInformasi"
-                        android:layout_width="12dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/icon_arrowright"
-                        android:scaleType="fitXY"/>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/layoutSuara"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:layout_marginBottom="15dp"
-                    android:layout_marginStart="26dp"
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:id="@+id/imgSuara"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_marginEnd="10dp"
-                        android:src="@drawable/icon_suaradanefek"
-                        android:scaleType="fitXY"/>
-
-                    <TextView
-                        android:id="@+id/tvSuara"
-                        android:textColor="#FFFFFF"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:layout_height="wrap_content"
-                        android:layout_width="wrap_content"
-                        android:text="Suara &amp; Efek"/>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"/>
-
-                    <ImageView
-                        android:id="@+id/btnSwitchSuara"
-                        android:layout_width="44dp"
-                        android:layout_height="22dp"
-                        android:src="@drawable/button_switch"
-                        android:scaleType="fitXY"/>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/layoutNotifikasi"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:layout_marginStart="23dp"
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:id="@+id/imgNotifikasi"
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
-                        android:layout_marginEnd="9dp"
-                        android:src="@drawable/icon_notifikasi"
-                        android:scaleType="fitXY"/>
-
-                    <TextView
-                        android:id="@+id/tvNotifikasi"
-                        android:textColor="#FFFFFF"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:layout_height="wrap_content"
-                        android:layout_width="wrap_content"
-                        android:text="Notifikasi"/>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"/>
-
-                    <ImageView
-                        android:id="@+id/btnSwitchNotifikasi"
-                        android:layout_width="44dp"
-                        android:layout_height="22dp"
-                        android:src="@drawable/button_switch"
-                        android:scaleType="fitXY"/>
-                </LinearLayout>
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/layoutLainnya"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/bg_login2"
-                android:paddingVertical="22dp"
-                android:paddingRight="18dp"
-                android:layout_marginBottom="209dp"
-                android:layout_marginHorizontal="30dp"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/tvLainnya"
-                    android:textColor="#FFFFFF"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="11dp"
-                    android:layout_marginStart="25dp"
-                    android:layout_height="wrap_content"
-                    android:layout_width="wrap_content"
-                    android:text="Lainnya"/>
-
-                <LinearLayout
-                    android:id="@+id/lineLainnya"
-                    android:layout_width="match_parent"
-                    android:layout_height="2dp"
-                    android:background="#FFFFFF"
-                    android:layout_marginBottom="12dp"
-                    android:layout_marginStart="18dp"/>
-
-                <LinearLayout
-                    android:id="@+id/btnBantuan"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:layout_marginBottom="17dp"
-                    android:layout_marginStart="24dp"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:id="@+id/imgBantuan"
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
-                        android:layout_marginEnd="8dp"
-                        android:src="@drawable/icon_bantuan"
-                        android:scaleType="fitXY"/>
-
-                    <TextView
-                        android:id="@+id/tvBantuan"
-                        android:textColor="#FFFFFF"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:layout_height="wrap_content"
-                        android:layout_width="wrap_content"
-                        android:text="Bantuan &amp; Panduan"/>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"/>
-
-                    <ImageView
-                        android:id="@+id/imgArrowBantuan"
-                        android:layout_width="12dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/icon_arrowright"
-                        android:scaleType="fitXY"/>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/btnLogout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:layout_marginStart="25dp"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:orientation="horizontal">
+                    android:text="Lainnya"
+                    android:textColor="#64748B"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
 
-                    <ImageView
-                        android:id="@+id/imgLogout"
-                        android:layout_width="26dp"
-                        android:layout_height="26dp"
-                        android:layout_marginEnd="9dp"
-                        android:src="@drawable/icon_logout"
-                        android:scaleType="fitXY"/>
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="32dp"
+                    app:cardBackgroundColor="#FFFFFF"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="6dp"
+                    app:cardUseCompatPadding="true"
+                    app:strokeWidth="0dp">
 
-                    <TextView
-                        android:id="@+id/tvLogout"
-                        android:textColor="#FFFFFF"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_width="wrap_content"
-                        android:text="Logout"/>
-                </LinearLayout>
+                        android:orientation="vertical"
+                        android:padding="8dp">
+
+                        <LinearLayout
+                            android:id="@+id/btnBantuan"
+                            android:layout_width="match_parent"
+                            android:layout_height="56dp"
+                            android:background="?attr/selectableItemBackground"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center_vertical"
+                            android:paddingHorizontal="12dp">
+
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/icon_bantuan"
+                                app:tint="#2DA0F5" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="16dp"
+                                android:layout_weight="1"
+                                android:text="Bantuan &amp; Panduan"
+                                android:textColor="#1E293B"
+                                android:textSize="15sp" />
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:src="@drawable/icon_arrowright"
+                                app:tint="#94A3B8" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/btnLogout"
+                            android:layout_width="match_parent"
+                            android:layout_height="56dp"
+                            android:background="?attr/selectableItemBackground"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center_vertical"
+                            android:paddingHorizontal="12dp">
+
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/icon_logout"
+                                app:tint="#EF4444" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="16dp"
+                                android:layout_weight="1"
+                                android:text="Logout"
+                                android:textColor="#EF4444"
+                                android:textSize="15sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
+
     <LinearLayout
         android:id="@+id/layoutNavbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/bg_navbar"
         android:paddingBottom="20dp"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent">
 
         <LinearLayout
             android:id="@+id/layoutIndicator"
@@ -466,4 +421,5 @@
                 android:text="Profil"/>
         </LinearLayout>
     </LinearLayout>
-</LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
