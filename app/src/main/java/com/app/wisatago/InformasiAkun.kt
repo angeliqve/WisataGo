@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.CoroutineScope
@@ -69,7 +70,9 @@ class InformasiAkun : AppCompatActivity() {
         }
 
         btnChangePasswordMenu.setOnClickListener {
-            Toast.makeText(this, "Fitur Ubah Password sedang dikembangkan", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, UbahPassword::class.java)
+            startActivity(intent)
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
         }
     }
 

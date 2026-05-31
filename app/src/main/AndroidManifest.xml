@@ -58,6 +58,11 @@
         <activity
             android:name=".BantuanPanduan"
             android:exported="false" />
+        <activity android:name=".UbahPassword"
+            android:exported="false" />
+        <activity
+            android:name=".EditProfile"
+            android:exported="false" />
         <activity
             android:name=".SplashActivity"
             android:exported="true"

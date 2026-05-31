@@ -19,7 +19,8 @@ data class ProfileResponse(
     val full_name: String,
     val email: String,
     val role: String?,
-    val created_at: String?
+    val created_at: String?,
+    val phone_number: String?
 )
 // Struktur data yang akan dikirim ke Node.js saat mendaftar
 data class SignUpRequest(

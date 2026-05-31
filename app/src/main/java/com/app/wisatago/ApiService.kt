@@ -72,4 +72,14 @@ interface ApiService {
     suspend fun getProfile(
         @Query("user_id") userId: String
     ): Response<ProfileResponse>
+
+    @POST("/update-password")
+    fun updatePassword(
+        @Body request: Map<String, String>
+    ): Call<okhttp3.ResponseBody>
+
+    @retrofit2.http.PUT("/update-profile")
+    fun updateProfile(
+        @Body request: Map<String, String>
+    ): Call<okhttp3.ResponseBody>
 }

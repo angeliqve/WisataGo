@@ -75,6 +75,12 @@ class Profile : AppCompatActivity() {
             startActivity(Intent(this, BantuanPanduan::class.java))
         }
 
+        btnEditProfile.setOnClickListener {
+            val intent = Intent(this, EditProfile::class.java)
+            startActivity(intent)
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
+        }
+
         switchSuara.setOnCheckedChangeListener { _, isChecked ->
             val status = if (isChecked) "Aktif" else "Nonaktif"
             Toast.makeText(this, "Suara $status", Toast.LENGTH_SHORT).show()
