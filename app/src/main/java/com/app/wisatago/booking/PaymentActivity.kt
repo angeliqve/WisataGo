@@ -69,6 +69,7 @@ class PaymentActivity : AppCompatActivity() {
         } else {
             layoutPergi.visibility = View.VISIBLE
             findViewById<TextView>(R.id.tv_label_pay_pergi).text = "Tiket Pergi (x$passengerCount)"
+            val displayPricePergi = pricePergiTotal * 1.12
             findViewById<TextView>(R.id.tv_pay_price_pergi).text = "Rp ${formatter.format(pricePergiTotal)}"
 
             if (isReturnTrip) {
@@ -81,6 +82,7 @@ class PaymentActivity : AppCompatActivity() {
 
                 layoutPulang.visibility = View.VISIBLE
                 findViewById<TextView>(R.id.tv_label_pay_pulang).text = "Tiket Pulang (x$passengerCount)"
+                val displayPricePulang = pricePulangTotal * 1.12
                 findViewById<TextView>(R.id.tv_pay_price_pulang).text = "Rp ${formatter.format(pricePulangTotal)}"
             } else {
                 tvTransportName.text = pergiName
@@ -169,7 +171,7 @@ class PaymentActivity : AppCompatActivity() {
                     AttractionDetailRequest(
                         attraction_id = wisataId,
                         num_tickets = ticketQty,
-                        subtotal = subTotal
+                        subtotal = grandTotal
                     )
                 )
             } else {
@@ -188,6 +190,7 @@ class PaymentActivity : AppCompatActivity() {
                 }
 
                 transportDetailsList.add(
+
                     TransportDetailRequest(
                         schedule_id = intent.getStringExtra("EXTRA_PERGI_SCHEDULE_ID") ?: "",
                         num_seats = passengerCount,
