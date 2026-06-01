@@ -79,17 +79,17 @@
 
                     <TextView
                         android:id="@+id/tv_pay_transport_name"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
                         android:textColor="#212121"
                         android:textSize="18sp"
                         android:textStyle="bold"
-                        tools:text="Argo Parahyangan &amp; Turangga" />
+                        tools:text="Dunia Fantasi (Dufan)" />
 
                     <TextView
                         android:id="@+id/tv_pay_route_summary"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
                         android:lineSpacingExtra="4dp"
@@ -127,6 +127,7 @@
                         android:background="#E9ECEF" />
 
                     <RelativeLayout
+                        android:id="@+id/layout_pay_pergi"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
                         <TextView
@@ -178,6 +179,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
                         <TextView
+                            android:id="@+id/tv_label_pay_subtotal"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Total Harga Tiket"
@@ -209,27 +211,6 @@
                             tools:text="Rp 37.800" />
                     </RelativeLayout>
 
-                    <RelativeLayout
-                        android:id="@+id/layout_pay_discount"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:visibility="gone">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Potongan Promo"
-                            android:textColor="#4CAF50" />
-                        <TextView
-                            android:id="@+id/tv_pay_discount"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true"
-                            android:textColor="#4CAF50"
-                            android:textStyle="bold"
-                            tools:text="- Rp 50.000" />
-                    </RelativeLayout>
-
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
@@ -257,16 +238,6 @@
                             tools:text="Rp 352.800" />
                     </RelativeLayout>
                 </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="1dp"
-                app:strokeColor="#E9ECEF"
-                app:strokeWidth="1dp">
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView

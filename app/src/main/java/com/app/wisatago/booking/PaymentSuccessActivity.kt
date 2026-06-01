@@ -19,23 +19,30 @@ class PaymentSuccessActivity : AppCompatActivity() {
         setContentView(R.layout.activity_payment_success)
 
         // =========================================================================
-        // 1. TANGKAP DATA ASLI DARI INTENT (Harus sama persis dengan PaymentActivity)
+        // 1. TANGKAP DATA ASLI DARI INTENT
         // =========================================================================
         val bookingCode = intent.getStringExtra("EXTRA_BOOKING_CODE") ?: "TR-000000"
         val pergiName = intent.getStringExtra("EXTRA_PERGI_NAME") ?: "Tiket Transportasi"
         val pulangName = intent.getStringExtra("EXTRA_PULANG_NAME") ?: ""
         val origin = intent.getStringExtra("EXTRA_ORIGIN") ?: "Asal"
         val dest = intent.getStringExtra("EXTRA_DESTINATION") ?: "Tujuan"
-        val passengerCount = intent.getIntExtra("EXTRA_PASSENGERS", 1)
         val isReturnTrip = intent.getBooleanExtra("EXTRA_IS_RETURN_TRIP", false)
         val grandTotal = intent.getDoubleExtra("EXTRA_GRAND_TOTAL", 0.0)
 
+        // Ambil jumlah (Bisa berupa jumlah tiket wisata ATAU jumlah penumpang transportasi)
+        val qty = intent.getIntExtra("EXTRA_TICKET_QTY", intent.getIntExtra("EXTRA_PASSENGERS", 1))
+
         // =========================================================================
-        // 2. RANGKAI NAMA DAN DETAIL RUTE
+        // 2. RANGKAI NAMA DAN DETAIL RUTE SECARA DINAMIS
         // =========================================================================
-        val transportName = if (isReturnTrip && pulangName.isNotEmpty()) "$pergiName & $pulangName" else pergiName
-        val tripType = if (isReturnTrip) "Pulang Pergi" else "Sekali Jalan"
-        val detailPesanan = "$transportName\n$origin ➔ $dest\n($tripType • $passengerCount Penumpang)"
+        // Jika data Asal/Tujuan masih "Asal" (default) atau kosong, berarti ini transaksi Wisata
+        val detailPesanan = if (origin == "Asal" || origin.isEmpty()) {
+            "$pergiName\n($qty Tiket)"
+        } else {
+            val transportName = if (isReturnTrip && pulangName.isNotEmpty()) "$pergiName & $pulangName" else pergiName
+            val tripType = if (isReturnTrip) "Pulang Pergi" else "Sekali Jalan"
+            "$transportName\n$origin ➔ $dest\n($tripType • $qty Penumpang)"
+        }
 
         // 3. FORMAT HARGA RUPIAH
         val formatter = NumberFormat.getNumberInstance(Locale("id", "ID"))
@@ -49,10 +56,7 @@ class PaymentSuccessActivity : AppCompatActivity() {
         // 5. SET SEMUA TEKS KE LAYAR
         // =========================================================================
         findViewById<TextView>(R.id.tv_success_date_time).text = currentDateAndTime
-
-        // 🟢 Sekarang kita menggunakan bookingCode dari server, bukan WGO acak lagi!
         findViewById<TextView>(R.id.tv_booking_code).text = bookingCode
-
         findViewById<TextView>(R.id.tv_success_transport_name).text = detailPesanan
         findViewById<TextView>(R.id.tv_success_total_price).text = formattedPrice
 

@@ -8,36 +8,42 @@
     android:orientation="vertical"
     android:background="#F5F7FA">
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#2DA0F5"
-        android:paddingTop="40dp"
-        android:paddingBottom="20dp"
-        android:paddingHorizontal="16dp">
+        android:orientation="vertical"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp">
 
-        <ImageView
-            android:id="@+id/btnBackWisata"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:layout_centerVertical="true"
-            android:src="@android:drawable/ic_menu_revert"
-            app:tint="#FFFFFF"
-            android:clickable="true"
-            android:focusable="true"/>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:paddingHorizontal="16dp">
 
-        <TextView
-            android:id="@+id/tvTitleWisata"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toEndOf="@id/btnBackWisata"
-            android:layout_marginStart="16dp"
-            android:layout_centerVertical="true"
-            android:text="Wisata"
-            android:textColor="#FFFFFF"
-            android:textSize="20sp"
-            android:textStyle="bold"/>
-    </RelativeLayout>
+            <ImageView
+                android:id="@+id/btnBackWisata"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_back_white"
+                app:tint="#FFFFFF"
+                android:clickable="true"
+                android:focusable="true"/>
+
+            <TextView
+                android:id="@+id/tvTitleWisata"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="16dp"
+                android:layout_toEndOf="@id/btnBackWisata"
+                android:text="Wisata"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp"
+                android:textStyle="bold"/>
+        </RelativeLayout>
+    </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvWisata"

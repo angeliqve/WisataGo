@@ -34,7 +34,13 @@ class WisataAdapter(
         holder.tvNama.text = wisata.attractionName
         holder.tvHarga.text = formatRupiah.format(wisata.ticketPrice)
 
-        holder.btnPesan.setOnClickListener { onPesanClick(wisata) }
+        holder.btnPesan.setOnClickListener {
+            val intent = android.content.Intent(holder.itemView.context, WisataOrderActivity::class.java)
+            intent.putExtra("EXTRA_WISATA_ID", wisata.attractionId) // Sesuaikan dengan properti di model Wisata
+            intent.putExtra("EXTRA_WISATA_NAME", wisata.attractionName)
+            intent.putExtra("EXTRA_WISATA_PRICE", wisata.ticketPrice)
+            holder.itemView.context.startActivity(intent)
+        }
     }
 
     override fun getItemCount(): Int = listWisata.size

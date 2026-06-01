@@ -30,11 +30,12 @@ class WisataActivity : AppCompatActivity() {
 
         // Inisialisasi awal dengan list kosong agar RecyclerView tidak skip layout saat memuat halaman
         adapter = WisataAdapter(emptyList()) { wisataTerpilih ->
-            Toast.makeText(
-                this,
-                "Membuka pemesanan untuk: ${wisataTerpilih.attractionName}",
-                Toast.LENGTH_SHORT
-            ).show()
+            // Mengarahkan ke form pesanan dan membawa data wisata yang dipilih
+            val intent = android.content.Intent(this, WisataOrderActivity::class.java)
+            intent.putExtra("EXTRA_WISATA_ID", wisataTerpilih.attractionId)
+            intent.putExtra("EXTRA_WISATA_NAME", wisataTerpilih.attractionName)
+            intent.putExtra("EXTRA_WISATA_PRICE", wisataTerpilih.ticketPrice)
+            startActivity(intent)
         }
         rvWisata.adapter = adapter
 

@@ -34,12 +34,15 @@
             android:name=".transport.BusActivity"
             android:exported="false" />
         <activity
-            android:name=".transport.BusResultActivity"
-            android:exported="false" />
-
-        <activity
             android:name=".attraction.WisataActivity"
             android:exported="false" />
+        <activity
+            android:name=".attraction.WisataOrderActivity"
+            android:exported="false" />
+        <activity
+            android:name=".attraction.CheckoutWisataActivity"
+            android:exported="false" />
+
         <activity
             android:name=".Dashboard"
             android:exported="false" />

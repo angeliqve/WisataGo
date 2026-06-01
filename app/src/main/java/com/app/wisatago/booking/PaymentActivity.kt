@@ -33,6 +33,8 @@ class PaymentActivity : AppCompatActivity() {
 
         // 1. AMBIL DATA DARI CHECKOUT
         val transportType = intent.getStringExtra("EXTRA_TRANSPORT_TYPE") ?: ""
+        val transactionType = intent.getStringExtra("EXTRA_TRANSACTION_TYPE") ?: transportType
+
         val pergiName = intent.getStringExtra("EXTRA_PERGI_NAME") ?: "Nama Armada"
         val origin = intent.getStringExtra("EXTRA_ORIGIN") ?: ""
         val destination = intent.getStringExtra("EXTRA_DESTINATION") ?: ""
@@ -49,25 +51,47 @@ class PaymentActivity : AppCompatActivity() {
         // 2. SET DATA KE TAMPILAN
         val tvTransportName = findViewById<TextView>(R.id.tv_pay_transport_name)
         val tvRouteSummary = findViewById<TextView>(R.id.tv_pay_route_summary)
+        val layoutPergi = findViewById<RelativeLayout>(R.id.layout_pay_pergi)
         val layoutPulang = findViewById<RelativeLayout>(R.id.layout_pay_pulang)
+        val tvLabelSubtotal = findViewById<TextView>(R.id.tv_label_pay_subtotal)
 
-        findViewById<TextView>(R.id.tv_label_pay_pergi).text = "Tiket Pergi (x$passengerCount)"
-        findViewById<TextView>(R.id.tv_pay_price_pergi).text = "Rp ${formatter.format(pricePergiTotal)}"
+        if (transactionType == "WISATA") {
+            // TAMPILAN KHUSUS WISATA
+            val wisataName = intent.getStringExtra("EXTRA_WISATA_NAME") ?: "Wisata"
+            val ticketQty = intent.getIntExtra("EXTRA_TICKET_QTY", 1)
 
-        if (isReturnTrip) {
-            val pulangName = intent.getStringExtra("EXTRA_PULANG_NAME") ?: ""
-            val pricePulangTotal = intent.getDoubleExtra("EXTRA_PRICE_PULANG_TOTAL", 0.0)
+            tvTransportName.text = wisataName
+            tvRouteSummary.visibility = View.GONE
 
-            tvTransportName.text = "$pergiName & $pulangName"
-            tvRouteSummary.text = "$origin ➔ $destination\nPulang Pergi • $passengerCount Penumpang"
-
-            layoutPulang.visibility = View.VISIBLE
-            findViewById<TextView>(R.id.tv_label_pay_pulang).text = "Tiket Pulang (x$passengerCount)"
-            findViewById<TextView>(R.id.tv_pay_price_pulang).text = "Rp ${formatter.format(pricePulangTotal)}"
-        } else {
-            tvTransportName.text = pergiName
-            tvRouteSummary.text = "$origin ➔ $destination\nSekali Jalan • $passengerCount Penumpang"
+            layoutPergi.visibility = View.GONE
             layoutPulang.visibility = View.GONE
+
+            tvLabelSubtotal.text = "Harga Tiket (x$ticketQty)"
+
+        } else {
+            // TAMPILAN KHUSUS TRANSPORTASI
+            layoutPergi.visibility = View.VISIBLE
+            findViewById<TextView>(R.id.tv_label_pay_pergi).text = "Tiket Pergi (x$passengerCount)"
+            findViewById<TextView>(R.id.tv_pay_price_pergi).text = "Rp ${formatter.format(pricePergiTotal)}"
+
+            if (isReturnTrip) {
+                val pulangName = intent.getStringExtra("EXTRA_PULANG_NAME") ?: ""
+                val pricePulangTotal = intent.getDoubleExtra("EXTRA_PRICE_PULANG_TOTAL", 0.0)
+
+                tvTransportName.text = "$pergiName & $pulangName"
+                tvRouteSummary.text = "$origin ➔ $destination\nPulang Pergi • $passengerCount Penumpang"
+                tvRouteSummary.visibility = View.VISIBLE
+
+                layoutPulang.visibility = View.VISIBLE
+                findViewById<TextView>(R.id.tv_label_pay_pulang).text = "Tiket Pulang (x$passengerCount)"
+                findViewById<TextView>(R.id.tv_pay_price_pulang).text = "Rp ${formatter.format(pricePulangTotal)}"
+            } else {
+                tvTransportName.text = pergiName
+                tvRouteSummary.text = "$origin ➔ $destination\nSekali Jalan • $passengerCount Penumpang"
+                tvRouteSummary.visibility = View.VISIBLE
+                layoutPulang.visibility = View.GONE
+            }
+            tvLabelSubtotal.text = "Total Harga Tiket"
         }
 
         findViewById<TextView>(R.id.tv_pay_subtotal).text = "Rp ${formatter.format(subTotal)}"
@@ -139,59 +163,59 @@ class PaymentActivity : AppCompatActivity() {
 
             // 1. LOGIKA KODE PEMESANAN DINAMIS
             val prefix = when {
-                transportType.contains("Kereta", ignoreCase = true) -> "TR"
-                transportType.contains("Pesawat", ignoreCase = true) -> "AI"
-                transportType.contains("Bus", ignoreCase = true) -> "BU"
+                transactionType == "WISATA" -> "WS"
+                transactionType.contains("Kereta", ignoreCase = true) -> "TR"
+                transactionType.contains("Pesawat", ignoreCase = true) -> "AI"
+                transactionType.contains("Bus", ignoreCase = true) -> "BU"
                 else -> "WGO"
             }
 
             val randomCode = "$prefix-${(100000..999999).random()}"
 
-            // 2. Tangkap Array Nama & Kursi dari Checkout
-            val passengerNames = intent.getStringArrayListExtra("EXTRA_PASSENGER_NAMES") ?: arrayListOf()
-            val seatsPergi = intent.getStringArrayListExtra("EXTRA_SEATS_PERGI") ?: arrayListOf()
-            val seatsPulang = intent.getStringArrayListExtra("EXTRA_SEATS_PULANG") ?: arrayListOf()
+            val transportDetailsList = mutableListOf<TransportDetailRequest>()
 
-            // 3. Susun Penumpang untuk Tiket Pergi
-            val listPenumpangPergi = mutableListOf<PassengerRequest>()
-            for (i in 0 until passengerCount) {
-                listPenumpangPergi.add(
-                    PassengerRequest(
-                        passenger_name = passengerNames.getOrElse(i) { "Penumpang ${i + 1}" },
-                        seat_number = seatsPergi.getOrElse(i) { "-" }
-                    )
-                )
-            }
+            if (transactionType != "WISATA") {
+                val passengerNames = intent.getStringArrayListExtra("EXTRA_PASSENGER_NAMES") ?: arrayListOf()
+                val seatsPergi = intent.getStringArrayListExtra("EXTRA_SEATS_PERGI") ?: arrayListOf()
+                val seatsPulang = intent.getStringArrayListExtra("EXTRA_SEATS_PULANG") ?: arrayListOf()
 
-            // 4. Susun Rincian Transportasi Pergi
-            val detailPergi = TransportDetailRequest(
-                schedule_id = intent.getStringExtra("EXTRA_PERGI_SCHEDULE_ID") ?: "",
-                num_seats = passengerCount,
-                subtotal = pricePergiTotal,
-                passengers = listPenumpangPergi
-            )
-
-            val transportDetailsList = mutableListOf(detailPergi)
-
-            // 5. Susun Rincian Transportasi Pulang (Jika PP)
-            if (isReturnTrip) {
-                val listPenumpangPulang = mutableListOf<PassengerRequest>()
+                val listPenumpangPergi = mutableListOf<PassengerRequest>()
                 for (i in 0 until passengerCount) {
-                    listPenumpangPulang.add(
+                    listPenumpangPergi.add(
                         PassengerRequest(
                             passenger_name = passengerNames.getOrElse(i) { "Penumpang ${i + 1}" },
-                            seat_number = seatsPulang.getOrElse(i) { "-" }
+                            seat_number = seatsPergi.getOrElse(i) { "-" }
                         )
                     )
                 }
 
-                val detailPulang = TransportDetailRequest(
-                    schedule_id = intent.getStringExtra("EXTRA_PULANG_SCHEDULE_ID") ?: "",
+                val detailPergi = TransportDetailRequest(
+                    schedule_id = intent.getStringExtra("EXTRA_PERGI_SCHEDULE_ID") ?: "",
                     num_seats = passengerCount,
-                    subtotal = intent.getDoubleExtra("EXTRA_PRICE_PULANG_TOTAL", 0.0),
-                    passengers = listPenumpangPulang
+                    subtotal = pricePergiTotal,
+                    passengers = listPenumpangPergi
                 )
-                transportDetailsList.add(detailPulang)
+                transportDetailsList.add(detailPergi)
+
+                if (isReturnTrip) {
+                    val listPenumpangPulang = mutableListOf<PassengerRequest>()
+                    for (i in 0 until passengerCount) {
+                        listPenumpangPulang.add(
+                            PassengerRequest(
+                                passenger_name = passengerNames.getOrElse(i) { "Penumpang ${i + 1}" },
+                                seat_number = seatsPulang.getOrElse(i) { "-" }
+                            )
+                        )
+                    }
+
+                    val detailPulang = TransportDetailRequest(
+                        schedule_id = intent.getStringExtra("EXTRA_PULANG_SCHEDULE_ID") ?: "",
+                        num_seats = passengerCount,
+                        subtotal = intent.getDoubleExtra("EXTRA_PRICE_PULANG_TOTAL", 0.0),
+                        passengers = listPenumpangPulang
+                    )
+                    transportDetailsList.add(detailPulang)
+                }
             }
 
             val sharedPref = getSharedPreferences("USER_SESSION", MODE_PRIVATE)
@@ -207,12 +231,12 @@ class PaymentActivity : AppCompatActivity() {
                 transport_details = transportDetailsList
             )
 
-            // 7. Ubah Tampilan Tombol (Mencegah Double Click)
+            // 7. Ubah Tampilan Tombol
             val btnPay = findViewById<MaterialButton>(R.id.btn_finish_payment)
             btnPay.isEnabled = false
             btnPay.text = "Memproses..."
 
-            // 8. KIRIM KE API NODE.JS MENGGUNAKAN RETROFIT
+            // 8. KIRIM KE API NODE.JS
             ApiClient.instance.createBooking(bookingPayload).enqueue(object : Callback<ResponseBooking> {
 
                 override fun onResponse(call: Call<ResponseBooking>, response: Response<ResponseBooking>) {
@@ -225,15 +249,21 @@ class PaymentActivity : AppCompatActivity() {
 
                         btnPay.text = "Berhasil! Mengalihkan..."
 
-                        // Jeda 2 detik agar user sempat membaca Toast sukses
                         Handler(Looper.getMainLooper()).postDelayed({
                             val successIntent = Intent(this@PaymentActivity, PaymentSuccessActivity::class.java)
                             successIntent.putExtra("EXTRA_BOOKING_CODE", response.body()?.booking_code ?: randomCode)
-                            successIntent.putExtra("EXTRA_PERGI_NAME", pergiName)
-                            successIntent.putExtra("EXTRA_PULANG_NAME", intent.getStringExtra("EXTRA_PULANG_NAME"))
-                            successIntent.putExtra("EXTRA_ORIGIN", origin)
-                            successIntent.putExtra("EXTRA_DESTINATION", destination)
+
+                            if (transactionType == "WISATA") {
+                                successIntent.putExtra("EXTRA_PERGI_NAME", intent.getStringExtra("EXTRA_WISATA_NAME"))
+                            } else {
+                                successIntent.putExtra("EXTRA_PERGI_NAME", pergiName)
+                                successIntent.putExtra("EXTRA_PULANG_NAME", intent.getStringExtra("EXTRA_PULANG_NAME"))
+                                successIntent.putExtra("EXTRA_ORIGIN", origin)
+                                successIntent.putExtra("EXTRA_DESTINATION", destination)
+                            }
+
                             successIntent.putExtra("EXTRA_PASSENGERS", passengerCount)
+                            successIntent.putExtra("EXTRA_TICKET_QTY", intent.getIntExtra("EXTRA_TICKET_QTY", 1))
                             successIntent.putExtra("EXTRA_IS_RETURN_TRIP", isReturnTrip)
                             successIntent.putExtra("EXTRA_GRAND_TOTAL", grandTotal)
 
@@ -243,7 +273,7 @@ class PaymentActivity : AppCompatActivity() {
                         }, 2000)
 
                     } else {
-                        Toast.makeText(this@PaymentActivity, "Gagal: Kursi mungkin sudah habis dipesan.", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this@PaymentActivity, "Gagal: Kesalahan pada server.", Toast.LENGTH_LONG).show()
                     }
                 }
 
