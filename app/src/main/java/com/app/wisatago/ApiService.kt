@@ -82,4 +82,9 @@ interface ApiService {
     fun updateProfile(
         @Body request: Map<String, String>
     ): Call<okhttp3.ResponseBody>
+
+    @GET("/booking-history")
+    fun getBookingHistory(
+        @Query("user_id") userId: String
+    ): retrofit2.Call<List<HistoryResponse>>
 }

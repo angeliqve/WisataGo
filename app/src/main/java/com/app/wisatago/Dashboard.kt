@@ -53,12 +53,14 @@ class Dashboard : AppCompatActivity() {
             Toast.makeText(this, "Anda sudah di Home", Toast.LENGTH_SHORT).show()
         }
 
-        btnPemesanan.setOnClickListener {
-            Toast.makeText(this, "Halaman Pemesanan", Toast.LENGTH_SHORT).show()
-        }
-
         btnProfile.setOnClickListener {
             val intent = Intent(this, Profile::class.java)
+            startActivity(intent)
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
+        }
+
+        btnPemesanan.setOnClickListener {
+            val intent = Intent(this, HistoryActivity::class.java)
             startActivity(intent)
             overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
         }

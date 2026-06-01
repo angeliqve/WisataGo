@@ -1,12 +1,10 @@
 package com.app.wisatago
 
-// Struktur data yang dikirim ke Node.js saat tombol masuk diklik
 data class LoginRequest(
     val email: String,
     val password: String
 )
 
-// Struktur data yang diterima dari Node.js saat login berhasil
 data class LoginResponse(
     val message: String,
     val user_id: String,
@@ -22,7 +20,6 @@ data class ProfileResponse(
     val created_at: String?,
     val phone_number: String?
 )
-// Struktur data yang akan dikirim ke Node.js saat mendaftar
 data class SignUpRequest(
     val full_name: String,
     val email: String,
@@ -30,7 +27,6 @@ data class SignUpRequest(
     val phone_number: String
 )
 
-// Struktur data jawaban dari Node.js setelah berhasil mendaftar
 data class SignUpResponse(
     val message: String
 )
@@ -39,4 +35,16 @@ data class ResponseBooking(
     val message: String,
     val booking_code: String,
     val error: String? = null
+)
+
+data class HistoryResponse(
+    val booking_id: String,
+    val booking_code: String,
+    val booking_date: String,
+    val status: String,
+    val total_amount: Any,
+    val class_type: String?,
+    val transport_name: String?,
+    val origin_city: String?,
+    val destination_city: String?
 )

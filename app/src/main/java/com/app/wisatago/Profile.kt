@@ -60,7 +60,9 @@ class Profile : AppCompatActivity() {
         }
 
         btnPemesanan.setOnClickListener {
-            Toast.makeText(this, "Halaman Pemesanan", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, HistoryActivity::class.java)
+            startActivity(intent)
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
         }
 
         btnEditProfile.setOnClickListener {
