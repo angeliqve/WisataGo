@@ -172,8 +172,29 @@
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:layout_marginVertical="12dp"
-                        android:background="#F1F3F5"
-                        app:layout_constraintEnd_toEndOf="parent" />
+                        android:background="#F1F3F5" />
+
+                    <RelativeLayout
+                        android:id="@+id/layout_pay_addon"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        android:visibility="gone">
+                        <TextView
+                            android:id="@+id/tv_label_pay_addon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Add-on Wisata (x1)"
+                            android:textColor="#6C757D" />
+                        <TextView
+                            android:id="@+id/tv_pay_price_addon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:textColor="#212121"
+                            android:textStyle="bold"
+                            tools:text="Rp 100.000" />
+                    </RelativeLayout>
 
                     <RelativeLayout
                         android:layout_width="match_parent"
@@ -237,6 +258,67 @@
                             android:textStyle="bold"
                             tools:text="Rp 352.800" />
                     </RelativeLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_addon_wisata"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:clickable="true"
+                android:focusable="true"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="2dp"
+                app:strokeColor="#00A3FF"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp"
+                    android:background="#F0F8FF">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Tambahkan Add-ons Wisata?"
+                        android:textColor="#00A3FF"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tv_addon_subtitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="Lengkapi perjalananmu di kota tujuan!"
+                        android:textColor="#6C757D"
+                        android:textSize="12sp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:src="@android:drawable/ic_menu_mapmode"
+                            app:tint="#00A3FF" />
+
+                        <TextView
+                            android:id="@+id/tv_selected_addon"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:layout_weight="1"
+                            android:text="Klik untuk memilih wisata, tanggal, &amp; jam"
+                            android:textColor="#212121"
+                            android:textStyle="bold" />
+                    </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 

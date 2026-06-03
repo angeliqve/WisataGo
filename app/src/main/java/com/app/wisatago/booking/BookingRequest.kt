@@ -29,7 +29,9 @@ data class PassengerRequest(
 data class AttractionDetailRequest(
     val attraction_id: String,
     val num_tickets: Int,
-    val subtotal: Double
+    val subtotal: Double,
+    val visit_date: String? = null, // 🟢 Tambahan baru
+    val visit_time: String? = null  // 🟢 Tambahan baru
 )
 
 data class ResponseBooking(
