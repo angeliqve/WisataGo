@@ -9,6 +9,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import com.app.wisatago.Dashboard
 import com.app.wisatago.R
 import com.google.android.material.switchmaterial.SwitchMaterial
 import java.text.SimpleDateFormat
@@ -56,7 +57,12 @@ class BusActivity : AppCompatActivity() {
             "Denpasar - Terminal Mengwi"
         )
 
-        btnBack.setOnClickListener { finish() }
+        // =================================================================
+        // 🟢 PERBAIKAN: AKSI TOMBOL BACK LANGSUNG KE DASHBOARD
+        // =================================================================
+        btnBack.setOnClickListener {
+            kembaliKeDashboard()
+        }
 
         tabKereta.setOnClickListener {
             startActivity(Intent(this, TrainActivity::class.java))
@@ -91,19 +97,35 @@ class BusActivity : AppCompatActivity() {
             tvDestination.text = temp
         }
 
+        // =================================================================
+        // KALENDER PERGI (Min: Hari Ini, Max: H+45)
+        // =================================================================
         btnTanggalPergi.setOnClickListener {
-            DatePickerDialog(
+            val datePickerDialog = DatePickerDialog(
                 this,
                 { _, year, month, dayOfMonth ->
                     calendarPergi.set(Calendar.YEAR, year)
                     calendarPergi.set(Calendar.MONTH, month)
                     calendarPergi.set(Calendar.DAY_OF_MONTH, dayOfMonth)
                     tvTanggalPergi.text = dateFormat.format(calendarPergi.time)
+
+                    // Reset tanggal pulang jika mendahului tanggal pergi yang baru
+                    if (switchPulangPergi.isChecked && calendarPulang.timeInMillis < calendarPergi.timeInMillis) {
+                        tvTanggalPulang.text = "DD, 00 0000 0000"
+                    }
                 },
                 calendarPergi.get(Calendar.YEAR),
                 calendarPergi.get(Calendar.MONTH),
                 calendarPergi.get(Calendar.DAY_OF_MONTH)
-            ).show()
+            )
+
+            datePickerDialog.datePicker.minDate = System.currentTimeMillis() - 1000
+
+            val maxCalendar = Calendar.getInstance()
+            maxCalendar.add(Calendar.DAY_OF_YEAR, 45)
+            datePickerDialog.datePicker.maxDate = maxCalendar.timeInMillis
+
+            datePickerDialog.show()
         }
 
         switchPulangPergi.setOnCheckedChangeListener { _, isChecked ->
@@ -113,8 +135,18 @@ class BusActivity : AppCompatActivity() {
             }
         }
 
+        // =================================================================
+        // KALENDER PULANG (Min: Tanggal Pergi, Max: H+45)
+        // =================================================================
         btnTanggalPulang.setOnClickListener {
-            DatePickerDialog(
+            val isPergiSelected = !tvTanggalPergi.text.toString().contains("DD, 00")
+
+            if (!isPergiSelected) {
+                Toast.makeText(this, "Silakan pilih Tanggal Pergi terlebih dahulu!", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val datePickerDialog = DatePickerDialog(
                 this,
                 { _, year, month, dayOfMonth ->
                     calendarPulang.set(Calendar.YEAR, year)
@@ -122,10 +154,18 @@ class BusActivity : AppCompatActivity() {
                     calendarPulang.set(Calendar.DAY_OF_MONTH, dayOfMonth)
                     tvTanggalPulang.text = dateFormat.format(calendarPulang.time)
                 },
-                calendarPulang.get(Calendar.YEAR),
-                calendarPulang.get(Calendar.MONTH),
-                calendarPulang.get(Calendar.DAY_OF_MONTH)
-            ).show()
+                calendarPergi.get(Calendar.YEAR),
+                calendarPergi.get(Calendar.MONTH),
+                calendarPergi.get(Calendar.DAY_OF_MONTH)
+            )
+
+            datePickerDialog.datePicker.minDate = calendarPergi.timeInMillis
+
+            val maxCalendar = Calendar.getInstance()
+            maxCalendar.add(Calendar.DAY_OF_YEAR, 45)
+            datePickerDialog.datePicker.maxDate = maxCalendar.timeInMillis
+
+            datePickerDialog.show()
         }
 
         btnSelectPassengers.setOnClickListener {
@@ -173,7 +213,7 @@ class BusActivity : AppCompatActivity() {
             val tujuanKota = tujuan.split(" - ")[0].trim()
 
             val intent = Intent(this, TicketResultActivity::class.java)
-            intent.putExtra("EXTRA_TRANSPORT_TYPE", "bus")  // 🔥 SUDAH ADA
+            intent.putExtra("EXTRA_TRANSPORT_TYPE", "bus")
             intent.putExtra("EXTRA_ORIGIN", asalKota)
             intent.putExtra("EXTRA_DESTINATION", tujuanKota)
             intent.putExtra("EXTRA_DATE_PERGI", tanggalPergi)
@@ -185,5 +225,22 @@ class BusActivity : AppCompatActivity() {
             intent.putExtra("EXTRA_PASSENGERS", jumlahPenumpang)
             startActivity(intent)
         }
+    }
+
+    // =================================================================
+    // 🟢 HANDLING TOMBOL BACK SISTEM HP (NAVBAR BAWAH ANDROID)
+    // =================================================================
+    override fun onBackPressed() {
+        super.onBackPressed()
+        kembaliKeDashboard()
+    }
+
+    // Fungsi pembantu agar kode tidak berulang
+    private fun kembaliKeDashboard() {
+        val intent = Intent(this, Dashboard::class.java)
+        // CLEAR_TOP akan menghancurkan TrainActivity yang menggantung di memori
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+        startActivity(intent)
+        finish()
     }
 }
