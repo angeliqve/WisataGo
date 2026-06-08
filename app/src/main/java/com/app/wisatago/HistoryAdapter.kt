@@ -6,10 +6,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
 import com.app.wisatago.R
 import com.app.wisatago.HistoryResponse
 import com.app.wisatago.DetailPemesananActivity
+import com.app.wisatago.ApiClient
+import com.app.wisatago.CancelRequest
+import com.app.wisatago.CancelResponse
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -57,17 +65,31 @@ class HistoryAdapter(private val listHistory: List<HistoryResponse>) :
             holder.tvTotalAmount.text = "Rp ${item.total_amount}"
         }
 
+        // =======================================================
+        // 🟢 PEWARNAAN STATUS CERDAS (SUCCESS, CANCELED, ONGOING)
+        // =======================================================
         val statusClean = item.status?.uppercase() ?: "PENDING"
-        if (statusClean == "SUCCESS") {
-            holder.tvStatus.text = "SUCCESS"
-            holder.tvStatus.setBackgroundColor(Color.parseColor("#DCFCE7"))
-            holder.tvStatus.setTextColor(Color.parseColor("#15803D"))
-        } else {
-            holder.tvStatus.text = "ONGOING"
-            holder.tvStatus.setBackgroundColor(Color.parseColor("#FEF3C7"))
-            holder.tvStatus.setTextColor(Color.parseColor("#D97706"))
+        when (statusClean) {
+            "SUCCESS" -> {
+                holder.tvStatus.text = "SUCCESS"
+                holder.tvStatus.setBackgroundColor(Color.parseColor("#DCFCE7")) // Hijau
+                holder.tvStatus.setTextColor(Color.parseColor("#15803D"))
+            }
+            "CANCELED" -> {
+                holder.tvStatus.text = "CANCELED"
+                holder.tvStatus.setBackgroundColor(Color.parseColor("#FEE2E2")) // Merah
+                holder.tvStatus.setTextColor(Color.parseColor("#B91C1C"))
+            }
+            else -> {
+                holder.tvStatus.text = "ONGOING"
+                holder.tvStatus.setBackgroundColor(Color.parseColor("#FEF3C7")) // Kuning
+                holder.tvStatus.setTextColor(Color.parseColor("#D97706"))
+            }
         }
 
+        // =======================================================
+        // 1. KLIK BIASA -> Masuk ke Detail Pemesanan
+        // =======================================================
         holder.itemView.setOnClickListener {
             val context = holder.itemView.context
             val intent = Intent(context, DetailPemesananActivity::class.java).apply {
@@ -77,8 +99,54 @@ class HistoryAdapter(private val listHistory: List<HistoryResponse>) :
                 putExtra("TOTAL_AMOUNT", item.total_amount.toString())
                 putExtra("ORIGIN_CITY", item.origin_city ?: "WisataGO")
                 putExtra("DEST_CITY", item.destination_city ?: "")
+                putExtra("DEPARTURE_TIME", item.departure_time)
             }
             context.startActivity(intent)
+        }
+
+        // =======================================================
+        // 2. TEKAN TAHAN (Long Click) -> Pop-up Batal Pesanan
+        // =======================================================
+        holder.itemView.setOnLongClickListener {
+
+            // 🟢 JIKA STATUS SUDAH CANCELED, JANGAN MUNCULKAN POP-UP BATAL LAGI
+            if (statusClean == "CANCELED") {
+                Toast.makeText(holder.itemView.context, "Pesanan ini sudah dibatalkan.", Toast.LENGTH_SHORT).show()
+                return@setOnLongClickListener true
+            }
+
+            val builder = AlertDialog.Builder(holder.itemView.context)
+            builder.setTitle("Batalkan Pesanan?")
+            builder.setMessage("Apakah Anda yakin ingin membatalkan pesanan ${item.booking_code}?\n\nPesanan transportasi hanya dapat dibatalkan maksimal H-1 sebelum keberangkatan.")
+            builder.setIcon(android.R.drawable.ic_dialog_alert)
+
+            builder.setPositiveButton("Ya, Batalkan") { dialog, _ ->
+                val request = CancelRequest(item.booking_code)
+
+                Toast.makeText(holder.itemView.context, "Memproses pembatalan...", Toast.LENGTH_SHORT).show()
+
+                ApiClient.instance.cancelBooking(request).enqueue(object : Callback<CancelResponse> {
+                    override fun onResponse(call: Call<CancelResponse>, response: Response<CancelResponse>) {
+                        if (response.isSuccessful && response.body()?.message != null) {
+                            Toast.makeText(holder.itemView.context, response.body()?.message, Toast.LENGTH_LONG).show()
+                            // Note: Untuk mengubah warna secara real-time tanpa pindah halaman, Anda bisa memanggil fungsi fetch/reload data API History di Activity Anda.
+                        } else {
+                            Toast.makeText(holder.itemView.context, "Gagal: Kesalahan pada sistem.", Toast.LENGTH_LONG).show()
+                        }
+                    }
+
+                    override fun onFailure(call: Call<CancelResponse>, t: Throwable) {
+                        Toast.makeText(holder.itemView.context, "Koneksi Error: ${t.message}", Toast.LENGTH_SHORT).show()
+                    }
+                })
+                dialog.dismiss()
+            }
+
+            builder.setNegativeButton("Tutup") { dialog, _ ->
+                dialog.dismiss()
+            }
+            builder.show()
+            true
         }
     }
 

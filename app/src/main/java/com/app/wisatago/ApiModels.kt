@@ -38,13 +38,24 @@ data class ResponseBooking(
 )
 
 data class HistoryResponse(
-    val booking_id: String,
+    val booking_id: String?,
     val booking_code: String,
-    val booking_date: String,
-    val status: String,
-    val total_amount: Any,
-    val class_type: String?,
+    val booking_date: String?,
+    val status: String?,
+    val total_amount: String?,
     val transport_name: String?,
     val origin_city: String?,
-    val destination_city: String?
+    val destination_city: String?,
+
+    // 🟢 PASTIKAN NAMA VARIABEL INI SAMA PERSIS (Pakai garis bawah)
+    val departure_time: String? = null
+)
+
+data class CancelRequest(
+    val booking_code: String
+)
+
+data class CancelResponse(
+    val message: String?,
+    val error: String?
 )

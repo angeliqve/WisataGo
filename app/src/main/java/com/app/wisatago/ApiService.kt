@@ -96,4 +96,7 @@ interface ApiService {
     fun getBookingHistory(
         @Query("user_id") userId: String
     ): retrofit2.Call<List<HistoryResponse>>
+
+    @POST("cancel-booking")
+    fun cancelBooking(@Body request: CancelRequest): Call<CancelResponse>
 }
