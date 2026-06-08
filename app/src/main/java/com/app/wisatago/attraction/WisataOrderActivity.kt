@@ -35,10 +35,18 @@ class WisataOrderActivity : AppCompatActivity() {
         // Date Picker
         findViewById<MaterialCardView>(R.id.btn_select_date).setOnClickListener {
             val calendar = Calendar.getInstance()
-            DatePickerDialog(this, { _, year, month, dayOfMonth ->
+
+            // 1. Simpan DatePickerDialog ke dalam sebuah variabel terlebih dahulu
+            val datePickerDialog = DatePickerDialog(this, { _, year, month, dayOfMonth ->
                 selectedDate = "$dayOfMonth/${month + 1}/$year"
                 tvDate.text = selectedDate
-            }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show()
+            }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH))
+
+            // 2. Kunci tanggal minimum ke hari ini (waktu sekarang)
+            datePickerDialog.datePicker.minDate = System.currentTimeMillis()
+
+            // 3. Tampilkan kalender
+            datePickerDialog.show()
         }
 
         // Time Picker
