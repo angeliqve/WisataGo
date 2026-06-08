@@ -140,6 +140,7 @@
                                 android:text="UUID-USER-12345"
                                 android:textColor="#334155"
                                 android:textSize="14sp" />
+
                         </LinearLayout>
 
                         <ImageView
@@ -184,6 +185,23 @@
                         android:layout_marginTop="2dp"
                         android:layout_marginBottom="16dp"
                         android:text="email@gmail.com"
+                        android:textColor="#334155"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Nomor Telepon"
+                        android:textColor="#94A3B8"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:id="@+id/tvPhone"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:layout_marginBottom="16dp"
+                        android:text="08XX-XXXX-XXXX"
                         android:textColor="#334155"
                         android:textSize="14sp" />
 

@@ -30,6 +30,7 @@ class InformasiAkun : AppCompatActivity() {
     private lateinit var tvFullName: TextView
     private lateinit var tvEmail: TextView
     private lateinit var tvCreatedAt: TextView
+    private lateinit var tvPhone: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,6 +42,7 @@ class InformasiAkun : AppCompatActivity() {
         tvFullName = findViewById(R.id.tvFullName)
         tvEmail = findViewById(R.id.tvEmail)
         tvCreatedAt = findViewById(R.id.tvCreatedAt)
+        tvPhone = findViewById(R.id.tvPhone)
 
         btnBack = findViewById(R.id.btnBack)
         btnCopyId = findViewById(R.id.btnCopyId)
@@ -92,6 +94,22 @@ class InformasiAkun : AppCompatActivity() {
                         tvEmail.text = user.email
                         tvUserEmail.text = user.email
 
+                        val rawPhone = user.phone_number ?: ""
+                        if (rawPhone.isNotEmpty()) {
+                            val digitsOnly = rawPhone.replace("-", "")
+                            val formattedPhone = StringBuilder()
+                            for (i in digitsOnly.indices) {
+                                formattedPhone.append(digitsOnly[i])
+                                if ((i + 1) % 4 == 0 && (i + 1) < digitsOnly.length) {
+                                    formattedPhone.append("-")
+                                }
+                            }
+                            tvPhone.text = formattedPhone.toString()
+                        } else {
+                            val sharedPref = getSharedPreferences("USER_SESSION", MODE_PRIVATE)
+                            tvPhone.text = sharedPref.getString("USER_PHONE", "-")
+                        }
+
                         try {
                             val parser = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
                             val formatter = SimpleDateFormat("dd MMMM yyyy", Locale("id", "ID"))
@@ -104,11 +122,10 @@ class InformasiAkun : AppCompatActivity() {
                         }
 
                     } else {
-                        Toast.makeText(
-                            this@InformasiAkun,
-                            "Gagal mengambil data",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        val sharedPref = getSharedPreferences("USER_SESSION", MODE_PRIVATE)
+                        tvFullName.text = sharedPref.getString("USERNAME", "-")
+                        tvUserName.text = sharedPref.getString("USERNAME", "-")
+                        tvPhone.text = sharedPref.getString("USER_PHONE", "-")
                     }
                 }
 

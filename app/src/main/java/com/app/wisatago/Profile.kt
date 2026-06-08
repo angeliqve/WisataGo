@@ -43,15 +43,6 @@ class Profile : AppCompatActivity() {
         btnHome = findViewById(R.id.btnHome)
         btnPemesanan = findViewById(R.id.btnPemesanan)
 
-        val sharedPref = getSharedPreferences("USER_SESSION", MODE_PRIVATE)
-        val userId = sharedPref.getString("USER_ID", null)
-
-        if (userId != null) {
-            ambilDataProfile(userId)
-        } else {
-            Toast.makeText(this, "User belum login", Toast.LENGTH_SHORT).show()
-        }
-
         btnHome.setOnClickListener {
             val intent = Intent(this, Dashboard::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
@@ -63,10 +54,6 @@ class Profile : AppCompatActivity() {
             val intent = Intent(this, HistoryActivity::class.java)
             startActivity(intent)
             overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
-        }
-
-        btnEditProfile.setOnClickListener {
-            Toast.makeText(this, "Halaman Edit Profil", Toast.LENGTH_SHORT).show()
         }
 
         btnInformasiAkun.setOnClickListener {
@@ -98,6 +85,7 @@ class Profile : AppCompatActivity() {
                 .setTitle("Logout")
                 .setMessage("Yakin ingin logout dari akun?")
                 .setPositiveButton("Ya") { _, _ ->
+                    val sharedPref = getSharedPreferences("USER_SESSION", MODE_PRIVATE)
                     sharedPref.edit().clear().apply()
                     Toast.makeText(this, "Logout berhasil", Toast.LENGTH_SHORT).show()
 
@@ -108,6 +96,18 @@ class Profile : AppCompatActivity() {
                 }
                 .setNegativeButton("Batal", null)
                 .show()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val sharedPref = getSharedPreferences("USER_SESSION", MODE_PRIVATE)
+        val userId = sharedPref.getString("USER_ID", null)
+
+        if (userId != null) {
+            ambilDataProfile(userId)
+        } else {
+            Toast.makeText(this, "User belum login", Toast.LENGTH_SHORT).show()
         }
     }
 

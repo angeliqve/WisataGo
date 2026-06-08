@@ -1,6 +1,8 @@
 package com.app.wisatago
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -40,6 +42,33 @@ class EditProfile : AppCompatActivity() {
             Toast.makeText(this, "Sesi habis, silakan login kembali", Toast.LENGTH_SHORT).show()
         }
 
+        etPhoneNumber.addTextChangedListener(object : TextWatcher {
+            private var isUpdating = false
+            private val hyphen = "-"
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable?) {
+                if (isUpdating) return
+                isUpdating = true
+
+                var current = s.toString().replace(Regex("[^0-9]"), "")
+                val formatted = StringBuilder()
+
+                for (i in current.indices) {
+                    formatted.append(current[i])
+                    if ((i + 1) % 4 == 0 && (i + 1) < current.length) {
+                        formatted.append(hyphen)
+                    }
+                }
+
+                etPhoneNumber.setText(formatted.toString())
+                etPhoneNumber.setSelection(formatted.length)
+                isUpdating = false
+            }
+        })
+
         btnBack.setOnClickListener {
             finish()
         }
@@ -61,10 +90,27 @@ class EditProfile : AppCompatActivity() {
 
                         etFullName.setText(user.full_name)
 
-                        etPhoneNumber.setText(user.phone_number ?: "")
+                        var nomorHp = user.phone_number ?: ""
+
+                        if (nomorHp.isEmpty()) {
+                            val sharedPref = getSharedPreferences("USER_SESSION", MODE_PRIVATE)
+                            nomorHp = sharedPref.getString("USER_PHONE", "") ?: ""
+                        }
+
+                        etPhoneNumber.setText(nomorHp)
+
+                    } else {
+                        val sharedPref = getSharedPreferences("USER_SESSION", MODE_PRIVATE)
+                        etFullName.setText(sharedPref.getString("USERNAME", ""))
+                        etPhoneNumber.setText(sharedPref.getString("USER_PHONE", ""))
                     }
                 }
             } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    val sharedPref = getSharedPreferences("USER_SESSION", MODE_PRIVATE)
+                    etFullName.setText(sharedPref.getString("USERNAME", ""))
+                    etPhoneNumber.setText(sharedPref.getString("USER_PHONE", ""))
+                }
             }
         }
     }
@@ -78,6 +124,14 @@ class EditProfile : AppCompatActivity() {
             return
         }
 
+        val cleanPhone = phoneText.replace("-", "")
+        val regexPhone = Regex("^(08|628)[0-9]{8,11}$")
+
+        if (!cleanPhone.matches(regexPhone)) {
+            Toast.makeText(this, "Format nomor tidak valid! Harus nomor HP Indonesia (Contoh: 08123456789)", Toast.LENGTH_LONG).show()
+            return
+        }
+
         val requestData = hashMapOf(
             "user_id" to userId,
             "full_name" to fullNameText,
@@ -88,13 +142,15 @@ class EditProfile : AppCompatActivity() {
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                 if (response.isSuccessful) {
                     val sharedPref = getSharedPreferences("USER_SESSION", MODE_PRIVATE)
-                    sharedPref.edit().putString("USERNAME", fullNameText).apply()
+                    sharedPref.edit().apply {
+                        putString("USERNAME", fullNameText)
+                        putString("USER_PHONE", phoneText)
+                    }.apply()
 
                     Toast.makeText(this@EditProfile, "Profil berhasil diperbarui!", Toast.LENGTH_SHORT).show()
-
                     finish()
                 } else {
-                    Toast.makeText(this@EditProfile, "Gagal memperbarui profil!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@EditProfile, "Gagal memperbarui profil di server!", Toast.LENGTH_SHORT).show()
                 }
             }
 
