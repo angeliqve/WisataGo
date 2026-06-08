@@ -34,6 +34,9 @@
             android:name=".transport.BusActivity"
             android:exported="false" />
         <activity
+            android:name=".transport.FlightActivity"
+            android:exported="false" />
+        <activity
             android:name=".attraction.WisataActivity"
             android:exported="false" />
         <activity

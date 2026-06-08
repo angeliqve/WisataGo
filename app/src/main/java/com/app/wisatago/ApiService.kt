@@ -15,6 +15,7 @@ import com.app.wisatago.transport.LocationResponse
 import com.app.wisatago.transport.TicketResponse
 import com.app.wisatago.transport.TrainSchedule
 import com.app.wisatago.transport.BusSchedule  // 🟢 TAMBAHKAN IMPORT BUS
+import com.app.wisatago.transport.FlightSchedule
 
 interface ApiService {
     // Menghubungkan langsung ke app.post('/login') di Node.js
@@ -57,6 +58,14 @@ interface ApiService {
         @Query("destination") destination: String,
         @Query("date") date: String
     ): Call<List<BusSchedule>>
+
+    // Mencari jadwal PESAWAT berdasarkan Asal, Tujuan, dan Tanggal
+    @GET("/flight/schedules")
+    fun searchFlightSchedules(
+        @Query("origin") origin: String,
+        @Query("destination") destination: String,
+        @Query("date") date: String
+    ): Call<List<FlightSchedule>>
 
     // Rute untuk mendapatkan detail jadwal BUS berdasarkan schedule_id
     @GET("/bus/detail")

@@ -70,7 +70,9 @@ class BusActivity : AppCompatActivity() {
             finish()
         }
         tabPesawat.setOnClickListener {
-            Toast.makeText(this, "Fitur Pesawat akan segera hadir", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, FlightActivity::class.java)
+            startActivity(intent)
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
         }
 
         containerOrigin.setOnClickListener {

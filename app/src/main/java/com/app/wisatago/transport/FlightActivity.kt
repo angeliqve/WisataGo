@@ -15,11 +15,11 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
-class TrainActivity : AppCompatActivity() {
+class FlightActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_train)
+        setContentView(R.layout.activity_flight)
 
         val btnTanggalPergi = findViewById<View>(R.id.btn_tanggal_pergi)
         val btnTanggalPulang = findViewById<View>(R.id.btn_tanggal_pulang)
@@ -42,30 +42,30 @@ class TrainActivity : AppCompatActivity() {
 
         val tabKereta = findViewById<TextView>(R.id.tabKereta)
         val tabBus = findViewById<TextView>(R.id.tabBus)
-        val tabPesawat = findViewById<TextView>(R.id.tabPesawat)
 
         val calendarPergi = Calendar.getInstance()
         val calendarPulang = Calendar.getInstance()
         val dateFormat = SimpleDateFormat("EEE, dd MMM yyyy", Locale("id", "ID"))
 
-        val daftarStasiun = arrayOf("Gambir (GMR)", "Bandung (BD)","Cirebon (CN)", "Surabaya Pasar Turi (SGU)", "Tugu (YK)", "Semarang Tawang (SMT)")
+        // 🛫 DATA DUMMY BANDARA KITA
+        val daftarBandara = arrayOf("Bandara Soekarno-Hatta (CGK)", "Bandara Internasional Ngurah Rai (DPS)")
 
         btnBack.setOnClickListener { finish() }
 
         containerOrigin.setOnClickListener {
             AlertDialog.Builder(this)
-                .setTitle("Pilih Stasiun Asal")
-                .setItems(daftarStasiun) { _, which ->
-                    tvOrigin.text = daftarStasiun[which]
+                .setTitle("Pilih Bandara Asal")
+                .setItems(daftarBandara) { _, which ->
+                    tvOrigin.text = daftarBandara[which]
                 }
                 .show()
         }
 
         containerDestination.setOnClickListener {
             AlertDialog.Builder(this)
-                .setTitle("Pilih Stasiun Tujuan")
-                .setItems(daftarStasiun) { _, which ->
-                    tvDestination.text = daftarStasiun[which]
+                .setTitle("Pilih Bandara Tujuan")
+                .setItems(daftarBandara) { _, which ->
+                    tvDestination.text = daftarBandara[which]
                 }
                 .show()
         }
@@ -76,37 +76,19 @@ class TrainActivity : AppCompatActivity() {
             tvDestination.text = temp
         }
 
-        // =================================================================
-        // KALENDER PERGI (Min: Hari Ini, Max: H+45)
-        // =================================================================
         btnTanggalPergi.setOnClickListener {
-            val datePickerDialog = DatePickerDialog(
+            DatePickerDialog(
                 this,
                 { _, year, month, dayOfMonth ->
                     calendarPergi.set(Calendar.YEAR, year)
                     calendarPergi.set(Calendar.MONTH, month)
                     calendarPergi.set(Calendar.DAY_OF_MONTH, dayOfMonth)
                     tvTanggalPergi.text = dateFormat.format(calendarPergi.time)
-
-                    // Reset tanggal pulang jika tanggal pulang yang dipilih sebelumnya ternyata mendahului tanggal pergi yang baru
-                    if (switchPulangPergi.isChecked && calendarPulang.timeInMillis < calendarPergi.timeInMillis) {
-                        tvTanggalPulang.text = "DD, 00 0000 0000"
-                    }
                 },
                 calendarPergi.get(Calendar.YEAR),
                 calendarPergi.get(Calendar.MONTH),
                 calendarPergi.get(Calendar.DAY_OF_MONTH)
-            )
-
-            // Kunci masa lalu (System.currentTimeMillis() - 1000 agar hari ini tetap bisa dipilih)
-            datePickerDialog.datePicker.minDate = System.currentTimeMillis() - 1000
-
-            // Kunci maksimal H+45
-            val maxCalendar = Calendar.getInstance()
-            maxCalendar.add(Calendar.DAY_OF_YEAR, 45)
-            datePickerDialog.datePicker.maxDate = maxCalendar.timeInMillis
-
-            datePickerDialog.show()
+            ).show()
         }
 
         switchPulangPergi.setOnCheckedChangeListener { _, isChecked ->
@@ -118,19 +100,8 @@ class TrainActivity : AppCompatActivity() {
             }
         }
 
-        // =================================================================
-        // KALENDER PULANG (Min: Tanggal Pergi, Max: H+45)
-        // =================================================================
         btnTanggalPulang.setOnClickListener {
-            // Cek apakah user sudah pilih tanggal pergi
-            val isPergiSelected = !tvTanggalPergi.text.toString().contains("DD, 00")
-
-            if (!isPergiSelected) {
-                Toast.makeText(this, "Silakan pilih Tanggal Pergi terlebih dahulu!", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            val datePickerDialog = DatePickerDialog(
+            DatePickerDialog(
                 this,
                 { _, year, month, dayOfMonth ->
                     calendarPulang.set(Calendar.YEAR, year)
@@ -138,21 +109,10 @@ class TrainActivity : AppCompatActivity() {
                     calendarPulang.set(Calendar.DAY_OF_MONTH, dayOfMonth)
                     tvTanggalPulang.text = dateFormat.format(calendarPulang.time)
                 },
-                // Buka kalender default pada bulan yang sama dengan tanggal pergi
-                calendarPergi.get(Calendar.YEAR),
-                calendarPergi.get(Calendar.MONTH),
-                calendarPergi.get(Calendar.DAY_OF_MONTH)
-            )
-
-            // Min Date = Tanggal Pergi (Agar tidak bisa pulang sebelum berangkat)
-            datePickerDialog.datePicker.minDate = calendarPergi.timeInMillis
-
-            // Max Date = H+45 dari hari ini
-            val maxCalendar = Calendar.getInstance()
-            maxCalendar.add(Calendar.DAY_OF_YEAR, 45)
-            datePickerDialog.datePicker.maxDate = maxCalendar.timeInMillis
-
-            datePickerDialog.show()
+                calendarPulang.get(Calendar.YEAR),
+                calendarPulang.get(Calendar.MONTH),
+                calendarPulang.get(Calendar.DAY_OF_MONTH)
+            ).show()
         }
 
         btnSelectPassengers.setOnClickListener {
@@ -165,18 +125,22 @@ class TrainActivity : AppCompatActivity() {
                 .show()
         }
 
+        // Navigasi Tab
+        tabKereta.setOnClickListener {
+            val intent = Intent(this, TrainActivity::class.java)
+            startActivity(intent)
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+            finish()
+        }
+
         tabBus.setOnClickListener {
             val intent = Intent(this, BusActivity::class.java)
             startActivity(intent)
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+            finish()
         }
 
-        tabPesawat.setOnClickListener {
-            val intent = Intent(this, FlightActivity::class.java)
-            startActivity(intent)
-            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
-        }
-
+        // 🛫 AKSI CARI TIKET PESAWAT
         btnCariTiket.setOnClickListener {
             val asal = tvOrigin.text.toString().trim()
             val tujuan = tvDestination.text.toString().trim()
@@ -185,12 +149,12 @@ class TrainActivity : AppCompatActivity() {
             val teksPenumpang = tvPassengers.text.toString().trim()
 
             if (asal.contains("Pilih") || tujuan.contains("Pilih") || asal.isEmpty() || tujuan.isEmpty()) {
-                Toast.makeText(this, "Harap pilih lokasi asal dan tujuan!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Harap pilih bandara asal dan tujuan!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
             if (asal == tujuan) {
-                Toast.makeText(this, "Lokasi asal dan tujuan tidak boleh sama!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Bandara asal dan tujuan tidak boleh sama!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
@@ -209,7 +173,8 @@ class TrainActivity : AppCompatActivity() {
             val jumlahPenumpang = teksPenumpang.split(" ")[0].toIntOrNull() ?: 1
 
             val intent = Intent(this, TicketResultActivity::class.java)
-            intent.putExtra("EXTRA_TRANSPORT_TYPE", "train")
+            // 🟢 MENGIRIMKAN IDENTITAS "flight" KE TicketResultActivity
+            intent.putExtra("EXTRA_TRANSPORT_TYPE", "flight")
             intent.putExtra("EXTRA_ORIGIN", asal)
             intent.putExtra("EXTRA_DESTINATION", tujuan)
             intent.putExtra("EXTRA_DATE_PERGI", tanggalPergi)
@@ -219,7 +184,6 @@ class TrainActivity : AppCompatActivity() {
             }
 
             intent.putExtra("EXTRA_PASSENGERS", jumlahPenumpang)
-
             startActivity(intent)
         }
     }

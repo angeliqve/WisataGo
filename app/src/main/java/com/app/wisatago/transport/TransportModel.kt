@@ -51,3 +51,17 @@ data class BusSchedule(
     val class_type: String,
     val available_seats: Int
 )
+
+// model pesawat
+data class FlightSchedule(
+    val schedule_id: String,
+    val class_type: String,
+    val departure_time: String,
+    val arrival_time: String,
+    val origin: String,
+    val destination: String,
+    val price: Double,
+    val available_seats: Int,
+    val airline_name: String,
+    val flight_code: String
+)
