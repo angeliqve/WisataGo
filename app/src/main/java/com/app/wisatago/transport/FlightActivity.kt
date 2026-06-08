@@ -47,8 +47,11 @@ class FlightActivity : AppCompatActivity() {
         val calendarPulang = Calendar.getInstance()
         val dateFormat = SimpleDateFormat("EEE, dd MMM yyyy", Locale("id", "ID"))
 
-        // 🛫 DATA DUMMY BANDARA KITA
-        val daftarBandara = arrayOf("Bandara Soekarno-Hatta (CGK)", "Bandara Internasional Ngurah Rai (DPS)")
+        // 🛫 DATA BANDARA KITA
+        val daftarBandara = arrayOf(
+            "Bandara Soekarno-Hatta (CGK)",
+            "Bandara Internasional Ngurah Rai (DPS)"
+        )
 
         btnBack.setOnClickListener { finish() }
 
@@ -76,19 +79,37 @@ class FlightActivity : AppCompatActivity() {
             tvDestination.text = temp
         }
 
+        // =================================================================
+        // KALENDER PERGI (Min: Hari Ini, Max: H+45)
+        // =================================================================
         btnTanggalPergi.setOnClickListener {
-            DatePickerDialog(
+            val datePickerDialog = DatePickerDialog(
                 this,
                 { _, year, month, dayOfMonth ->
                     calendarPergi.set(Calendar.YEAR, year)
                     calendarPergi.set(Calendar.MONTH, month)
                     calendarPergi.set(Calendar.DAY_OF_MONTH, dayOfMonth)
                     tvTanggalPergi.text = dateFormat.format(calendarPergi.time)
+
+                    // Reset tanggal pulang jika tanggal pulang yang dipilih sebelumnya ternyata mendahului tanggal pergi yang baru
+                    if (switchPulangPergi.isChecked && calendarPulang.timeInMillis < calendarPergi.timeInMillis) {
+                        tvTanggalPulang.text = "DD, 00 0000 0000"
+                    }
                 },
                 calendarPergi.get(Calendar.YEAR),
                 calendarPergi.get(Calendar.MONTH),
                 calendarPergi.get(Calendar.DAY_OF_MONTH)
-            ).show()
+            )
+
+            // Kunci masa lalu (System.currentTimeMillis() - 1000 agar hari ini tetap bisa dipilih)
+            datePickerDialog.datePicker.minDate = System.currentTimeMillis() - 1000
+
+            // Kunci maksimal H+45
+            val maxCalendar = Calendar.getInstance()
+            maxCalendar.add(Calendar.DAY_OF_YEAR, 45)
+            datePickerDialog.datePicker.maxDate = maxCalendar.timeInMillis
+
+            datePickerDialog.show()
         }
 
         switchPulangPergi.setOnCheckedChangeListener { _, isChecked ->
@@ -100,8 +121,19 @@ class FlightActivity : AppCompatActivity() {
             }
         }
 
+        // =================================================================
+        // KALENDER PULANG (Min: Tanggal Pergi, Max: H+45)
+        // =================================================================
         btnTanggalPulang.setOnClickListener {
-            DatePickerDialog(
+            // Cek apakah user sudah pilih tanggal pergi
+            val isPergiSelected = !tvTanggalPergi.text.toString().contains("DD, 00")
+
+            if (!isPergiSelected) {
+                Toast.makeText(this, "Silakan pilih Tanggal Pergi terlebih dahulu!", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val datePickerDialog = DatePickerDialog(
                 this,
                 { _, year, month, dayOfMonth ->
                     calendarPulang.set(Calendar.YEAR, year)
@@ -109,10 +141,21 @@ class FlightActivity : AppCompatActivity() {
                     calendarPulang.set(Calendar.DAY_OF_MONTH, dayOfMonth)
                     tvTanggalPulang.text = dateFormat.format(calendarPulang.time)
                 },
-                calendarPulang.get(Calendar.YEAR),
-                calendarPulang.get(Calendar.MONTH),
-                calendarPulang.get(Calendar.DAY_OF_MONTH)
-            ).show()
+                // Buka kalender default pada bulan yang sama dengan tanggal pergi
+                calendarPergi.get(Calendar.YEAR),
+                calendarPergi.get(Calendar.MONTH),
+                calendarPergi.get(Calendar.DAY_OF_MONTH)
+            )
+
+            // Min Date = Tanggal Pergi (Agar tidak bisa pulang sebelum berangkat)
+            datePickerDialog.datePicker.minDate = calendarPergi.timeInMillis
+
+            // Max Date = H+45 dari hari ini
+            val maxCalendar = Calendar.getInstance()
+            maxCalendar.add(Calendar.DAY_OF_YEAR, 45)
+            datePickerDialog.datePicker.maxDate = maxCalendar.timeInMillis
+
+            datePickerDialog.show()
         }
 
         btnSelectPassengers.setOnClickListener {
