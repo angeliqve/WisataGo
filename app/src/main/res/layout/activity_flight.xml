@@ -130,7 +130,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginBottom="6dp"
-                                android:text="Terbang Dari"
+                                android:text="Dari"
                                 android:textColor="#757575"
                                 android:textSize="12sp"
                                 android:textStyle="bold" />
@@ -149,7 +149,7 @@
                                 <ImageView
                                     android:layout_width="20dp"
                                     android:layout_height="20dp"
-                                    android:src="@drawable/icon_trains_go"
+                                    android:src="@drawable/ic_flight_takeoff"
                                     app:tint="#1976D2" />
 
                                 <TextView
@@ -171,7 +171,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginBottom="6dp"
-                                android:text="Terbang Ke"
+                                android:text="Menuju"
                                 android:textColor="#757575"
                                 android:textSize="12sp"
                                 android:textStyle="bold" />
@@ -190,7 +190,7 @@
                                 <ImageView
                                     android:layout_width="20dp"
                                     android:layout_height="20dp"
-                                    android:src="@drawable/icon_trains_back"
+                                    android:src="@drawable/ic_flight_land"
                                     app:tint="#1976D2" />
 
                                 <TextView
@@ -389,7 +389,7 @@
                         android:layout_marginTop="16dp"
                         android:background="#F5F6F8"
                         android:padding="8dp"
-                        android:text="💡 Bayi di bawah 2 tahun tidak mendapatkan kursi sendiri"
+                        android:text="💡 Penumpang bayi tidak mendapatkan kursi sendiri"
                         android:textColor="#757575"
                         android:textSize="11sp" />
 
@@ -421,7 +421,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="28dp"
                 android:layout_marginBottom="12dp"
-                android:text="Promo &amp; Destinasi Populer"
+                android:text="Promo &amp; Inspirasi Perjalanan"
                 android:textColor="#1E1E1E"
                 android:textSize="16sp"
                 android:textStyle="bold" />
@@ -445,7 +445,7 @@
                         android:layout_width="80dp"
                         android:layout_height="80dp"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/ic_parahyangan"
+                        android:src="@drawable/ic_garuda"
                         app:shapeAppearanceOverlay="@style/ShapeAppearance.MaterialComponents.SmallComponent" />
 
                     <LinearLayout
@@ -457,7 +457,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Liburan ke Bali"
+                            android:text="Garuda Indonesia"
                             android:textColor="#1E1E1E"
                             android:textSize="14sp"
                             android:textStyle="bold" />
@@ -477,7 +477,7 @@
                             android:layout_marginTop="4dp"
                             android:ellipsize="end"
                             android:maxLines="3"
-                            android:text="Nikmati keindahan pantai dan budaya Bali. Temukan penawaran penerbangan terbaik dari berbagai maskapai."
+                            android:text="Maskapai bintang lima kebanggaan Indonesia. Nikmati kenyamanan ruang kaki ekstra, hiburan in-flight, dan layanan hidangan gratis selama perjalanan menuju Pulau Dewata."
                             android:textColor="#9E9E9E"
                             android:textSize="10sp" />
                     </LinearLayout>
@@ -503,7 +503,7 @@
                         android:layout_width="80dp"
                         android:layout_height="80dp"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/ic_anggrek"
+                        android:src="@drawable/ic_citilink"
                         app:shapeAppearanceOverlay="@style/ShapeAppearance.MaterialComponents.SmallComponent" />
 
                     <LinearLayout
@@ -515,7 +515,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Pesona Labuan Bajo"
+                            android:text="Citilink Indonesia"
                             android:textColor="#1E1E1E"
                             android:textSize="14sp"
                             android:textStyle="bold" />
@@ -524,7 +524,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="Jakarta (CGK) - Komodo (LBJ)"
+                            android:text="Jakarta (CGK) - Surabaya (SUB)"
                             android:textColor="#757575"
                             android:textSize="11sp"
                             android:textStyle="bold" />
@@ -535,7 +535,7 @@
                             android:layout_marginTop="4dp"
                             android:ellipsize="end"
                             android:maxLines="3"
-                            android:text="Jelajahi keajaiban Pulau Komodo dan pemandangan laut yang menakjubkan dengan penerbangan langsung."
+                            android:text="Terbang hemat dan tepat waktu ke Kota Pahlawan. Pilihan maskapai bertarif rendah (LCC) terbaik dengan kabin yang nyaman dan pelayanan ramah di udara."
                             android:textColor="#9E9E9E"
                             android:textSize="10sp" />
                     </LinearLayout>
