@@ -2,6 +2,7 @@ package com.app.wisatago
 
 import android.graphics.Color
 import android.os.Bundle
+import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -16,7 +17,6 @@ import com.app.wisatago.CancelResponse
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import android.view.View
 
 class DetailPemesananActivity : AppCompatActivity() {
 
@@ -32,7 +32,7 @@ class DetailPemesananActivity : AppCompatActivity() {
         val tvDetailTotal = findViewById<TextView>(R.id.tvDetailTotal)
         val labelRute = findViewById<TextView>(R.id.labelRute)
 
-        // 🟢 Inisialisasi Tombol Material
+        // Inisialisasi Tombol Material
         val btnCancel = findViewById<MaterialButton>(R.id.btnCancelBooking)
 
         // Tarik data dari Intent
@@ -45,25 +45,36 @@ class DetailPemesananActivity : AppCompatActivity() {
         val departureTimeStr = intent.getStringExtra("DEPARTURE_TIME")
 
         val tvDetailAddon = findViewById<TextView>(R.id.tvDetailAddon)
-
-        // 🟢 Tarik data Add-on Wisata dari Intent
         val addonWisata = intent.getStringExtra("ADDON_WISATA")
-        // 1. Tarik Data Penumpang
         val passengerInfo = intent.getStringExtra("PASSENGER_INFO")
 
-        // 2. Hubungkan dengan UI XML
+        // Hubungkan dengan UI XML
         val tvDetailTime = findViewById<TextView>(R.id.tvDetailTime)
         val tvDetailPassengers = findViewById<TextView>(R.id.tvDetailPassengers)
         val labelWaktu = findViewById<TextView>(R.id.labelWaktu)
         val labelPenumpang = findViewById<TextView>(R.id.labelPenumpang)
 
-        // 3. Logika Format Jam Cantik (Contoh: 11 Jun 2026, 10:00 WIB)
+        // =====================================================================
+        // Logika Format Tanggal dan Jam Cerdas (Pemisahan Wisata & Transport)
+        // =====================================================================
         if (!departureTimeStr.isNullOrEmpty()) {
             try {
-                val inputFormat = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-                val outputFormat = java.text.SimpleDateFormat("dd MMM yyyy, HH:mm 'WIB'", Locale.getDefault())
-                val date = inputFormat.parse(departureTimeStr)
-                tvDetailTime.text = if (date != null) outputFormat.format(date) else departureTimeStr
+                if (bookingCode.startsWith("WS-")) {
+                    // TIKET WISATA: Hanya ambil YYYY-MM-DD dan hilangkan jamnya
+                    val inputFormat = java.text.SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                    val outputFormat = java.text.SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
+
+                    val dateOnly = departureTimeStr.take(10)
+                    val date = inputFormat.parse(dateOnly)
+
+                    tvDetailTime.text = if (date != null) outputFormat.format(date) else dateOnly
+                } else {
+                    // TIKET TRANSPORTASI: Tetap ambil jam dan menitnya
+                    val inputFormat = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+                    val outputFormat = java.text.SimpleDateFormat("dd MMM yyyy, HH:mm 'WIB'", Locale.getDefault())
+                    val date = inputFormat.parse(departureTimeStr)
+                    tvDetailTime.text = if (date != null) outputFormat.format(date) else departureTimeStr
+                }
             } catch (e: Exception) {
                 tvDetailTime.text = departureTimeStr
             }
@@ -71,35 +82,42 @@ class DetailPemesananActivity : AppCompatActivity() {
             tvDetailTime.text = "Waktu tidak tersedia"
         }
 
-        // 4. Logika Tampilan Penumpang
-        if (!passengerInfo.isNullOrEmpty()) {
-            tvDetailPassengers.text = passengerInfo
+        // =====================================================================
+        // Logika Tampilan Penumpang & Pengunjung
+        // =====================================================================
+        if (bookingCode.startsWith("WS-")) {
+            labelPenumpang.visibility = View.GONE
+            tvDetailPassengers.visibility = View.GONE
         } else {
-            tvDetailPassengers.text = "Data penumpang tidak tersedia"
+            labelPenumpang.visibility = View.VISIBLE
+            tvDetailPassengers.visibility = View.VISIBLE
+            if (!passengerInfo.isNullOrEmpty()) {
+                tvDetailPassengers.text = passengerInfo
+            } else {
+                tvDetailPassengers.text = "Data penumpang tidak tersedia"
+            }
         }
 
-        // 5. Ubah Judul Label Jika Ini Tiket Wisata (Bukan Transportasi)
+        // Ubah Judul Label Jika Ini Tiket Wisata
         if (bookingCode.startsWith("WS-")) {
-            labelWaktu.text = "Waktu Kunjungan"
-            labelPenumpang.text = "Rincian Pengunjung"
+            labelWaktu.text = "Tanggal Kunjungan"
+        } else {
+            labelWaktu.text = "Waktu Keberangkatan"
         }
 
         tvDetailName.text = productName
         tvDetailCode.text = bookingCode
 
-        // 🟢 Logika Tampilan UI Add-on
-        if (!addonWisata.isNullOrEmpty()) {
+        // Logika Tampilan UI Add-on
+        if (!addonWisata.isNullOrEmpty() && bookingCode.startsWith("TR-")) {
             tvDetailAddon.visibility = View.VISIBLE
             tvDetailAddon.text = "+ Add-on: $addonWisata"
         } else {
             tvDetailAddon.visibility = View.GONE
         }
 
-        tvDetailCode.text = bookingCode
-
         if (bookingCode.startsWith("TR-") && destination.isNotEmpty()) {
             labelRute.text = "Rute Perjalanan"
-            // 🟢 Samakan logikanya dengan Adapter
             if (productName.contains("&")) {
                 tvDetailRoute.text = "$origin ⇌ $destination"
             } else {
@@ -127,8 +145,8 @@ class DetailPemesananActivity : AppCompatActivity() {
             }
             "CANCELED" -> {
                 tvDetailStatus.text = "CANCELED"
-                tvDetailStatus.setBackgroundColor(Color.parseColor("#FEE2E2")) // Merah
-                tvDetailStatus.setTextColor(Color.parseColor("#B91C1C")) // Merah
+                tvDetailStatus.setBackgroundColor(Color.parseColor("#FEE2E2"))
+                tvDetailStatus.setTextColor(Color.parseColor("#B91C1C"))
             }
             else -> {
                 tvDetailStatus.text = statusClean
@@ -138,7 +156,7 @@ class DetailPemesananActivity : AppCompatActivity() {
         }
 
         // ==========================================
-        // 🟢 LOGIKA CERDAS TOMBOL BATAL (H-1)
+        // LOGIKA CERDAS TOMBOL BATAL (H-1)
         // ==========================================
         if (statusClean != "SUCCESS") {
             btnCancel.isEnabled = false
@@ -146,74 +164,102 @@ class DetailPemesananActivity : AppCompatActivity() {
             btnCancel.text = "Pesanan Tidak Dapat Dibatalkan"
         } else if (!departureTimeStr.isNullOrEmpty()) {
             try {
-                val format = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-                val departureDate = format.parse(departureTimeStr)
-                val currentDate = java.util.Date()
+                if (bookingCode.startsWith("WS-")) {
+                    // 🟢 LOGIKA WISATA: Berdasarkan Selisih Hari Kalender
+                    val dateOnly = departureTimeStr.take(10)
+                    val formatTanggal = java.text.SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                    val visitDateObj = formatTanggal.parse(dateOnly)
 
-                if (departureDate != null) {
-                    val diffMillis = departureDate.time - currentDate.time
-                    val diffHours = diffMillis / (1000 * 60 * 60)
+                    // Ambil tanggal hari ini, lalu format ulang agar jamnya menjadi 00:00:00
+                    val currentDateStr = formatTanggal.format(java.util.Date())
+                    val currentDateObj = formatTanggal.parse(currentDateStr)
 
-                    if (diffHours < 24) {
-                        btnCancel.isEnabled = false
-                        btnCancel.alpha = 0.5f
-                        btnCancel.text = "Batas Waktu Batal Habis (H-1)"
-                    } else {
-                        btnCancel.isEnabled = true
-                        btnCancel.alpha = 1.0f
+                    if (visitDateObj != null && currentDateObj != null) {
+                        // Jika hari ini sudah sama dengan hari kunjungan, atau sudah lewat (H-0)
+                        if (currentDateObj.time >= visitDateObj.time) {
+                            btnCancel.isEnabled = false
+                            btnCancel.alpha = 0.5f
+                            btnCancel.text = "Batas Waktu Batal Habis"
+                        } else {
+                            btnCancel.isEnabled = true
+                            btnCancel.alpha = 1.0f
+                        }
+                    }
+                } else {
+                    // 🔵 LOGIKA TRANSPORTASI: Strict 24 Jam (Tetap aman tidak terganggu)
+                    val formatFull = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+                    val departureDate = formatFull.parse(departureTimeStr)
+                    val currentDate = java.util.Date()
 
-                        // Aksi saat tombol ditekan
-                        btnCancel.setOnClickListener {
-                            val builder = AlertDialog.Builder(this)
-                            builder.setTitle("Batalkan Pesanan?")
-                            builder.setMessage("Apakah Anda yakin ingin membatalkan pesanan $bookingCode?\n\nPesanan transportasi hanya dapat dibatalkan maksimal H-1 sebelum keberangkatan.")
-                            builder.setIcon(android.R.drawable.ic_dialog_alert)
+                    if (departureDate != null) {
+                        val diffMillis = departureDate.time - currentDate.time
+                        val diffHours = diffMillis / (1000 * 60 * 60)
 
-                            builder.setPositiveButton("Ya, Batalkan") { dialog, _ ->
-                                val request = CancelRequest(bookingCode)
-                                Toast.makeText(this, "Memproses pembatalan...", Toast.LENGTH_SHORT).show()
-
-                                // Tembak API Batal ke Node.js
-                                ApiClient.instance.cancelBooking(request).enqueue(object : Callback<CancelResponse> {
-                                    override fun onResponse(call: Call<CancelResponse>, response: Response<CancelResponse>) {
-                                        if (response.isSuccessful && response.body()?.message != null) {
-                                            Toast.makeText(this@DetailPemesananActivity, response.body()?.message, Toast.LENGTH_LONG).show()
-
-                                            // Matikan tombol langsung di layar jika berhasil
-                                            btnCancel.isEnabled = false
-                                            btnCancel.alpha = 0.5f
-                                            btnCancel.text = "Pesanan Dibatalkan"
-
-                                            tvDetailStatus.text = "CANCELED"
-                                            tvDetailStatus.setBackgroundColor(Color.parseColor("#FEE2E2"))
-                                            tvDetailStatus.setTextColor(Color.parseColor("#B91C1C"))
-                                        } else {
-                                            Toast.makeText(this@DetailPemesananActivity, "Gagal membatalkan pesanan.", Toast.LENGTH_LONG).show()
-                                        }
-                                    }
-
-                                    override fun onFailure(call: Call<CancelResponse>, t: Throwable) {
-                                        Toast.makeText(this@DetailPemesananActivity, "Koneksi Error: ${t.message}", Toast.LENGTH_SHORT).show()
-                                    }
-                                })
-                                dialog.dismiss()
-                            }
-
-                            builder.setNegativeButton("Tutup") { dialog, _ ->
-                                dialog.dismiss()
-                            }
-                            builder.show()
+                        if (diffHours < 24) {
+                            btnCancel.isEnabled = false
+                            btnCancel.alpha = 0.5f
+                            btnCancel.text = "Batas Waktu Batal Habis (H-1)"
+                        } else {
+                            btnCancel.isEnabled = true
+                            btnCancel.alpha = 1.0f
                         }
                     }
                 }
+
+                // Aksi saat tombol ditekan (Berlaku untuk keduanya jika isEnabled = true)
+                btnCancel.setOnClickListener {
+                    val builder = AlertDialog.Builder(this)
+                    builder.setTitle("Batalkan Pesanan?")
+
+                    val warningText = if (bookingCode.startsWith("WS-")) {
+                        "Apakah Anda yakin ingin membatalkan pesanan $bookingCode?\n\nPesanan wisata hanya dapat dibatalkan maksimal H-1 sebelum hari kunjungan."
+                    } else {
+                        "Apakah Anda yakin ingin membatalkan pesanan $bookingCode?\n\nPesanan transportasi hanya dapat dibatalkan maksimal 24 jam sebelum keberangkatan."
+                    }
+                    builder.setMessage(warningText)
+                    builder.setIcon(android.R.drawable.ic_dialog_alert)
+
+                    builder.setPositiveButton("Ya, Batalkan") { dialog, _ ->
+                        val request = CancelRequest(bookingCode)
+                        Toast.makeText(this, "Memproses pembatalan...", Toast.LENGTH_SHORT).show()
+
+                        ApiClient.instance.cancelBooking(request).enqueue(object : Callback<CancelResponse> {
+                            override fun onResponse(call: Call<CancelResponse>, response: Response<CancelResponse>) {
+                                if (response.isSuccessful && response.body()?.message != null) {
+                                    Toast.makeText(this@DetailPemesananActivity, response.body()?.message, Toast.LENGTH_LONG).show()
+
+                                    btnCancel.isEnabled = false
+                                    btnCancel.alpha = 0.5f
+                                    btnCancel.text = "Pesanan Dibatalkan"
+
+                                    tvDetailStatus.text = "CANCELED"
+                                    tvDetailStatus.setBackgroundColor(Color.parseColor("#FEE2E2"))
+                                    tvDetailStatus.setTextColor(Color.parseColor("#B91C1C"))
+                                } else {
+                                    Toast.makeText(this@DetailPemesananActivity, "Gagal membatalkan pesanan.", Toast.LENGTH_LONG).show()
+                                }
+                            }
+
+                            override fun onFailure(call: Call<CancelResponse>, t: Throwable) {
+                                Toast.makeText(this@DetailPemesananActivity, "Koneksi Error: ${t.message}", Toast.LENGTH_SHORT).show()
+                            }
+                        })
+                        dialog.dismiss()
+                    }
+
+                    builder.setNegativeButton("Tutup") { dialog, _ ->
+                        dialog.dismiss()
+                    }
+                    builder.show()
+                }
+
             } catch (e: Exception) {
                 e.printStackTrace()
             }
         } else {
-            // Jika data tanggal keberangkatan gagal ditarik
             btnCancel.isEnabled = false
             btnCancel.alpha = 0.5f
-            btnCancel.text = "Waktu Tidak Terbaca dari Database" // 🟢 Teks diubah agar terlihat jika terjadi error data
+            btnCancel.text = "Waktu Tidak Terbaca dari Database"
         }
 
         btnBack.setOnClickListener { finish() }

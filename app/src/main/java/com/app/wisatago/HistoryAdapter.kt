@@ -43,7 +43,7 @@ class HistoryAdapter(private val listHistory: List<HistoryResponse>) :
 
         // 🟢 PERBAIKAN 1: Deklarasikan variabel mainProduct agar tidak error
         val mainProduct = item.transport_name ?: "Produk WisataGO"
-        if (!item.addon_wisata.isNullOrEmpty()) {
+        if (!item.addon_wisata.isNullOrEmpty() && item.booking_code.startsWith("TR-")) {
             holder.tvTransportName.text = "$mainProduct (+ ${item.addon_wisata})"
         } else {
             holder.tvTransportName.text = mainProduct

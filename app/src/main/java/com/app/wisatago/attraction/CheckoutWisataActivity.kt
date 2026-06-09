@@ -21,12 +21,11 @@ class CheckoutWisataActivity : AppCompatActivity() {
         val wisataName = intent.getStringExtra("EXTRA_WISATA_NAME") ?: "Wisata"
         val ticketPrice = intent.getDoubleExtra("EXTRA_WISATA_PRICE", 0.0)
         val visitDate = intent.getStringExtra("EXTRA_VISIT_DATE") ?: "-"
-        val visitTime = intent.getStringExtra("EXTRA_VISIT_TIME") ?: "-"
         val ticketQty = intent.getIntExtra("EXTRA_TICKET_QTY", 1)
 
         // Set Informasi Tiket
         findViewById<TextView>(R.id.tv_co_wisata_name).text = wisataName
-        findViewById<TextView>(R.id.tv_co_wisata_datetime).text = "$visitDate • $visitTime WIB"
+        findViewById<TextView>(R.id.tv_co_wisata_datetime).text = visitDate
         findViewById<TextView>(R.id.tv_co_wisata_qty).text = "$ticketQty Tiket"
 
         // Kalkulasi Biaya sesuai database (subtotal & tax)
@@ -47,6 +46,7 @@ class CheckoutWisataActivity : AppCompatActivity() {
                 putExtra("EXTRA_TRANSACTION_TYPE", "WISATA")
                 putExtra("EXTRA_WISATA_ID", wisataId)
                 putExtra("EXTRA_WISATA_NAME", wisataName)
+                putExtra("EXTRA_VISIT_DATE", visitDate) // Teruskan tanggal ke Payment
                 putExtra("EXTRA_TICKET_QTY", ticketQty)
                 putExtra("EXTRA_SUBTOTAL", subTotal)
                 putExtra("EXTRA_TAX", tax)

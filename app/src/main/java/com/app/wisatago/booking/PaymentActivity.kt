@@ -347,7 +347,8 @@ class PaymentActivity : AppCompatActivity() {
                     AttractionDetailRequest(
                         attraction_id = wisataId,
                         num_tickets = ticketQty,
-                        subtotal = grandTotal
+                        subtotal = grandTotal,
+                        visit_date = intent.getStringExtra("EXTRA_VISIT_DATE")
                     )
                 )
             } else {
