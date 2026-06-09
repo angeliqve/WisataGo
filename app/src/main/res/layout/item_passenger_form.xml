@@ -36,7 +36,9 @@
         android:inputType="phone"
         android:paddingHorizontal="16dp"
         android:textColor="#212121"
-        android:textSize="14sp" />
+        android:textSize="14sp"
+
+        android:maxLength="15" />
 
     <View
         android:layout_width="match_parent"
