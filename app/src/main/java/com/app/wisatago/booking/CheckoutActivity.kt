@@ -98,7 +98,6 @@ class CheckoutActivity : AppCompatActivity() {
 
         val listEtPergi = mutableListOf<EditText>()
         val listEtPulang = mutableListOf<EditText>()
-
         val listEtPhonePergi = mutableListOf<EditText>()
         val listEtPhonePulang = mutableListOf<EditText>()
 
@@ -108,7 +107,7 @@ class CheckoutActivity : AppCompatActivity() {
             val formView = layoutInflater.inflate(R.layout.item_passenger_form, llPassengerContainer, false)
             val tvTitle = formView.findViewById<TextView>(R.id.tv_passenger_title)
             val etName = formView.findViewById<EditText>(R.id.et_passenger_name)
-            val etPhone = formView.findViewById<EditText>(R.id.et_passenger_phone) // Ambil EditText HP per form
+            val etPhone = formView.findViewById<EditText>(R.id.et_passenger_phone)
 
             val isPulang = isReturnTrip && i >= passengerCount
             val tripLabel = if (isPulang) "Pulang" else "Pergi"
@@ -127,15 +126,20 @@ class CheckoutActivity : AppCompatActivity() {
             etPhone.addTextChangedListener(object : TextWatcher {
                 private var isUpdating = false
                 private val hyphen = "-"
+
                 override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
                 override fun afterTextChanged(s: Editable?) {
                     if (isUpdating) return
-                    isUpdating = true
 
-                    var current = s.toString().replace(Regex("[^0-9]"), "")
+                    val inputString = s.toString()
+                    var current = inputString.replace(Regex("[^0-9]"), "")
+
+                    if (current.length > 13) {
+                        current = current.substring(0, 13)
+                    }
+
                     val formatted = StringBuilder()
-
                     for (k in current.indices) {
                         formatted.append(current[k])
                         if ((k + 1) % 4 == 0 && (k + 1) < current.length) {
@@ -143,6 +147,11 @@ class CheckoutActivity : AppCompatActivity() {
                         }
                     }
 
+                    if (formatted.toString() == inputString) {
+                        return
+                    }
+
+                    isUpdating = true
                     etPhone.setText(formatted.toString())
                     etPhone.setSelection(formatted.length)
                     isUpdating = false
