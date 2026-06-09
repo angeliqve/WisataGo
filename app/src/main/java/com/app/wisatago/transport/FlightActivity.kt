@@ -11,6 +11,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.app.wisatago.R
 import com.google.android.material.switchmaterial.SwitchMaterial
+import com.app.wisatago.Dashboard
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -50,7 +51,14 @@ class FlightActivity : AppCompatActivity() {
         // 🛫 DATA DUMMY BANDARA KITA
         val daftarBandara = arrayOf("Bandara Soekarno-Hatta (CGK)", "Bandara Internasional Ngurah Rai (DPS)")
 
-        btnBack.setOnClickListener { finish() }
+        btnBack.setOnClickListener {
+            // Mengarahkan langsung ke Dashboard
+            val intent = Intent(this, Dashboard::class.java)
+            // Membersihkan tumpukan halaman sebelumnya agar RAM tidak penuh
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            startActivity(intent)
+            finish()
+        }
 
         containerOrigin.setOnClickListener {
             AlertDialog.Builder(this)
