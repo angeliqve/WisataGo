@@ -226,37 +226,32 @@ class PaymentActivity : AppCompatActivity() {
                     // ========================================================
                     val calendar = Calendar.getInstance()
                     val datePickerDialog = DatePickerDialog(this@PaymentActivity, { _, year, month, day ->
-                        addonDate = "$year-${month + 1}-$day"
+                        // Format tanggal jadi YYYY-MM-DD
+                        val formatBulan = String.format("%02d", month + 1)
+                        val formatHari = String.format("%02d", day)
+                        addonDate = "$year-$formatBulan-$formatHari"
+                        addonTime = "" // Jam sengaja dikosongkan
 
-                        // ⏰ Pemilihan Jam Kunjungan
-                        TimePickerDialog(this@PaymentActivity, { _, hour, minute ->
-                            addonTime = String.format("%02d:%02d:00", hour, minute)
+                        // 🟢 INSTANT UPDATE UI & KALKULATOR TOTAL
+                        isAddonSelected = true
+                        tvSelectedAddon.text = "$addonName\n📅 $addonDate"
 
-                            // 🟢 PERBAIKAN: Buat variabel khusus tampilan jam agar selalu 2 digit (contoh: 10:00)
-                            val displayTime = String.format("%02d:%02d", hour, minute)
+                        val totalAddonBase = addonPriceBase * passengerCount
+                        val totalAddonTax = totalAddonBase * 0.12
 
-                            // 🟢 UPDATE UI & KALKULATOR TOTAL
-                            isAddonSelected = true
-                            tvSelectedAddon.text = "$addonName\n📅 $addonDate  ⏰ $displayTime"
+                        dynamicSubtotal = subTotal + totalAddonBase
+                        dynamicTax = tax + totalAddonTax
+                        dynamicGrandTotal = dynamicSubtotal + dynamicTax
 
-                            val totalAddonBase = addonPriceBase * passengerCount
-                            val totalAddonTax = totalAddonBase * 0.12
+                        // Tampilkan Biaya Addon di Rincian
+                        layoutAddon.visibility = View.VISIBLE
+                        tvLabelPayAddon.text = "Add-on: $addonName (x$passengerCount)"
+                        tvPriceAddon.text = "Rp ${formatter.format(totalAddonBase + totalAddonTax)}"
 
-                            dynamicSubtotal = subTotal + totalAddonBase
-                            dynamicTax = tax + totalAddonTax
-                            dynamicGrandTotal = dynamicSubtotal + dynamicTax
-
-                            // Tampilkan Biaya Addon di Rincian
-                            layoutAddon.visibility = View.VISIBLE
-                            tvLabelPayAddon.text = "Add-on: $addonName (x$passengerCount)"
-                            tvPriceAddon.text = "Rp ${formatter.format(totalAddonBase + totalAddonTax)}"
-
-                            // Perbarui Total Keseluruhan
-                            findViewById<TextView>(R.id.tv_pay_subtotal).text = "Rp ${formatter.format(dynamicSubtotal)}"
-                            findViewById<TextView>(R.id.tv_pay_tax).text = "Rp ${formatter.format(dynamicTax)}"
-                            findViewById<TextView>(R.id.tv_pay_grand_total).text = "Rp ${formatter.format(dynamicGrandTotal)}"
-
-                        }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true).show()
+                        // Perbarui Total Keseluruhan
+                        findViewById<TextView>(R.id.tv_pay_subtotal).text = "Rp ${formatter.format(dynamicSubtotal)}"
+                        findViewById<TextView>(R.id.tv_pay_tax).text = "Rp ${formatter.format(dynamicTax)}"
+                        findViewById<TextView>(R.id.tv_pay_grand_total).text = "Rp ${formatter.format(dynamicGrandTotal)}"
 
                     }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH))
 
@@ -268,7 +263,7 @@ class PaymentActivity : AppCompatActivity() {
                     maxCalendar.add(Calendar.DAY_OF_MONTH, 30)
                     datePickerDialog.datePicker.maxDate = maxCalendar.timeInMillis
 
-                    // Tampilkan kalender yang sudah terkunci
+                    // Tampilkan kalender
                     datePickerDialog.show()
                 }
                 .show()
@@ -468,7 +463,7 @@ class PaymentActivity : AppCompatActivity() {
 
                 override fun onFailure(call: Call<ResponseBooking>, t: Throwable) {
                     btnPay.isEnabled = true
-                    btnPay.text = "Bayar Sekarang"
+                    btnPay.text = "Bayar fSekarang"
                     Toast.makeText(this@PaymentActivity, "Koneksi Bermasalah: ${t.message}", Toast.LENGTH_LONG).show()
                 }
             })

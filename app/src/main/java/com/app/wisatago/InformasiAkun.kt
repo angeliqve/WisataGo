@@ -158,7 +158,7 @@ class InformasiAkun : AppCompatActivity() {
                         tvEmail.text = user.email
                         tvUserEmail.text = user.email
 
-                        // Logika Format Telepon (Tetap sama seperti buatan Anda)
+                        // Logika Format Telepon
                         val rawPhone = user.phone_number ?: ""
                         if (rawPhone.isNotEmpty()) {
                             val digitsOnly = rawPhone.replace("-", "")
@@ -185,10 +185,12 @@ class InformasiAkun : AppCompatActivity() {
                             tvCreatedAt.text = user.created_at
                         }
 
-                        // 🟢 TAMPILKAN FOTO DARI DATABASE JIKA ADA
+                        // 🟢 PERBAIKAN 1: TAMPILKAN FOTO DARI DATABASE DENGAN AMAN
                         if (!user.profile_picture.isNullOrEmpty()) {
                             try {
-                                val imageBytes = Base64.decode(user.profile_picture, Base64.DEFAULT)
+                                // Hapus embel-embel "data:image..." jika ada agar tidak error saat di-decode
+                                val cleanBase64 = user.profile_picture.replace(Regex("^data:image/[a-zA-Z]+;base64,"), "")
+                                val imageBytes = Base64.decode(cleanBase64, Base64.DEFAULT)
                                 val decodedImage = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
                                 imgProfile.setImageBitmap(decodedImage)
                             } catch (e: Exception) {
@@ -222,11 +224,22 @@ class InformasiAkun : AppCompatActivity() {
     private fun uploadProfilePicture() {
         Toast.makeText(this, "Menyimpan foto profil...", Toast.LENGTH_SHORT).show()
 
+        // 🟢 PERBAIKAN 2: JARING PENGAMAN DATA KOSONG
+        // Pastikan nama dan HP tidak pernah kosong agar lolos validasi Node.js
+        if (currentFullName.isEmpty()) {
+            val sharedPref = getSharedPreferences("USER_SESSION", MODE_PRIVATE)
+            currentFullName = sharedPref.getString("USERNAME", "User WisataGO") ?: "User WisataGO"
+        }
+        if (currentPhone.isEmpty()) {
+            val sharedPref = getSharedPreferences("USER_SESSION", MODE_PRIVATE)
+            currentPhone = sharedPref.getString("USER_PHONE", "-") ?: "-"
+        }
+
         val updateRequest = UpdateProfileRequest(
             user_id = userId,
             full_name = currentFullName,
             phone_number = currentPhone,
-            profile_picture = currentBase64Image // Kirim sandi gambar ke API
+            profile_picture = currentBase64Image // Kirim sandi gambar utuh tanpa enter
         )
 
         ApiClient.instance.updateProfile(updateRequest).enqueue(object : Callback<ProfileResponse> {
@@ -234,12 +247,12 @@ class InformasiAkun : AppCompatActivity() {
                 if (response.isSuccessful) {
                     Toast.makeText(this@InformasiAkun, "Foto Profil berhasil diperbarui!", Toast.LENGTH_SHORT).show()
                 } else {
-                    Toast.makeText(this@InformasiAkun, "Gagal memperbarui foto", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@InformasiAkun, "Gagal memperbarui foto di server", Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onFailure(call: Call<ProfileResponse>, t: Throwable) {
-                Toast.makeText(this@InformasiAkun, "Error jaringan", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@InformasiAkun, "Koneksi Error: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
     }
@@ -265,6 +278,10 @@ class InformasiAkun : AppCompatActivity() {
         val baos = ByteArrayOutputStream()
         bm.compress(Bitmap.CompressFormat.JPEG, 70, baos)
         val b = baos.toByteArray()
-        return Base64.encodeToString(b, Base64.DEFAULT)
+
+        // 🟢 PERBAIKAN 3: GUNAKAN NO_WRAP
+        // Ini memastikan kode gambar menjadi satu baris panjang tanpa terpotong tombol "Enter"
+        // Sehingga struktur JSON tidak hancur saat terbang ke Node.js
+        return Base64.encodeToString(b, Base64.NO_WRAP)
     }
 }

@@ -315,7 +315,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="12dp"
                             android:layout_weight="1"
-                            android:text="Klik untuk memilih wisata, tanggal, &amp; jam"
+                            android:text="Klik untuk memilih wisata, &amp; tanggal"
                             android:textColor="#212121"
                             android:textStyle="bold" />
                     </LinearLayout>

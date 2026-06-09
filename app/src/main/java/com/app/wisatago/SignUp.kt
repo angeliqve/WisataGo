@@ -64,8 +64,8 @@ class SignUp : AppCompatActivity() {
                         // Menutup halaman Sign Up agar pengguna langsung kembali ke layar Login
                         finish()
                     } else {
-                        // Respon gagal dari server (misal email sudah terdaftar)
-                        Toast.makeText(this@SignUp, "Gagal Daftar! Email mungkin sudah digunakan.", Toast.LENGTH_SHORT).show()
+                        // Respon gagal dari server (misal nama sudah terdaftar)
+                        Toast.makeText(this@SignUp, "Gagal Daftar! Nama mungkin sudah digunakan.", Toast.LENGTH_SHORT).show()
                     }
                 }
             } catch (e: Exception) {

@@ -1,7 +1,9 @@
 package com.app.wisatago
 
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.util.Base64
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -27,6 +29,9 @@ class Profile : AppCompatActivity() {
     private lateinit var btnHome: ImageView
     private lateinit var btnPemesanan: ImageView
 
+    // 🟢 1. Tambahkan Variabel untuk Foto Profil
+    private lateinit var imgProfilePic: ImageView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
@@ -42,6 +47,11 @@ class Profile : AppCompatActivity() {
 
         btnHome = findViewById(R.id.btnHome)
         btnPemesanan = findViewById(R.id.btnPemesanan)
+
+        // 🟢 2. Hubungkan Foto Profil dengan ID di XML Anda
+        // CATATAN: Pastikan ID R.id.imgProfile sesuai dengan ID ImageView lingkaran di activity_profile.xml Anda.
+        // Jika namanya berbeda (misal: R.id.imgProfilePic), silakan disesuaikan.
+        imgProfilePic = findViewById(R.id.imgProfile)
 
         btnHome.setOnClickListener {
             val intent = Intent(this, Dashboard::class.java)
@@ -118,8 +128,23 @@ class Profile : AppCompatActivity() {
                 withContext(Dispatchers.Main) {
                     if (response.isSuccessful && response.body() != null) {
                         val user = response.body()!!
+
+                        // Update Teks
                         tvUserName.text = user.full_name
                         tvUserEmail.text = user.email
+
+                        // 🟢 3. MESIN DECODER FOTO BASE64 KE BITMAP
+                        if (!user.profile_picture.isNullOrEmpty()) {
+                            try {
+                                val cleanBase64 = user.profile_picture.replace(Regex("^data:image/[a-zA-Z]+;base64,"), "")
+                                val imageBytes = Base64.decode(cleanBase64, Base64.DEFAULT)
+                                val decodedImage = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+                                imgProfilePic.setImageBitmap(decodedImage)
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            }
+                        }
+
                     } else {
                         Toast.makeText(this@Profile, "Gagal ambil data: ${response.errorBody()?.string()}", Toast.LENGTH_LONG).show()
                     }
