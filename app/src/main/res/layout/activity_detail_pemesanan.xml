@@ -59,6 +59,18 @@
                     android:textStyle="bold" />
 
                 <TextView
+                    android:id="@+id/tvDetailAddon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tvDetailName"
+                    android:layout_marginTop="4dp"
+                    android:text="+ Add-on: Nama Wisata"
+                    android:textColor="#2DA0F5"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:visibility="gone" />
+
+                <TextView
                     android:id="@+id/tvDetailStatus"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -112,6 +124,49 @@
                 android:textSize="15sp"
                 android:textStyle="bold"
                 android:layout_marginBottom="12dp"/>
+            <!-- 🟢 TAMBAHAN: WAKTU KEBERANGKATAN -->
+            <TextView
+                android:id="@+id/labelWaktu"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Waktu Keberangkatan"
+                android:textColor="#757575"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/tvDetailTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="-"
+                android:textColor="#1E1E1E"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="12dp"/>
+
+            <!-- 🟢 TAMBAHAN: RINCIAN PENUMPANG -->
+            <TextView
+                android:id="@+id/labelPenumpang"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Rincian Penumpang"
+                android:textColor="#757575"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/tvDetailPassengers"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="-"
+                android:textColor="#1E1E1E"
+                android:textSize="14sp"
+                android:lineSpacingExtra="4dp"
+                android:layout_marginBottom="12dp"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#E5E7EB"
+                android:layout_marginBottom="16dp"/>
 
             <View
                 android:layout_width="match_parent"
@@ -141,7 +196,9 @@
                     android:textColor="#2DA0F5"
                     android:textSize="18sp"
                     android:textStyle="bold" />
+
             </RelativeLayout>
+
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnCancelBooking"
                 android:layout_width="match_parent"

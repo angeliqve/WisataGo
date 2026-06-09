@@ -16,6 +16,7 @@ import com.app.wisatago.CancelResponse
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import android.view.View
 
 class DetailPemesananActivity : AppCompatActivity() {
 
@@ -43,12 +44,67 @@ class DetailPemesananActivity : AppCompatActivity() {
         val destination = intent.getStringExtra("DEST_CITY") ?: ""
         val departureTimeStr = intent.getStringExtra("DEPARTURE_TIME")
 
+        val tvDetailAddon = findViewById<TextView>(R.id.tvDetailAddon)
+
+        // 🟢 Tarik data Add-on Wisata dari Intent
+        val addonWisata = intent.getStringExtra("ADDON_WISATA")
+        // 1. Tarik Data Penumpang
+        val passengerInfo = intent.getStringExtra("PASSENGER_INFO")
+
+        // 2. Hubungkan dengan UI XML
+        val tvDetailTime = findViewById<TextView>(R.id.tvDetailTime)
+        val tvDetailPassengers = findViewById<TextView>(R.id.tvDetailPassengers)
+        val labelWaktu = findViewById<TextView>(R.id.labelWaktu)
+        val labelPenumpang = findViewById<TextView>(R.id.labelPenumpang)
+
+        // 3. Logika Format Jam Cantik (Contoh: 11 Jun 2026, 10:00 WIB)
+        if (!departureTimeStr.isNullOrEmpty()) {
+            try {
+                val inputFormat = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+                val outputFormat = java.text.SimpleDateFormat("dd MMM yyyy, HH:mm 'WIB'", Locale.getDefault())
+                val date = inputFormat.parse(departureTimeStr)
+                tvDetailTime.text = if (date != null) outputFormat.format(date) else departureTimeStr
+            } catch (e: Exception) {
+                tvDetailTime.text = departureTimeStr
+            }
+        } else {
+            tvDetailTime.text = "Waktu tidak tersedia"
+        }
+
+        // 4. Logika Tampilan Penumpang
+        if (!passengerInfo.isNullOrEmpty()) {
+            tvDetailPassengers.text = passengerInfo
+        } else {
+            tvDetailPassengers.text = "Data penumpang tidak tersedia"
+        }
+
+        // 5. Ubah Judul Label Jika Ini Tiket Wisata (Bukan Transportasi)
+        if (bookingCode.startsWith("WS-")) {
+            labelWaktu.text = "Waktu Kunjungan"
+            labelPenumpang.text = "Rincian Pengunjung"
+        }
+
         tvDetailName.text = productName
+        tvDetailCode.text = bookingCode
+
+        // 🟢 Logika Tampilan UI Add-on
+        if (!addonWisata.isNullOrEmpty()) {
+            tvDetailAddon.visibility = View.VISIBLE
+            tvDetailAddon.text = "+ Add-on: $addonWisata"
+        } else {
+            tvDetailAddon.visibility = View.GONE
+        }
+
         tvDetailCode.text = bookingCode
 
         if (bookingCode.startsWith("TR-") && destination.isNotEmpty()) {
             labelRute.text = "Rute Perjalanan"
-            tvDetailRoute.text = "$origin ➔ $destination"
+            // 🟢 Samakan logikanya dengan Adapter
+            if (productName.contains("&")) {
+                tvDetailRoute.text = "$origin ⇌ $destination"
+            } else {
+                tvDetailRoute.text = "$origin ➔ $destination"
+            }
         } else {
             labelRute.text = "Lokasi Destinasi"
             tvDetailRoute.text = origin
@@ -71,8 +127,8 @@ class DetailPemesananActivity : AppCompatActivity() {
             }
             "CANCELED" -> {
                 tvDetailStatus.text = "CANCELED"
-                tvDetailStatus.setBackgroundColor(Color.parseColor("#FEE2E2")) // 🟢 Merah
-                tvDetailStatus.setTextColor(Color.parseColor("#B91C1C")) // 🟢 Merah
+                tvDetailStatus.setBackgroundColor(Color.parseColor("#FEE2E2")) // Merah
+                tvDetailStatus.setTextColor(Color.parseColor("#B91C1C")) // Merah
             }
             else -> {
                 tvDetailStatus.text = statusClean

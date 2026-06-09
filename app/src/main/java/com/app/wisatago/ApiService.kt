@@ -89,9 +89,8 @@ interface ApiService {
 
     @retrofit2.http.PUT("/update-profile")
     fun updateProfile(
-        @Body request: Map<String, String>
-    ): Call<okhttp3.ResponseBody>
-
+        @Body request: UpdateProfileRequest
+    ): Call<ProfileResponse>
     @GET("/booking-history")
     fun getBookingHistory(
         @Query("user_id") userId: String

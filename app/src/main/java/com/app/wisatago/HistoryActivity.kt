@@ -25,14 +25,8 @@ class HistoryActivity : AppCompatActivity() {
         rvHistory = findViewById(R.id.rvHistory)
         rvHistory.layoutManager = LinearLayoutManager(this)
 
-        val sharedPref = getSharedPreferences("USER_SESSION", MODE_PRIVATE)
-        val userId = sharedPref.getString("USER_ID", null)
-
-        if (userId != null) {
-            muatRiwayatTransaksi(userId)
-        } else {
-            Toast.makeText(this, "Sesi habis, silakan login ulang", Toast.LENGTH_SHORT).show()
-        }
+        // 🟢 NOTE: Pemanggilan API (muatRiwayatTransaksi) sudah dihapus dari sini
+        // dan dipindahkan ke bawah (ke dalam onResume) agar bisa Auto-Refresh.
 
         val btnHome = findViewById<ImageView>(R.id.btnHome)
         val btnPemesanan = findViewById<ImageView>(R.id.btnPemesanan)
@@ -66,6 +60,23 @@ class HistoryActivity : AppCompatActivity() {
                 finish()
             }
         })
+    }
+
+    // ==========================================
+    // 🟢 SIKLUS AUTO-REFRESH (Mantra Rahasianya)
+    // ==========================================
+    override fun onResume() {
+        super.onResume()
+
+        // Kode ini akan selalu dieksekusi setiap kali user melihat halaman ini
+        val sharedPref = getSharedPreferences("USER_SESSION", MODE_PRIVATE)
+        val userId = sharedPref.getString("USER_ID", null)
+
+        if (userId != null) {
+            muatRiwayatTransaksi(userId) // Tarik data terbaru dari server!
+        } else {
+            Toast.makeText(this, "Sesi habis, silakan login ulang", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun muatRiwayatTransaksi(userId: String) {

@@ -1,5 +1,5 @@
 package com.app.wisatago
-
+import com.google.gson.annotations.SerializedName
 data class LoginRequest(
     val email: String,
     val password: String
@@ -18,7 +18,15 @@ data class ProfileResponse(
     val email: String,
     val role: String?,
     val created_at: String?,
-    val phone_number: String?
+    val phone_number: String?,
+    val profile_picture: String?
+)
+
+data class UpdateProfileRequest(
+    val user_id: String,
+    val full_name: String,
+    val phone_number: String,
+    val profile_picture: String? // Tambahan untuk foto profil
 )
 data class SignUpRequest(
     val full_name: String,
@@ -47,8 +55,16 @@ data class HistoryResponse(
     val origin_city: String?,
     val destination_city: String?,
 
-    // 🟢 PASTIKAN NAMA VARIABEL INI SAMA PERSIS (Pakai garis bawah)
-    val departure_time: String? = null
+    @SerializedName("departure_time")
+    val departure_time: String? = null,
+
+    // 🟢 TAMBAHKAN INI
+    @SerializedName("addon_wisata")
+    val addon_wisata: String? = null,
+
+    @SerializedName("passenger_info")
+    val passenger_info: String? = null
+
 )
 
 data class CancelRequest(

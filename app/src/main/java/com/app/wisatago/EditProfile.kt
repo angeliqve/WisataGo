@@ -12,7 +12,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import okhttp3.ResponseBody
+// 🟢 okhttp3.ResponseBody sudah dihapus dari sini
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -132,14 +132,21 @@ class EditProfile : AppCompatActivity() {
             return
         }
 
-        val requestData = hashMapOf(
-            "user_id" to userId,
-            "full_name" to fullNameText,
-            "phone_number" to phoneText
+        // ==========================================
+        // 🟢 PERBAIKAN 1: Gunakan Data Class UpdateProfileRequest
+        // ==========================================
+        val requestData = UpdateProfileRequest(
+            user_id = userId,
+            full_name = fullNameText,
+            phone_number = phoneText,
+            profile_picture = null // Biarkan null, karena pengubahan foto ada di InformasiAkun
         )
 
-        ApiClient.instance.updateProfile(requestData).enqueue(object : Callback<ResponseBody> {
-            override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+        // ==========================================
+        // 🟢 PERBAIKAN 2: Ubah ResponseBody menjadi ProfileResponse
+        // ==========================================
+        ApiClient.instance.updateProfile(requestData).enqueue(object : Callback<ProfileResponse> {
+            override fun onResponse(call: Call<ProfileResponse>, response: Response<ProfileResponse>) {
                 if (response.isSuccessful) {
                     val sharedPref = getSharedPreferences("USER_SESSION", MODE_PRIVATE)
                     sharedPref.edit().apply {
@@ -154,7 +161,7 @@ class EditProfile : AppCompatActivity() {
                 }
             }
 
-            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+            override fun onFailure(call: Call<ProfileResponse>, t: Throwable) {
                 Toast.makeText(this@EditProfile, "Koneksi gagal: ${t.message}", Toast.LENGTH_LONG).show()
             }
         })

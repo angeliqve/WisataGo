@@ -41,13 +41,24 @@ class HistoryAdapter(private val listHistory: List<HistoryResponse>) :
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = listHistory[position]
 
-        holder.tvTransportName.text = item.transport_name ?: "Produk WisataGO"
+        // 🟢 PERBAIKAN 1: Deklarasikan variabel mainProduct agar tidak error
+        val mainProduct = item.transport_name ?: "Produk WisataGO"
+        if (!item.addon_wisata.isNullOrEmpty()) {
+            holder.tvTransportName.text = "$mainProduct (+ ${item.addon_wisata})"
+        } else {
+            holder.tvTransportName.text = mainProduct
+        }
 
         val origin = item.origin_city ?: "WisataGO"
         val destination = item.destination_city
 
         if (!destination.isNullOrEmpty()) {
-            holder.tvRoute.text = "$origin ➔ $destination"
+            // 🟢 Trik UI/UX: Jika nama transport mengandung "&", ubah panah menjadi icon PP ⇌
+            if (mainProduct.contains("&")) {
+                holder.tvRoute.text = "$origin ⇌ $destination"
+            } else {
+                holder.tvRoute.text = "$origin ➔ $destination"
+            }
         } else {
             holder.tvRoute.text = origin
         }
@@ -100,6 +111,11 @@ class HistoryAdapter(private val listHistory: List<HistoryResponse>) :
                 putExtra("ORIGIN_CITY", item.origin_city ?: "WisataGO")
                 putExtra("DEST_CITY", item.destination_city ?: "")
                 putExtra("DEPARTURE_TIME", item.departure_time)
+
+                // 🟢 PERBAIKAN 2: Sisipkan data Add-on agar terbaca di halaman Detail
+                putExtra("ADDON_WISATA", item.addon_wisata)
+
+                putExtra("PASSENGER_INFO", item.passenger_info)
             }
             context.startActivity(intent)
         }
@@ -109,7 +125,7 @@ class HistoryAdapter(private val listHistory: List<HistoryResponse>) :
         // =======================================================
         holder.itemView.setOnLongClickListener {
 
-            // 🟢 JIKA STATUS SUDAH CANCELED, JANGAN MUNCULKAN POP-UP BATAL LAGI
+            // JIKA STATUS SUDAH CANCELED, JANGAN MUNCULKAN POP-UP BATAL LAGI
             if (statusClean == "CANCELED") {
                 Toast.makeText(holder.itemView.context, "Pesanan ini sudah dibatalkan.", Toast.LENGTH_SHORT).show()
                 return@setOnLongClickListener true
@@ -129,7 +145,6 @@ class HistoryAdapter(private val listHistory: List<HistoryResponse>) :
                     override fun onResponse(call: Call<CancelResponse>, response: Response<CancelResponse>) {
                         if (response.isSuccessful && response.body()?.message != null) {
                             Toast.makeText(holder.itemView.context, response.body()?.message, Toast.LENGTH_LONG).show()
-                            // Note: Untuk mengubah warna secara real-time tanpa pindah halaman, Anda bisa memanggil fungsi fetch/reload data API History di Activity Anda.
                         } else {
                             Toast.makeText(holder.itemView.context, "Gagal: Kesalahan pada sistem.", Toast.LENGTH_LONG).show()
                         }

@@ -3,17 +3,28 @@ package com.app.wisatago
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Bundle
+import android.util.Base64
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import android.content.Intent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.imageview.ShapeableImageView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import java.io.ByteArrayOutputStream
+import java.io.InputStream
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -25,12 +36,46 @@ class InformasiAkun : AppCompatActivity() {
 
     private lateinit var tvUserName: TextView
     private lateinit var tvUserEmail: TextView
-
     private lateinit var tvUserId: TextView
     private lateinit var tvFullName: TextView
     private lateinit var tvEmail: TextView
     private lateinit var tvCreatedAt: TextView
     private lateinit var tvPhone: TextView
+
+    // 🟢 Komponen Foto Profil
+    private lateinit var imgProfile: ShapeableImageView
+    private lateinit var tvChangePhoto: TextView
+
+    // 🟢 Variabel Penyimpan Sementara untuk Update
+    private var currentBase64Image: String? = null
+    private var currentFullName = ""
+    private var currentPhone = ""
+    private var userId = ""
+
+    // ==========================================
+    // 🟢 MESIN PEMANGGIL GALERI & PEMROSES FOTO
+    // ==========================================
+    private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        uri?.let {
+            try {
+                val imageStream: InputStream? = contentResolver.openInputStream(it)
+                val selectedImage = BitmapFactory.decodeStream(imageStream)
+
+                // Perkecil gambar agar tidak membuat lag (Maksimal 800px)
+                val resizedBitmap = resizeBitmap(selectedImage, 800)
+
+                // Pasang ke UI (Lingkaran Foto)
+                imgProfile.setImageBitmap(resizedBitmap)
+
+                // Ubah gambar ke teks Base64 lalu Upload
+                currentBase64Image = encodeImageToBase64(resizedBitmap)
+                uploadProfilePicture()
+
+            } catch (e: Exception) {
+                Toast.makeText(this, "Gagal memproses gambar", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,13 +93,28 @@ class InformasiAkun : AppCompatActivity() {
         btnCopyId = findViewById(R.id.btnCopyId)
         btnChangePasswordMenu = findViewById(R.id.btnChangePasswordMenu)
 
-        val sharedPref = getSharedPreferences("USER_SESSION", MODE_PRIVATE)
-        val userId = sharedPref.getString("USER_ID", null)
+        // 🟢 Hubungkan UI Foto Profil
+        imgProfile = findViewById(R.id.imgProfile)
+        tvChangePhoto = findViewById(R.id.tvChangePhoto)
 
-        if (userId != null) {
+        val sharedPref = getSharedPreferences("USER_SESSION", MODE_PRIVATE)
+        userId = sharedPref.getString("USER_ID", "") ?: ""
+
+        if (userId.isNotEmpty()) {
             ambilDataUser(userId)
         } else {
             Toast.makeText(this, "Sesi habis, silakan login kembali", Toast.LENGTH_SHORT).show()
+        }
+
+        // ==========================================
+        // 🟢 AKSI KLIK FOTO PROFIL (Buka Galeri)
+        // ==========================================
+        imgProfile.setOnClickListener {
+            pickImageLauncher.launch("image/*")
+        }
+
+        tvChangePhoto.setOnClickListener {
+            pickImageLauncher.launch("image/*")
         }
 
         btnBack.setOnClickListener {
@@ -87,13 +147,18 @@ class InformasiAkun : AppCompatActivity() {
                     if (response.isSuccessful && response.body() != null) {
                         val user = response.body()!!
 
-                        tvUserId.text = user.user_id.toString()
+                        // 🟢 Simpan data saat ini untuk proses Update Foto nanti
+                        currentFullName = user.full_name
+                        currentPhone = user.phone_number ?: ""
+                        currentBase64Image = user.profile_picture
+
+                        tvUserId.text = user.user_id
                         tvFullName.text = user.full_name
                         tvUserName.text = user.full_name
-
                         tvEmail.text = user.email
                         tvUserEmail.text = user.email
 
+                        // Logika Format Telepon (Tetap sama seperti buatan Anda)
                         val rawPhone = user.phone_number ?: ""
                         if (rawPhone.isNotEmpty()) {
                             val digitsOnly = rawPhone.replace("-", "")
@@ -110,15 +175,25 @@ class InformasiAkun : AppCompatActivity() {
                             tvPhone.text = sharedPref.getString("USER_PHONE", "-")
                         }
 
+                        // Logika Format Tanggal
                         try {
                             val parser = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
                             val formatter = SimpleDateFormat("dd MMMM yyyy", Locale("id", "ID"))
-
                             val date = parser.parse(user.created_at)
                             tvCreatedAt.text = formatter.format(date!!)
-
                         } catch (e: Exception) {
                             tvCreatedAt.text = user.created_at
+                        }
+
+                        // 🟢 TAMPILKAN FOTO DARI DATABASE JIKA ADA
+                        if (!user.profile_picture.isNullOrEmpty()) {
+                            try {
+                                val imageBytes = Base64.decode(user.profile_picture, Base64.DEFAULT)
+                                val decodedImage = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+                                imgProfile.setImageBitmap(decodedImage)
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            }
                         }
 
                     } else {
@@ -139,5 +214,57 @@ class InformasiAkun : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    // ==========================================
+    // 🟢 FUNGSI UPLOAD FOTO KE DATABASE
+    // ==========================================
+    private fun uploadProfilePicture() {
+        Toast.makeText(this, "Menyimpan foto profil...", Toast.LENGTH_SHORT).show()
+
+        val updateRequest = UpdateProfileRequest(
+            user_id = userId,
+            full_name = currentFullName,
+            phone_number = currentPhone,
+            profile_picture = currentBase64Image // Kirim sandi gambar ke API
+        )
+
+        ApiClient.instance.updateProfile(updateRequest).enqueue(object : Callback<ProfileResponse> {
+            override fun onResponse(call: Call<ProfileResponse>, response: Response<ProfileResponse>) {
+                if (response.isSuccessful) {
+                    Toast.makeText(this@InformasiAkun, "Foto Profil berhasil diperbarui!", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this@InformasiAkun, "Gagal memperbarui foto", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<ProfileResponse>, t: Throwable) {
+                Toast.makeText(this@InformasiAkun, "Error jaringan", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
+    // ==========================================
+    // 🟢 FUNGSI ALAT BANTU GAMBAR
+    // ==========================================
+    private fun resizeBitmap(image: Bitmap, maxSize: Int): Bitmap {
+        var width = image.width
+        var height = image.height
+        val bitmapRatio = width.toFloat() / height.toFloat()
+        if (bitmapRatio > 1) {
+            width = maxSize
+            height = (width / bitmapRatio).toInt()
+        } else {
+            height = maxSize
+            width = (height * bitmapRatio).toInt()
+        }
+        return Bitmap.createScaledBitmap(image, width, height, true)
+    }
+
+    private fun encodeImageToBase64(bm: Bitmap): String {
+        val baos = ByteArrayOutputStream()
+        bm.compress(Bitmap.CompressFormat.JPEG, 70, baos)
+        val b = baos.toByteArray()
+        return Base64.encodeToString(b, Base64.DEFAULT)
     }
 }

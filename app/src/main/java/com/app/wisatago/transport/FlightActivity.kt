@@ -10,12 +10,17 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.app.wisatago.R
+import com.app.wisatago.Dashboard
 import com.google.android.material.switchmaterial.SwitchMaterial
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
 class FlightActivity : AppCompatActivity() {
+
+    // 🟢 VARIABEL RAHASIA UNTUK API NODE.JS (Format: YYYY-MM-DD)
+    private var apiDatePergi = ""
+    private var apiDatePulang = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,10 +52,17 @@ class FlightActivity : AppCompatActivity() {
         val calendarPulang = Calendar.getInstance()
         val dateFormat = SimpleDateFormat("EEE, dd MMM yyyy", Locale("id", "ID"))
 
-        // 🛫 DATA DUMMY BANDARA KITA
+        // 🛫 DATA DUMMY BANDARA KITA (Catatan: Jika nanti mau pakai database, ini bisa diganti)
         val daftarBandara = arrayOf("Bandara Soekarno-Hatta (CGK)", "Bandara Internasional Ngurah Rai (DPS)")
 
-        btnBack.setOnClickListener { finish() }
+        btnBack.setOnClickListener {
+            val intent = Intent(this, Dashboard::class.java)
+            // 🟢 FLAG ini berfungsi untuk menghapus history halaman lain (seperti halaman pemilihan transport)
+            // Jadi saat user menekan tombol "Back" di HP Android dari Dashboard, dia tidak akan kembali ke Pesawat lagi
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            startActivity(intent)
+            finish()
+        }
 
         containerOrigin.setOnClickListener {
             AlertDialog.Builder(this)
@@ -76,19 +88,32 @@ class FlightActivity : AppCompatActivity() {
             tvDestination.text = temp
         }
 
+        // ==========================================
+        // 🟢 KALENDER KEBERANGKATAN (DIKUNCI HARI INI)
+        // ==========================================
         btnTanggalPergi.setOnClickListener {
-            DatePickerDialog(
+            val datePickerDialog = DatePickerDialog(
                 this,
                 { _, year, month, dayOfMonth ->
                     calendarPergi.set(Calendar.YEAR, year)
                     calendarPergi.set(Calendar.MONTH, month)
                     calendarPergi.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+
+                    // 1. Teks Cantik untuk UI Layar
                     tvTanggalPergi.text = dateFormat.format(calendarPergi.time)
+
+                    // 2. Teks Baku untuk dikirim ke API Server (YYYY-MM-DD)
+                    val formatBulan = String.format("%02d", month + 1)
+                    val formatHari = String.format("%02d", dayOfMonth)
+                    apiDatePergi = "$year-$formatBulan-$formatHari"
                 },
                 calendarPergi.get(Calendar.YEAR),
                 calendarPergi.get(Calendar.MONTH),
                 calendarPergi.get(Calendar.DAY_OF_MONTH)
-            ).show()
+            )
+            // 🔒 Kunci agar tidak bisa pesan hari kemarin
+            datePickerDialog.datePicker.minDate = System.currentTimeMillis() - 1000
+            datePickerDialog.show()
         }
 
         switchPulangPergi.setOnCheckedChangeListener { _, isChecked ->
@@ -97,22 +122,34 @@ class FlightActivity : AppCompatActivity() {
             } else {
                 btnTanggalPulang.visibility = View.GONE
                 tvTanggalPulang.text = "DD, 00 0000 0000"
+                apiDatePulang = ""
             }
         }
 
+        // ==========================================
+        // 🟢 KALENDER KEPULANGAN (DIKUNCI)
+        // ==========================================
         btnTanggalPulang.setOnClickListener {
-            DatePickerDialog(
+            val datePickerDialog = DatePickerDialog(
                 this,
                 { _, year, month, dayOfMonth ->
                     calendarPulang.set(Calendar.YEAR, year)
                     calendarPulang.set(Calendar.MONTH, month)
                     calendarPulang.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+
                     tvTanggalPulang.text = dateFormat.format(calendarPulang.time)
+
+                    val formatBulan = String.format("%02d", month + 1)
+                    val formatHari = String.format("%02d", dayOfMonth)
+                    apiDatePulang = "$year-$formatBulan-$formatHari"
                 },
                 calendarPulang.get(Calendar.YEAR),
                 calendarPulang.get(Calendar.MONTH),
                 calendarPulang.get(Calendar.DAY_OF_MONTH)
-            ).show()
+            )
+            // 🔒 Set minimal tanggal pulang = tanggal pergi (atau hari ini)
+            datePickerDialog.datePicker.minDate = calendarPergi.timeInMillis
+            datePickerDialog.show()
         }
 
         btnSelectPassengers.setOnClickListener {
@@ -144,8 +181,6 @@ class FlightActivity : AppCompatActivity() {
         btnCariTiket.setOnClickListener {
             val asal = tvOrigin.text.toString().trim()
             val tujuan = tvDestination.text.toString().trim()
-            val tanggalPergi = tvTanggalPergi.text.toString().trim()
-            val tanggalPulang = tvTanggalPulang.text.toString().trim()
             val teksPenumpang = tvPassengers.text.toString().trim()
 
             if (asal.contains("Pilih") || tujuan.contains("Pilih") || asal.isEmpty() || tujuan.isEmpty()) {
@@ -158,13 +193,13 @@ class FlightActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            if (tanggalPergi.isEmpty() || tanggalPergi.contains("Pilih") || tanggalPergi.contains("DD, 00")) {
+            if (apiDatePergi.isEmpty()) {
                 Toast.makeText(this, "Harap pilih tanggal keberangkatan!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
             if (switchPulangPergi.isChecked) {
-                if (tanggalPulang.isEmpty() || tanggalPulang.contains("Pilih") || tanggalPulang.contains("DD, 00")) {
+                if (apiDatePulang.isEmpty()) {
                     Toast.makeText(this, "Harap pilih tanggal kepulangan!", Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
                 }
@@ -173,14 +208,20 @@ class FlightActivity : AppCompatActivity() {
             val jumlahPenumpang = teksPenumpang.split(" ")[0].toIntOrNull() ?: 1
 
             val intent = Intent(this, TicketResultActivity::class.java)
+
             // 🟢 MENGIRIMKAN IDENTITAS "flight" KE TicketResultActivity
             intent.putExtra("EXTRA_TRANSPORT_TYPE", "flight")
             intent.putExtra("EXTRA_ORIGIN", asal)
             intent.putExtra("EXTRA_DESTINATION", tujuan)
-            intent.putExtra("EXTRA_DATE_PERGI", tanggalPergi)
+
+            // 🟢 KITA MENGIRIMKAN FORMAT YYYY-MM-DD UNTUK SERVER
+            intent.putExtra("EXTRA_DATE_PERGI", apiDatePergi)
+            // (Opsional) Mengirimkan tanggal format cantik untuk sekadar ditampilkan di judul atas TicketResult
+            intent.putExtra("EXTRA_DISPLAY_DATE_PERGI", tvTanggalPergi.text.toString())
 
             if (switchPulangPergi.isChecked) {
-                intent.putExtra("EXTRA_DATE_PULANG", tanggalPulang)
+                intent.putExtra("EXTRA_DATE_PULANG", apiDatePulang)
+                intent.putExtra("EXTRA_DISPLAY_DATE_PULANG", tvTanggalPulang.text.toString())
             }
 
             intent.putExtra("EXTRA_PASSENGERS", jumlahPenumpang)

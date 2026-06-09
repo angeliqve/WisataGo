@@ -221,9 +221,11 @@ class PaymentActivity : AppCompatActivity() {
                     addonPriceBase = hargaWisata[which]
                     addonId = mockIds[which]
 
-                    // 📅 Pemilihan Tanggal Kunjungan
+                    // ========================================================
+                    // 📅 🟢 KUNCI TANGGAL: HANYA HARI INI s/d 30 HARI KE DEPAN
+                    // ========================================================
                     val calendar = Calendar.getInstance()
-                    DatePickerDialog(this@PaymentActivity, { _, year, month, day ->
+                    val datePickerDialog = DatePickerDialog(this@PaymentActivity, { _, year, month, day ->
                         addonDate = "$year-${month + 1}-$day"
 
                         // ⏰ Pemilihan Jam Kunjungan
@@ -256,7 +258,18 @@ class PaymentActivity : AppCompatActivity() {
 
                         }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true).show()
 
-                    }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show()
+                    }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH))
+
+                    // 🔒 Batas Minimal: Hari ini (dikurangi 1 detik untuk mencegah error timezone)
+                    datePickerDialog.datePicker.minDate = System.currentTimeMillis() - 1000
+
+                    // 🔒 Batas Maksimal: 30 Hari dari hari ini
+                    val maxCalendar = Calendar.getInstance()
+                    maxCalendar.add(Calendar.DAY_OF_MONTH, 30)
+                    datePickerDialog.datePicker.maxDate = maxCalendar.timeInMillis
+
+                    // Tampilkan kalender yang sudah terkunci
+                    datePickerDialog.show()
                 }
                 .show()
         }
