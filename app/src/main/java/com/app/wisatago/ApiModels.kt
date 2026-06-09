@@ -5,6 +5,7 @@ data class LoginRequest(
     val password: String
 )
 
+
 data class LoginResponse(
     val message: String,
     val user_id: String,
@@ -74,4 +75,9 @@ data class CancelRequest(
 data class CancelResponse(
     val message: String?,
     val error: String?
+)
+
+data class AdminStatsResponse(
+    val total_transaksi: Int,
+    val total_pendapatan: Double
 )

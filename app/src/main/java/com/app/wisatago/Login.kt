@@ -63,20 +63,27 @@ class Login : AppCompatActivity() {
 
                         val sharedPref = getSharedPreferences("USER_SESSION", MODE_PRIVATE)
                         with(sharedPref.edit()) {
-
                             putString("USER_ID", hasilData.user_id)
+                            putString("USERNAME", hasilData.full_name)
                             putString("FULL_NAME", hasilData.full_name)
                             putString("EMAIL", email)
                             putString("ROLE", hasilData.role)
-
                             apply()
                         }
 
                         Toast.makeText(this@Login, "Selamat datang, ${hasilData.full_name}!", Toast.LENGTH_SHORT).show()
 
-                        val intent = Intent(this@Login, Dashboard::class.java)
-                        intent.putExtra("USERNAME_KEY", hasilData.full_name)
-                        startActivity(intent)
+                        if (hasilData.role.equals("admin", ignoreCase = true)) {
+                            val intent = Intent(this@Login, AdminDashboardActivity::class.java)
+                            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                            startActivity(intent)
+                        } else {
+                            val intent = Intent(this@Login, Dashboard::class.java)
+                            intent.putExtra("USERNAME_KEY", hasilData.full_name)
+                            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                            startActivity(intent)
+                        }
+
                         finish()
 
                     } else {

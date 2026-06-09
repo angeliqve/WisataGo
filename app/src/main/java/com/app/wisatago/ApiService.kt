@@ -96,6 +96,10 @@ interface ApiService {
         @Query("user_id") userId: String
     ): retrofit2.Call<List<HistoryResponse>>
 
+    @GET("api/admin/dashboard-stats")
+    suspend fun getAdminDashboardStats(): Response<AdminStatsResponse>
+    @GET("api/admin/bookings")
+    suspend fun getAllBookingsAdmin(): Response<List<HistoryResponse>>
     @POST("cancel-booking")
     fun cancelBooking(@Body request: CancelRequest): Call<CancelResponse>
 }
