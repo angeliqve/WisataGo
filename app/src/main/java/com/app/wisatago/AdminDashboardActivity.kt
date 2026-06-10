@@ -7,6 +7,7 @@ import android.text.TextWatcher
 import android.view.View
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -24,8 +25,10 @@ class AdminDashboardActivity : AppCompatActivity() {
 
     private lateinit var tvAdminWelcome: TextView
     private lateinit var btnAdminLogout: ImageButton
-    private lateinit var bottomNav: BottomNavigationView
-
+    private lateinit var btnAdminStats: ImageView
+    private lateinit var btnAdminOrders: ImageView
+    private lateinit var tvAdminStats: TextView
+    private lateinit var tvAdminOrders: TextView
     private lateinit var layoutStatistik: View
     private lateinit var layoutPesanan: View
     private lateinit var etAdminSearch: EditText
@@ -40,7 +43,11 @@ class AdminDashboardActivity : AppCompatActivity() {
 
         tvAdminWelcome = findViewById(R.id.tv_admin_welcome)
         btnAdminLogout = findViewById(R.id.btn_admin_logout)
-        bottomNav = findViewById(R.id.admin_bottom_navigation)
+
+        btnAdminStats = findViewById(R.id.btnAdminStats)
+        btnAdminOrders = findViewById(R.id.btnAdminOrders)
+        tvAdminStats = findViewById(R.id.tvAdminStats)
+        tvAdminOrders = findViewById(R.id.tvAdminOrders)
 
         layoutStatistik = findViewById(R.id.layout_tab_statistik)
         layoutPesanan = findViewById(R.id.layout_tab_pesanan)
@@ -56,21 +63,24 @@ class AdminDashboardActivity : AppCompatActivity() {
 
         muatDataStatistikDanTransaksi()
 
-        bottomNav.setOnItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.nav_admin_stats -> {
-                    layoutStatistik.visibility = View.VISIBLE
-                    layoutPesanan.visibility = View.GONE
-                    true
-                }
-                R.id.nav_admin_orders -> {
-                    layoutStatistik.visibility = View.VISIBLE
-                    layoutStatistik.visibility = View.GONE
-                    layoutPesanan.visibility = View.VISIBLE
-                    true
-                }
-                else -> false
-            }
+        btnAdminStats.setOnClickListener {
+            layoutStatistik.visibility = View.VISIBLE
+            layoutPesanan.visibility = View.GONE
+
+            btnAdminStats.setImageResource(R.drawable.icon_home_white)
+            btnAdminOrders.setImageResource(R.drawable.icon_order_blue)
+            tvAdminStats.setTextColor(android.graphics.Color.parseColor("#FFFFFF"))
+            tvAdminOrders.setTextColor(android.graphics.Color.parseColor("#0A4181"))
+        }
+
+        btnAdminOrders.setOnClickListener {
+            layoutStatistik.visibility = View.GONE
+            layoutPesanan.visibility = View.VISIBLE
+
+            btnAdminStats.setImageResource(R.drawable.icon_home_blue)
+            btnAdminOrders.setImageResource(R.drawable.icon_order_white)
+            tvAdminStats.setTextColor(android.graphics.Color.parseColor("#0A4181"))
+            tvAdminOrders.setTextColor(android.graphics.Color.parseColor("#FFFFFF"))
         }
 
         etAdminSearch.addTextChangedListener(object : TextWatcher {
