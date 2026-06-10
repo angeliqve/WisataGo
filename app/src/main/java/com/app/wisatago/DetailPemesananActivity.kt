@@ -86,11 +86,12 @@ class DetailPemesananActivity : AppCompatActivity() {
         // Logika Tampilan Penumpang & Pengunjung
         // =====================================================================
         if (bookingCode.startsWith("WS-")) {
-            labelPenumpang.visibility = View.GONE
-            tvDetailPassengers.visibility = View.GONE
+            // 🟢 TIKET WISATA: Ubah label menjadi "Jumlah Tiket" dan tampilkan isinya
+            labelPenumpang.text = "Jumlah Tiket"
+            tvDetailPassengers.text = if (!passengerInfo.isNullOrEmpty()) passengerInfo else "1 Tiket"
         } else {
-            labelPenumpang.visibility = View.VISIBLE
-            tvDetailPassengers.visibility = View.VISIBLE
+            // 🔵 TIKET TRANSPORTASI: Tampilkan daftar nama penumpang (yang baru saja Anda kirim)
+            labelPenumpang.text = "Rincian Penumpang"
             if (!passengerInfo.isNullOrEmpty()) {
                 tvDetailPassengers.text = passengerInfo
             } else {
