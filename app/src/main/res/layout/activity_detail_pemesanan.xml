@@ -91,6 +91,24 @@
                 android:layout_marginBottom="16dp"/>
 
             <TextView
+                android:id="@+id/labelNamaPemesan"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Nama Pemesan"
+                android:textColor="#757575"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/tvDetailNamaPemesan"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Nama : -"
+                android:textColor="#1E1E1E"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="12dp"/>
+
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Kode Pemesanan"
@@ -124,7 +142,7 @@
                 android:textSize="15sp"
                 android:textStyle="bold"
                 android:layout_marginBottom="12dp"/>
-            <!-- 🟢 TAMBAHAN: WAKTU KEBERANGKATAN -->
+
             <TextView
                 android:id="@+id/labelWaktu"
                 android:layout_width="wrap_content"
@@ -143,7 +161,6 @@
                 android:textStyle="bold"
                 android:layout_marginBottom="12dp"/>
 
-            <!-- 🟢 TAMBAHAN: RINCIAN PENUMPANG -->
             <TextView
                 android:id="@+id/labelPenumpang"
                 android:layout_width="wrap_content"
@@ -162,12 +179,6 @@
                 android:lineSpacingExtra="4dp"
                 android:layout_marginBottom="12dp"
                 android:textStyle="bold"/>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#E5E7EB"
-                android:layout_marginBottom="16dp"/>
 
             <View
                 android:layout_width="match_parent"

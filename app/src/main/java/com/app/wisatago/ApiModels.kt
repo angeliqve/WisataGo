@@ -64,7 +64,10 @@ data class HistoryResponse(
     val addon_wisata: String? = null,
 
     @SerializedName("passenger_info")
-    val passenger_info: String? = null
+    val passenger_info: String? = null,
+
+    @SerializedName("full_name")
+    val full_name: String? = null
 
 )
 

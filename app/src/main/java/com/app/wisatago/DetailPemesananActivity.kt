@@ -48,11 +48,29 @@ class DetailPemesananActivity : AppCompatActivity() {
         val addonWisata = intent.getStringExtra("ADDON_WISATA")
         val passengerInfo = intent.getStringExtra("PASSENGER_INFO")
 
+        // 🟢 DATA BARU: Nama Pemesan Khusus Tampilan Admin
+        val fullName = intent.getStringExtra("FULL_NAME")
+
         // Hubungkan dengan UI XML
         val tvDetailTime = findViewById<TextView>(R.id.tvDetailTime)
         val tvDetailPassengers = findViewById<TextView>(R.id.tvDetailPassengers)
         val labelWaktu = findViewById<TextView>(R.id.labelWaktu)
         val labelPenumpang = findViewById<TextView>(R.id.labelPenumpang)
+
+        val labelNamaPemesan = findViewById<TextView>(R.id.labelNamaPemesan)
+        val tvDetailNamaPemesan = findViewById<TextView>(R.id.tvDetailNamaPemesan)
+
+        // =====================================================================
+        // 🟢 1. LOGIKA TAMPILAN NAMA PEMESAN (KHUSUS DASHBOARD ADMIN)
+        // =====================================================================
+        if (!fullName.isNullOrEmpty()) {
+            labelNamaPemesan.visibility = View.VISIBLE
+            tvDetailNamaPemesan.visibility = View.VISIBLE
+            tvDetailNamaPemesan.text = fullName
+        } else {
+            labelNamaPemesan.visibility = View.GONE
+            tvDetailNamaPemesan.visibility = View.GONE // Menyembunyikan jika user biasa
+        }
 
         // =====================================================================
         // Logika Format Tanggal dan Jam Cerdas (Pemisahan Wisata & Transport)
@@ -86,11 +104,9 @@ class DetailPemesananActivity : AppCompatActivity() {
         // Logika Tampilan Penumpang & Pengunjung
         // =====================================================================
         if (bookingCode.startsWith("WS-")) {
-            // 🟢 TIKET WISATA: Ubah label menjadi "Jumlah Tiket" dan tampilkan isinya
             labelPenumpang.text = "Jumlah Tiket"
             tvDetailPassengers.text = if (!passengerInfo.isNullOrEmpty()) passengerInfo else "1 Tiket"
         } else {
-            // 🔵 TIKET TRANSPORTASI: Tampilkan daftar nama penumpang (yang baru saja Anda kirim)
             labelPenumpang.text = "Rincian Penumpang"
             if (!passengerInfo.isNullOrEmpty()) {
                 tvDetailPassengers.text = passengerInfo
@@ -99,7 +115,7 @@ class DetailPemesananActivity : AppCompatActivity() {
             }
         }
 
-        // Ubah Judul Label Jika Ini Tiket Wisata
+        // Ubah Judul Label Waktu Jika Ini Tiket Wisata
         if (bookingCode.startsWith("WS-")) {
             labelWaktu.text = "Tanggal Kunjungan"
         } else {
@@ -117,6 +133,9 @@ class DetailPemesananActivity : AppCompatActivity() {
             tvDetailAddon.visibility = View.GONE
         }
 
+        // =====================================================================
+        // 🟢 2. PERBAIKAN LABEL DESTINASI WISATA (BUKAN WISATAGO)
+        // =====================================================================
         if (bookingCode.startsWith("TR-") && destination.isNotEmpty()) {
             labelRute.text = "Rute Perjalanan"
             if (productName.contains("&")) {
@@ -125,8 +144,8 @@ class DetailPemesananActivity : AppCompatActivity() {
                 tvDetailRoute.text = "$origin ➔ $destination"
             }
         } else {
-            labelRute.text = "Lokasi Destinasi"
-            tvDetailRoute.text = origin
+            labelRute.text = "Destinasi Wisata"
+            tvDetailRoute.text = origin // Otomatis berisi nama tempat wisata hasil query SQL Admin
         }
 
         try {
@@ -156,27 +175,27 @@ class DetailPemesananActivity : AppCompatActivity() {
             }
         }
 
-        // ==========================================
-        // LOGIKA CERDAS TOMBOL BATAL (H-1)
-        // ==========================================
-        if (statusClean != "SUCCESS") {
+        // =====================================================================
+        // 🟢 3. LOGIKA TOMBOL BATAL CERDAS (DIPOTONG/DIHAPUS UNTUK ADMIN)
+        // =====================================================================
+        if (!fullName.isNullOrEmpty()) {
+            // JIKA DIAKSES OLEH ADMIN: Sembunyikan total tombol pembatalan
+            btnCancel.visibility = View.GONE
+        } else if (statusClean != "SUCCESS") {
             btnCancel.isEnabled = false
             btnCancel.alpha = 0.5f
             btnCancel.text = "Pesanan Tidak Dapat Dibatalkan"
         } else if (!departureTimeStr.isNullOrEmpty()) {
             try {
                 if (bookingCode.startsWith("WS-")) {
-                    // 🟢 LOGIKA WISATA: Berdasarkan Selisih Hari Kalender
                     val dateOnly = departureTimeStr.take(10)
                     val formatTanggal = java.text.SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
                     val visitDateObj = formatTanggal.parse(dateOnly)
 
-                    // Ambil tanggal hari ini, lalu format ulang agar jamnya menjadi 00:00:00
                     val currentDateStr = formatTanggal.format(java.util.Date())
                     val currentDateObj = formatTanggal.parse(currentDateStr)
 
                     if (visitDateObj != null && currentDateObj != null) {
-                        // Jika hari ini sudah sama dengan hari kunjungan, atau sudah lewat (H-0)
                         if (currentDateObj.time >= visitDateObj.time) {
                             btnCancel.isEnabled = false
                             btnCancel.alpha = 0.5f
@@ -187,7 +206,6 @@ class DetailPemesananActivity : AppCompatActivity() {
                         }
                     }
                 } else {
-                    // 🔵 LOGIKA TRANSPORTASI: Strict 24 Jam (Tetap aman tidak terganggu)
                     val formatFull = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
                     val departureDate = formatFull.parse(departureTimeStr)
                     val currentDate = java.util.Date()
@@ -207,7 +225,7 @@ class DetailPemesananActivity : AppCompatActivity() {
                     }
                 }
 
-                // Aksi saat tombol ditekan (Berlaku untuk keduanya jika isEnabled = true)
+                // Aksi tombol tekan batal (Khusus User Biasa)
                 btnCancel.setOnClickListener {
                     val builder = AlertDialog.Builder(this)
                     builder.setTitle("Batalkan Pesanan?")
@@ -258,9 +276,8 @@ class DetailPemesananActivity : AppCompatActivity() {
                 e.printStackTrace()
             }
         } else {
-            btnCancel.isEnabled = false
-            btnCancel.alpha = 0.5f
-            btnCancel.text = "Waktu Tidak Terbaca dari Database"
+            // 🟢 PERBAIKAN: Jika data waktu error/kosong, langsung hapus/sembunyikan tombolnya
+            btnCancel.visibility = View.GONE
         }
 
         btnBack.setOnClickListener { finish() }

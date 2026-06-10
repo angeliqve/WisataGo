@@ -31,6 +31,9 @@ class HistoryAdapter(private val listHistory: List<HistoryResponse>) :
         val tvBookingCode: TextView = view.findViewById(R.id.tvItemBookingCode)
         val tvDate: TextView = view.findViewById(R.id.tvItemDate)
         val tvTotalAmount: TextView = view.findViewById(R.id.tvItemTotalAmount)
+
+        // 🟢 TAMBAHAN: Mengambil ID label Rute dari XML
+        val tvLabelRoute: TextView = view.findViewById(R.id.tvLabelRoute)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -41,7 +44,7 @@ class HistoryAdapter(private val listHistory: List<HistoryResponse>) :
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = listHistory[position]
 
-        // 🟢 PERBAIKAN 1: Deklarasikan variabel mainProduct agar tidak error
+        // Penamaan Produk Utama / Add-on
         val mainProduct = item.transport_name ?: "Produk WisataGO"
         if (!item.addon_wisata.isNullOrEmpty() && item.booking_code.startsWith("TR-")) {
             holder.tvTransportName.text = "$mainProduct (+ ${item.addon_wisata})"
@@ -49,11 +52,18 @@ class HistoryAdapter(private val listHistory: List<HistoryResponse>) :
             holder.tvTransportName.text = mainProduct
         }
 
+        // 🟢 TAMBAHAN LOGIKA: Ubah Label Rute Menjadi Destinasi jika itu tiket Wisata
+        if (item.booking_code.startsWith("WS-")) {
+            holder.tvLabelRoute.text = "Destinasi Wisata"
+        } else {
+            holder.tvLabelRoute.text = "Rute Perjalanan"
+        }
+
+        // Tampilan Rute
         val origin = item.origin_city ?: "WisataGO"
         val destination = item.destination_city
 
         if (!destination.isNullOrEmpty()) {
-            // 🟢 Trik UI/UX: Jika nama transport mengandung "&", ubah panah menjadi icon PP ⇌
             if (mainProduct.contains("&")) {
                 holder.tvRoute.text = "$origin ⇌ $destination"
             } else {
@@ -66,6 +76,7 @@ class HistoryAdapter(private val listHistory: List<HistoryResponse>) :
         holder.tvBookingCode.text = item.booking_code
         holder.tvDate.text = item.booking_date
 
+        // Format Rupiah
         try {
             val rawAmount = item.total_amount.toString().toDoubleOrNull() ?: 0.0
             val amountParsed = rawAmount.toLong()
@@ -77,7 +88,7 @@ class HistoryAdapter(private val listHistory: List<HistoryResponse>) :
         }
 
         // =======================================================
-        // 🟢 PEWARNAAN STATUS CERDAS (SUCCESS, CANCELED, ONGOING)
+        // PEWARNAAN STATUS CERDAS (SUCCESS, CANCELED, ONGOING)
         // =======================================================
         val statusClean = item.status?.uppercase() ?: "PENDING"
         when (statusClean) {
@@ -111,11 +122,11 @@ class HistoryAdapter(private val listHistory: List<HistoryResponse>) :
                 putExtra("ORIGIN_CITY", item.origin_city ?: "WisataGO")
                 putExtra("DEST_CITY", item.destination_city ?: "")
                 putExtra("DEPARTURE_TIME", item.departure_time)
-
-                // 🟢 PERBAIKAN 2: Sisipkan data Add-on agar terbaca di halaman Detail
                 putExtra("ADDON_WISATA", item.addon_wisata)
-
                 putExtra("PASSENGER_INFO", item.passenger_info)
+
+                // 🟢 TAMBAHAN: Mengirimkan Data Nama Pemesan (User) ke Halaman Detail
+                putExtra("FULL_NAME", item.full_name)
             }
             context.startActivity(intent)
         }
@@ -125,7 +136,6 @@ class HistoryAdapter(private val listHistory: List<HistoryResponse>) :
         // =======================================================
         holder.itemView.setOnLongClickListener {
 
-            // JIKA STATUS SUDAH CANCELED, JANGAN MUNCULKAN POP-UP BATAL LAGI
             if (statusClean == "CANCELED") {
                 Toast.makeText(holder.itemView.context, "Pesanan ini sudah dibatalkan.", Toast.LENGTH_SHORT).show()
                 return@setOnLongClickListener true

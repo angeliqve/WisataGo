@@ -79,6 +79,9 @@
             android:name=".AdminDashboardActivity"
             android:exported="false" />
         <activity
+            android:name=".AdminPesananActivity"
+            android:exported="false" />
+        <activity
             android:name=".SplashActivity"
             android:exported="true"
             android:theme="@style/Theme.WisataGo">
