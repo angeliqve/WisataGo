@@ -1,174 +1,203 @@
 package com.app.wisatago
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.View
-import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.app.wisatago.booking.HistoryAdapter
-import com.google.android.material.bottomnavigation.BottomNavigationView
+
+import com.github.mikephil.charting.formatter.ValueFormatter
+import com.github.mikephil.charting.charts.BarChart
+import com.github.mikephil.charting.charts.LineChart
+import com.github.mikephil.charting.charts.PieChart
+import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.data.BarData
+import com.github.mikephil.charting.data.BarDataSet
+import com.github.mikephil.charting.data.BarEntry
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.data.PieData
+import com.github.mikephil.charting.data.PieDataSet
+import com.github.mikephil.charting.data.PieEntry
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
+
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.text.NumberFormat
 import java.util.Locale
 
 class AdminDashboardActivity : AppCompatActivity() {
 
     private lateinit var tvAdminWelcome: TextView
     private lateinit var btnAdminLogout: ImageButton
+
     private lateinit var btnAdminStats: ImageView
     private lateinit var btnAdminOrders: ImageView
     private lateinit var tvAdminStats: TextView
     private lateinit var tvAdminOrders: TextView
-    private lateinit var layoutStatistik: View
-    private lateinit var layoutPesanan: View
-    private lateinit var etAdminSearch: EditText
-    private lateinit var rvAdminAllOrders: RecyclerView
-    private lateinit var adminAdapter: HistoryAdapter
-    private var listSemuaPesananRaw: List<HistoryResponse> = ArrayList()
-    private var listPesananFilter: MutableList<HistoryResponse> = ArrayList()
+
+    private lateinit var tvAdminTotalTransaksi: TextView
+    private lateinit var tvAdminPemesananBaru: TextView
+    private lateinit var tvAdminPendapatanHari: TextView
+    private lateinit var tvAdminPendapatanBulan: TextView
+
+    private lateinit var lineChartPendapatan: LineChart
+    private lateinit var pieChartStatus: PieChart
+    private lateinit var barChartProduk: BarChart
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // 🟢 Menggunakan XML yang sama
         setContentView(R.layout.activity_admin_dashboard)
 
         tvAdminWelcome = findViewById(R.id.tv_admin_welcome)
         btnAdminLogout = findViewById(R.id.btn_admin_logout)
-
         btnAdminStats = findViewById(R.id.btnAdminStats)
         btnAdminOrders = findViewById(R.id.btnAdminOrders)
         tvAdminStats = findViewById(R.id.tvAdminStats)
         tvAdminOrders = findViewById(R.id.tvAdminOrders)
 
-        layoutStatistik = findViewById(R.id.layout_tab_statistik)
-        layoutPesanan = findViewById(R.id.layout_tab_pesanan)
+        tvAdminTotalTransaksi = findViewById(R.id.tvAdminTotalTransaksi)
+        tvAdminPemesananBaru = findViewById(R.id.tvAdminPemesananBaru)
+        tvAdminPendapatanHari = findViewById(R.id.tvAdminPendapatanHari)
+        tvAdminPendapatanBulan = findViewById(R.id.tvAdminPendapatanBulan)
 
-        etAdminSearch = findViewById(R.id.et_admin_search)
-        rvAdminAllOrders = findViewById(R.id.rv_admin_all_orders)
+        lineChartPendapatan = findViewById(R.id.lineChartPendapatan)
+        pieChartStatus = findViewById(R.id.pieChartStatus)
+        barChartProduk = findViewById(R.id.barChartProduk)
+
+        // 🟢 PENTING: Sembunyikan Layout Pesanan, Tampilkan Layout Statistik
+        findViewById<View>(R.id.layout_tab_pesanan).visibility = View.GONE
+        findViewById<View>(R.id.layout_tab_statistik).visibility = View.VISIBLE
+
+        // 🟢 Set Warna Tombol Navbar Aktif
+        btnAdminStats.setImageResource(R.drawable.icon_home_white)
+        btnAdminOrders.setImageResource(R.drawable.icon_order_blue)
+        tvAdminStats.setTextColor(Color.parseColor("#FFFFFF"))
+        tvAdminOrders.setTextColor(Color.parseColor("#0A4181"))
 
         val sharedPref = getSharedPreferences("USER_SESSION", MODE_PRIVATE)
         val adminName = sharedPref.getString("USERNAME", "Admin")
         tvAdminWelcome.text = "Selamat Datang, $adminName!"
 
-        rvAdminAllOrders.layoutManager = LinearLayoutManager(this)
+        // Panggil fungsi penarik data khusus statistik
+        ambilDataStatistik()
 
-        muatDataStatistikDanTransaksi()
-
-        btnAdminStats.setOnClickListener {
-            layoutStatistik.visibility = View.VISIBLE
-            layoutPesanan.visibility = View.GONE
-
-            btnAdminStats.setImageResource(R.drawable.icon_home_white)
-            btnAdminOrders.setImageResource(R.drawable.icon_order_blue)
-            tvAdminStats.setTextColor(android.graphics.Color.parseColor("#FFFFFF"))
-            tvAdminOrders.setTextColor(android.graphics.Color.parseColor("#0A4181"))
-        }
-
+        // 🟢 PINDAH KE ACTIVITY PESANAN
         btnAdminOrders.setOnClickListener {
-            layoutStatistik.visibility = View.GONE
-            layoutPesanan.visibility = View.VISIBLE
-
-            btnAdminStats.setImageResource(R.drawable.icon_home_blue)
-            btnAdminOrders.setImageResource(R.drawable.icon_order_white)
-            tvAdminStats.setTextColor(android.graphics.Color.parseColor("#0A4181"))
-            tvAdminOrders.setTextColor(android.graphics.Color.parseColor("#FFFFFF"))
+            startActivity(Intent(this, AdminPesananActivity::class.java))
+            overridePendingTransition(0, 0) // Menghilangkan animasi transisi agar terasa seperti pindah tab
+            finish()
         }
 
-        etAdminSearch.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                filterDataPemesanan(s.toString())
-            }
-            override fun afterTextChanged(s: Editable?) {}
-        })
-
-        btnAdminLogout.setOnClickListener {
-            androidx.appcompat.app.AlertDialog.Builder(this)
-                .setTitle("Logout Admin")
-                .setMessage("Yakin ingin keluar dari panel admin WisataGO?")
-                .setPositiveButton("Ya") { _, _ ->
-                    sharedPref.edit().clear().apply()
-                    Toast.makeText(this, "Logout admin berhasil", Toast.LENGTH_SHORT).show()
-
-                    val intent = Intent(this, Login::class.java)
-                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    startActivity(intent)
-                    finish()
-                }
-                .setNegativeButton("Batal", null)
-                .show()
-        }
+        btnAdminLogout.setOnClickListener { logoutAdmin() }
     }
 
-    private fun muatDataStatistikDanTransaksi() {
+    private fun ambilDataStatistik() {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val response = ApiClient.instance.getAllBookingsAdmin()
-
+                val response = ApiClient.instance.getAdminStats().execute()
                 withContext(Dispatchers.Main) {
                     if (response.isSuccessful && response.body() != null) {
-                        listSemuaPesananRaw = response.body()!!
+                        val statsData = response.body()!!.data
+                        if (statsData != null) {
+                            val formatRp = NumberFormat.getCurrencyInstance(Locale("id", "ID"))
+                            tvAdminTotalTransaksi.text = statsData.ringkasan.totalTransaksi ?: "0"
+                            tvAdminPemesananBaru.text = statsData.ringkasan.pemesananBaru ?: "0"
 
-                        listPesananFilter.clear()
-                        listPesananFilter.addAll(listSemuaPesananRaw)
+                            val hariIni = statsData.ringkasan.pendapatanHariIni?.toDoubleOrNull() ?: 0.0
+                            tvAdminPendapatanHari.text = formatRp.format(hariIni).replace(",00", "")
 
-                        adminAdapter = HistoryAdapter(listPesananFilter)
-                        rvAdminAllOrders.adapter = adminAdapter
+                            val bulanIni = statsData.ringkasan.totalPendapatan?.toDoubleOrNull() ?: 0.0
+                            tvAdminPendapatanBulan.text = formatRp.format(bulanIni).replace(",00", "")
 
-                        findViewById<TextView>(R.id.tv_stat_total_booking).text = listSemuaPesananRaw.size.toString()
-
-                        var totalIncome = 0.0
-                        for (booking in listSemuaPesananRaw) {
-                            if (booking.status?.uppercase() == "SUCCESS") {
-                                val amount = booking.total_amount.toString().toDoubleOrNull() ?: 0.0
-                                totalIncome += amount
-                            }
+                            setupLineChart(statsData.bulanan)
+                            setupPieChart(statsData.status)
+                            setupBarChart(statsData.populer)
                         }
-
-                        val formatter = java.text.NumberFormat.getCurrencyInstance(Locale("id", "ID"))
-                        findViewById<TextView>(R.id.tv_stat_income).text = formatter.format(totalIncome).replace(",00", "")
-
                     } else {
-                        Toast.makeText(this@AdminDashboardActivity, "Gagal mengambil data dari server", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@AdminDashboardActivity, "Gagal muat diagram", Toast.LENGTH_SHORT).show()
                     }
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(this@AdminDashboardActivity, "Koneksi gagal atau server mati: ${e.message}", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@AdminDashboardActivity, "Error API Statistik", Toast.LENGTH_SHORT).show()
                 }
             }
         }
     }
 
-    private fun filterDataPemesanan(query: String) {
-        listPesananFilter.clear()
-
-        if (query.isEmpty()) {
-            listPesananFilter.addAll(listSemuaPesananRaw)
-        } else {
-            val kataKunci = query.lowercase().trim()
-            for (item in listSemuaPesananRaw) {
-                val kodeBookingMatch = item.booking_code?.lowercase()?.contains(kataKunci) == true
-                val namaArmadaMatch = item.transport_name?.lowercase()?.contains(kataKunci) == true
-                val kotaAsalMatch = item.origin_city?.lowercase()?.contains(kataKunci) == true
-
-                if (kodeBookingMatch || namaArmadaMatch || kotaAsalMatch) {
-                    listPesananFilter.add(item)
-                }
-            }
+    private fun setupLineChart(dataBulanan: List<StatsBulanan>) {
+        val entries = ArrayList<Entry>()
+        val labels = ArrayList<String>()
+        for ((index, item) in dataBulanan.withIndex()) {
+            entries.add(Entry(index.toFloat(), item.total.toFloatOrNull() ?: 0f))
+            labels.add(item.bulan)
         }
-
-        if (::adminAdapter.isInitialized) {
-            adminAdapter.notifyDataSetChanged()
+        val dataSet = LineDataSet(entries, "Pendapatan").apply {
+            color = Color.WHITE; lineWidth = 3f; circleRadius = 5f; setCircleColor(Color.WHITE)
+            mode = LineDataSet.Mode.CUBIC_BEZIER; setDrawValues(false)
         }
+        lineChartPendapatan.apply {
+            data = LineData(dataSet); description.isEnabled = false; legend.textColor = Color.WHITE
+            xAxis.valueFormatter = IndexAxisValueFormatter(labels); xAxis.position = XAxis.XAxisPosition.BOTTOM
+            xAxis.textColor = Color.WHITE; xAxis.setDrawGridLines(false); xAxis.granularity = 1f
+            axisLeft.textColor = Color.WHITE; axisRight.isEnabled = false
+            animateY(1000); invalidate()
+        }
+    }
+
+    private fun setupPieChart(dataStatus: List<StatsStatus>) {
+        val entries = ArrayList<PieEntry>()
+        for (item in dataStatus) {
+            entries.add(PieEntry(item.jumlah.toFloatOrNull() ?: 0f, item.status))
+        }
+        val dataSet = PieDataSet(entries, "").apply {
+            colors = listOf(Color.parseColor("#4CAF50"), Color.parseColor("#FFC107"), Color.parseColor("#F44336"))
+            valueTextColor = Color.WHITE; valueTextSize = 14f
+            valueFormatter = object : ValueFormatter() { override fun getFormattedValue(value: Float): String = "${value.toInt()}%" }
+        }
+        pieChartStatus.apply {
+            data = PieData(dataSet); description.isEnabled = false; isDrawHoleEnabled = true; holeRadius = 45f
+            setHoleColor(Color.TRANSPARENT); legend.textColor = Color.WHITE; setUsePercentValues(true)
+            setDrawEntryLabels(false); animateY(1000); invalidate()
+        }
+    }
+
+    private fun setupBarChart(dataPopuler: List<StatsPopuler>) {
+        val entries = ArrayList<BarEntry>()
+        val labels = ArrayList<String>()
+        for ((index, item) in dataPopuler.withIndex()) {
+            entries.add(BarEntry(index.toFloat(), item.jumlah.toFloatOrNull() ?: 0f))
+            labels.add(item.produk)
+        }
+        val dataSet = BarDataSet(entries, "Total Pemesanan").apply {
+            color = Color.parseColor("#80FFFFFF"); valueTextColor = Color.WHITE; valueTextSize = 12f
+            valueFormatter = object : ValueFormatter() { override fun getFormattedValue(value: Float): String = value.toInt().toString() }
+        }
+        barChartProduk.apply {
+            data = BarData(dataSet); description.isEnabled = false; legend.textColor = Color.WHITE
+            xAxis.valueFormatter = IndexAxisValueFormatter(labels); xAxis.position = XAxis.XAxisPosition.BOTTOM
+            xAxis.textColor = Color.WHITE; xAxis.setDrawGridLines(false); xAxis.granularity = 1f
+            axisLeft.textColor = Color.WHITE; axisRight.isEnabled = false
+            animateY(1000); invalidate()
+        }
+    }
+
+    private fun logoutAdmin() {
+        androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle("Logout Admin").setMessage("Yakin ingin keluar?")
+            .setPositiveButton("Ya") { _, _ ->
+                getSharedPreferences("USER_SESSION", MODE_PRIVATE).edit().clear().apply()
+                startActivity(Intent(this, Login::class.java).apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK })
+                finish()
+            }.setNegativeButton("Batal", null).show()
     }
 }

@@ -76,8 +76,3 @@ data class CancelResponse(
     val message: String?,
     val error: String?
 )
-
-data class AdminStatsResponse(
-    val total_transaksi: Int,
-    val total_pendapatan: Double
-)

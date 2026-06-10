@@ -102,4 +102,6 @@ interface ApiService {
     suspend fun getAllBookingsAdmin(): Response<List<HistoryResponse>>
     @POST("cancel-booking")
     fun cancelBooking(@Body request: CancelRequest): Call<CancelResponse>
+    @GET("admin/dashboard-stats")
+    fun getAdminStats(): retrofit2.Call<AdminStatsResponse>
 }
