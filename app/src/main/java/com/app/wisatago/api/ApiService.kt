@@ -1,21 +1,22 @@
-package com.app.wisatago
+package com.app.wisatago.api
 
+import com.app.wisatago.AdminStatsResponse
 import com.app.wisatago.attraction.Wisata
 import com.app.wisatago.booking.BookingRequest
 import com.app.wisatago.booking.ResponseBooking
+import com.app.wisatago.transport.BusSchedule
+import com.app.wisatago.transport.FlightSchedule
+import com.app.wisatago.transport.LocationResponse
+import com.app.wisatago.transport.TicketResponse
+import com.app.wisatago.transport.TrainSchedule
+import okhttp3.ResponseBody
+import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
-import retrofit2.Call
+import retrofit2.http.PUT
 import retrofit2.http.Query
-
-// Mengundang model dari package transport
-import com.app.wisatago.transport.LocationResponse
-import com.app.wisatago.transport.TicketResponse
-import com.app.wisatago.transport.TrainSchedule
-import com.app.wisatago.transport.BusSchedule  // 🟢 TAMBAHKAN IMPORT BUS
-import com.app.wisatago.transport.FlightSchedule
 
 interface ApiService {
     // Menghubungkan langsung ke app.post('/login') di Node.js
@@ -85,16 +86,16 @@ interface ApiService {
     @POST("/update-password")
     fun updatePassword(
         @Body request: Map<String, String>
-    ): Call<okhttp3.ResponseBody>
+    ): Call<ResponseBody>
 
-    @retrofit2.http.PUT("/update-profile")
+    @PUT("/update-profile")
     fun updateProfile(
         @Body request: UpdateProfileRequest
     ): Call<ProfileResponse>
     @GET("/booking-history")
     fun getBookingHistory(
         @Query("user_id") userId: String
-    ): retrofit2.Call<List<HistoryResponse>>
+    ): Call<List<HistoryResponse>>
 
     @GET("api/admin/dashboard-stats")
     suspend fun getAdminDashboardStats(): Response<AdminStatsResponse>
@@ -103,5 +104,5 @@ interface ApiService {
     @POST("cancel-booking")
     fun cancelBooking(@Body request: CancelRequest): Call<CancelResponse>
     @GET("admin/dashboard-stats")
-    fun getAdminStats(): retrofit2.Call<AdminStatsResponse>
+    fun getAdminStats(): Call<AdminStatsResponse>
 }

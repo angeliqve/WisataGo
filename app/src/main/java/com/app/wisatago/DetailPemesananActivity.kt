@@ -11,9 +11,9 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.button.MaterialButton
 import java.text.NumberFormat
 import java.util.Locale
-import com.app.wisatago.ApiClient
-import com.app.wisatago.CancelRequest
-import com.app.wisatago.CancelResponse
+import com.app.wisatago.api.ApiClient
+import com.app.wisatago.api.CancelRequest
+import com.app.wisatago.api.CancelResponse
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response

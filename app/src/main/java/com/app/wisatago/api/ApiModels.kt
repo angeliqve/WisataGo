@@ -1,4 +1,4 @@
-package com.app.wisatago
+package com.app.wisatago.api
 import com.google.gson.annotations.SerializedName
 data class LoginRequest(
     val email: String,

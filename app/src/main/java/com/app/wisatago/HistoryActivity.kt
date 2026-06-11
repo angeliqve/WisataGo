@@ -8,6 +8,8 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.app.wisatago.api.ApiClient
+import com.app.wisatago.api.HistoryResponse
 import com.app.wisatago.booking.HistoryAdapter
 import retrofit2.Call
 import retrofit2.Callback

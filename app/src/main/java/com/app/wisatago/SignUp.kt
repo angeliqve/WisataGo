@@ -1,102 +1,240 @@
 package com.app.wisatago
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.app.wisatago.api.ApiClient
+import com.app.wisatago.api.SignUpRequest
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class SignUp : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sign_up)
 
-        // 1. Sinkronisasi dengan ID yang ada di activity_sign_up.xml
         val etNama = findViewById<EditText>(R.id.etNamaDaftar)
         val etEmail = findViewById<EditText>(R.id.etEmailDaftar)
         val etPassword = findViewById<EditText>(R.id.etPasswordDaftar)
-        val etNoTelepon = findViewById<EditText>(R.id.etNoTeleponDaftar) // Kolom nomor telepon
+        val etNoTelepon = findViewById<EditText>(R.id.etNoTeleponDaftar)
+
         val btnDaftar = findViewById<LinearLayout>(R.id.btnTombolDaftar)
         val tvSudahPunyaAkun = findViewById<TextView>(R.id.tvSudahPunyaAkun)
 
-        // 2. Logika ketika tombol "Daftar" diklik
+        // Default selalu diawali 08
+        etNoTelepon.setText("08")
+        etNoTelepon.setSelection(etNoTelepon.text.length)
+
+        etNoTelepon.addTextChangedListener(object : TextWatcher {
+
+            private var isUpdating = false
+
+            override fun beforeTextChanged(
+                s: CharSequence?,
+                start: Int,
+                count: Int,
+                after: Int
+            ) {
+            }
+
+            override fun onTextChanged(
+                s: CharSequence?,
+                start: Int,
+                before: Int,
+                count: Int
+            ) {
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+
+                if (isUpdating) return
+
+                isUpdating = true
+
+                var input = s.toString()
+
+                // Hapus karakter selain angka
+                input = input.replace(Regex("[^0-9]"), "")
+
+                // Tidak boleh menghapus awalan 08
+                if (input.isEmpty()) {
+                    input = "08"
+                }
+
+                if (input.length == 1) {
+                    input = "08"
+                }
+
+                if (!input.startsWith("08")) {
+                    input = "08"
+                }
+
+                // Maksimal 12 digit
+                if (input.length > 12) {
+                    input = input.substring(0, 12)
+                }
+
+                if (input != etNoTelepon.text.toString()) {
+                    etNoTelepon.setText(input)
+                    etNoTelepon.setSelection(input.length)
+                }
+
+                isUpdating = false
+            }
+        })
+
         btnDaftar.setOnClickListener {
+
             val namaInput = etNama.text.toString().trim()
             val emailInput = etEmail.text.toString().trim()
-            val passInput = etPassword.text.toString().trim()
-            val noTeleponInput = etNoTelepon.text.toString().trim()
+            val passwordInput = etPassword.text.toString().trim()
+            val nomorTeleponInput = etNoTelepon.text.toString().trim()
 
-            // Validasi field kosong
-            if (namaInput.isEmpty() || emailInput.isEmpty() || passInput.isEmpty() || noTeleponInput.isEmpty()) {
-                Toast.makeText(this, "Semua kolom wajib diisi!", Toast.LENGTH_SHORT).show()
+            if (
+                namaInput.isEmpty() ||
+                emailInput.isEmpty() ||
+                passwordInput.isEmpty() ||
+                nomorTeleponInput.isEmpty()
+            ) {
+                Toast.makeText(
+                    this,
+                    "Semua kolom wajib diisi!",
+                    Toast.LENGTH_SHORT
+                ).show()
                 return@setOnClickListener
             }
 
-            // Bersihkan nomor telepon dari karakter non-digit (spasi, tanda hubung, dll)
-            val cleanedPhone = noTeleponInput.replace(Regex("[^0-9]"), "")
+            val hasilValidasi =
+                validasiNomorTelepon(nomorTeleponInput)
 
-            val validasiNoTelp = validasiNomorTelepon(cleanedPhone)
-            if (!validasiNoTelp.isValid) {
-                Toast.makeText(this, validasiNoTelp.pesan, Toast.LENGTH_SHORT).show()
+            if (!hasilValidasi.isValid) {
+
+                Toast.makeText(
+                    this,
+                    hasilValidasi.pesan,
+                    Toast.LENGTH_LONG
+                ).show()
+
+                // Reset hanya field nomor telepon
+                etNoTelepon.setText("08")
+                etNoTelepon.setSelection(etNoTelepon.text.length)
+                etNoTelepon.requestFocus()
+
                 return@setOnClickListener
             }
 
-            Toast.makeText(this, "Mendaftarkan akun...", Toast.LENGTH_SHORT).show()
-            jalankanFungsiSignUp(namaInput, emailInput, passInput, cleanedPhone)
+            Toast.makeText(
+                this,
+                "Mendaftarkan akun...",
+                Toast.LENGTH_SHORT
+            ).show()
+
+            jalankanFungsiSignUp(
+                namaInput,
+                emailInput,
+                passwordInput,
+                nomorTeleponInput
+            )
         }
 
-        // 3. Logika ketika teks "Sudah Punya Akun? Log In" diklik
         tvSudahPunyaAkun.setOnClickListener {
-            finish() // Menutup halaman Sign Up dan otomatis kembali ke halaman Login
+            finish()
         }
     }
 
-    private fun validasiNomorTelepon(nomorTelepon: String): ValidasiTeleponResult {
-        // Regex untuk nomor HP Indonesia: diawali 08 atau 628, diikuti 8-11 digit angka
-        val regexPhone = Regex("^(08|628)[0-9]{8,11}$")
+    private fun validasiNomorTelepon(
+        nomorTelepon: String
+    ): ValidasiTeleponResult {
 
-        return if (nomorTelepon.matches(regexPhone)) {
-            ValidasiTeleponResult(true, "Nomor telepon valid")
-        } else {
-            ValidasiTeleponResult(false, "Format nomor tidak valid! Harus nomor HP Indonesia (Contoh: 08123456789 atau 628123456789)")
+        if (!nomorTelepon.startsWith("08")) {
+            return ValidasiTeleponResult(
+                false,
+                "Nomor telepon harus diawali 08"
+            )
         }
+
+        if (nomorTelepon.length != 12) {
+            return ValidasiTeleponResult(
+                false,
+                "Nomor telepon harus tepat 12 digit"
+            )
+        }
+
+        return ValidasiTeleponResult(
+            true,
+            "Nomor telepon valid"
+        )
     }
 
-    private data class ValidasiTeleponResult(
+    data class ValidasiTeleponResult(
         val isValid: Boolean,
         val pesan: String
     )
 
-    // Fungsi pengiriman data pendaftaran menggunakan Retrofit
-    private fun jalankanFungsiSignUp(nama: String, email: String, pass: String, phone: String) {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                // Bungkus data input ke dalam model Request
-                val dataRequest = SignUpRequest(nama, email, pass, phone)
+    private fun jalankanFungsiSignUp(
+        nama: String,
+        email: String,
+        pass: String,
+        phone: String
+    ) {
 
-                // Tembak data ke Node.js melalui ApiClient
-                val respon = ApiClient.instance.prosesDaftarUser(dataRequest)
+        CoroutineScope(Dispatchers.IO).launch {
+
+            try {
+
+                val request =
+                    SignUpRequest(
+                        nama,
+                        email,
+                        pass,
+                        phone
+                    )
+
+                val response =
+                    ApiClient.instance.prosesDaftarUser(request)
 
                 withContext(Dispatchers.Main) {
-                    if (respon.isSuccessful && respon.body() != null) {
-                        Toast.makeText(this@SignUp, "Pendaftaran Berhasil! Silakan Login", Toast.LENGTH_LONG).show()
 
-                        // Menutup halaman Sign Up agar pengguna langsung kembali ke layar Login
+                    if (
+                        response.isSuccessful &&
+                        response.body() != null
+                    ) {
+
+                        Toast.makeText(
+                            this@SignUp,
+                            "Pendaftaran Berhasil! Silakan Login",
+                            Toast.LENGTH_LONG
+                        ).show()
+
                         finish()
+
                     } else {
-                        // Respon gagal dari server (misal email sudah terdaftar)
-                        Toast.makeText(this@SignUp, "Gagal Daftar! Email atau nama mungkin sudah digunakan.", Toast.LENGTH_SHORT).show()
+
+                        Toast.makeText(
+                            this@SignUp,
+                            "Gagal Daftar! Email atau nama mungkin sudah digunakan.",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
+
             } catch (e: Exception) {
+
                 withContext(Dispatchers.Main) {
-                    // Terjadi masalah jaringan atau server Node.js mati
-                    Toast.makeText(this@SignUp, "Gagal terhubung ke server backend", Toast.LENGTH_SHORT).show()
+
+                    Toast.makeText(
+                        this@SignUp,
+                        "Gagal terhubung ke server backend",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
         }

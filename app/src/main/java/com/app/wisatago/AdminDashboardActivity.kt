@@ -9,6 +9,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.app.wisatago.api.ApiClient
 
 import com.github.mikephil.charting.formatter.ValueFormatter
 import com.github.mikephil.charting.charts.BarChart

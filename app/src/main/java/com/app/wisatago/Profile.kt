@@ -20,6 +20,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SwitchCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import com.app.wisatago.api.ApiClient
 import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -31,6 +32,7 @@ class Profile : AppCompatActivity() {
 
     private lateinit var tvUserName: TextView
     private lateinit var tvUserEmail: TextView
+    private lateinit var tvUserPhone: TextView
     private lateinit var btnEditProfile: MaterialButton
     private lateinit var btnInformasiAkun: LinearLayout
     private lateinit var btnBantuan: LinearLayout
@@ -65,6 +67,7 @@ class Profile : AppCompatActivity() {
 
         tvUserName = findViewById(R.id.tvUserName)
         tvUserEmail = findViewById(R.id.tvUserEmail)
+        tvUserPhone = findViewById(R.id.tvUserPhone)
         btnEditProfile = findViewById(R.id.btnEditProfile)
         btnInformasiAkun = findViewById(R.id.btnInformasiAkun)
         btnBantuan = findViewById(R.id.btnBantuan)
@@ -245,44 +248,96 @@ class Profile : AppCompatActivity() {
     }
     override fun onResume() {
         super.onResume()
-        val sharedPref = getSharedPreferences("USER_SESSION", MODE_PRIVATE)
-        val userId = sharedPref.getString("USER_ID", null)
+
+        val sharedPref =
+            getSharedPreferences("USER_SESSION", MODE_PRIVATE)
+
+        val userId =
+            sharedPref.getString("USER_ID", null)
 
         if (userId != null) {
             ambilDataProfile(userId)
         } else {
-            Toast.makeText(this, "User belum login", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                this,
+                "User belum login",
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 
     private fun ambilDataProfile(userId: String) {
+
         CoroutineScope(Dispatchers.IO).launch {
+
             try {
-                val response = ApiClient.instance.getProfile(userId)
+
+                val response =
+                    ApiClient.instance.getProfile(userId)
+
                 withContext(Dispatchers.Main) {
-                    if (response.isSuccessful && response.body() != null) {
+
+                    if (
+                        response.isSuccessful &&
+                        response.body() != null
+                    ) {
+
                         val user = response.body()!!
+
+                        android.util.Log.d(
+                            "PROFILE_DEBUG",
+                            "PHONE = ${user.phone_number}"
+                        )
 
                         tvUserName.text = user.full_name
                         tvUserEmail.text = user.email
+                        tvUserPhone.text =
+                            user.phone_number ?: "-"
 
                         if (!user.profile_picture.isNullOrEmpty()) {
                             try {
-                                val cleanBase64 = user.profile_picture.replace(Regex("^data:image/[a-zA-Z]+;base64,"), "")
-                                val imageBytes = Base64.decode(cleanBase64, Base64.DEFAULT)
-                                val decodedImage = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
-                                imgProfilePic.setImageBitmap(decodedImage)
+                                val cleanBase64 =
+                                    user.profile_picture.replace(
+                                        Regex("^data:image/[a-zA-Z]+;base64,"),
+                                        ""
+                                    )
+                                val imageBytes =
+                                    Base64.decode(
+                                        cleanBase64,
+                                        Base64.DEFAULT
+                                    )
+                                val decodedImage =
+                                    BitmapFactory.decodeByteArray(
+                                        imageBytes,
+                                        0,
+                                        imageBytes.size
+                                    )
+                                imgProfilePic.setImageBitmap(
+                                    decodedImage
+                                )
                             } catch (e: Exception) {
                                 e.printStackTrace()
                             }
                         }
+
                     } else {
-                        Toast.makeText(this@Profile, "Gagal ambil data: ${response.errorBody()?.string()}", Toast.LENGTH_LONG).show()
+                        Toast.makeText(
+                            this@Profile,
+                            "Gagal ambil data profile",
+                            Toast.LENGTH_LONG
+                        ).show()
                     }
                 }
+
             } catch (e: Exception) {
+
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(this@Profile, "Server error: ${e.message}", Toast.LENGTH_LONG).show()
+
+                    Toast.makeText(
+                        this@Profile,
+                        "Server error: ${e.message}",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
             }
         }

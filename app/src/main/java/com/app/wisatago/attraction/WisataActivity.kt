@@ -7,7 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.app.wisatago.ApiClient
+import com.app.wisatago.api.ApiClient
 import com.app.wisatago.R
 import kotlinx.coroutines.launch
 

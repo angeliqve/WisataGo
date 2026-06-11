@@ -1,5 +1,6 @@
-package com.app.wisatago
+package com.app.wisatago.api
 
+import com.app.wisatago.api.ApiService
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 

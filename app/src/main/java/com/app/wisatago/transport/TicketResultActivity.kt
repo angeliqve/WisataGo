@@ -9,7 +9,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.app.wisatago.ApiClient
+import com.app.wisatago.api.ApiClient
 import com.app.wisatago.R
 import com.app.wisatago.booking.CheckoutActivity
 import com.google.android.material.chip.Chip

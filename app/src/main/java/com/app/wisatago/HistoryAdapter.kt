@@ -10,11 +10,11 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
 import com.app.wisatago.R
-import com.app.wisatago.HistoryResponse
+import com.app.wisatago.api.HistoryResponse
 import com.app.wisatago.DetailPemesananActivity
-import com.app.wisatago.ApiClient
-import com.app.wisatago.CancelRequest
-import com.app.wisatago.CancelResponse
+import com.app.wisatago.api.ApiClient
+import com.app.wisatago.api.CancelRequest
+import com.app.wisatago.api.CancelResponse
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
