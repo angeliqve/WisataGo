@@ -271,6 +271,114 @@
                     android:hint="Cari Kode Booking / User..."
                     android:paddingHorizontal="16dp" />
 
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/container_filters"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp">
+
+                    <HorizontalScrollView
+                        android:id="@+id/hsv_admin_categories"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:scrollbars="none"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/btn_filter_bulan"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:paddingHorizontal="16dp">
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btn_filter_semua"
+                                android:layout_width="wrap_content"
+                                android:layout_height="40dp"
+                                android:layout_marginEnd="8dp"
+                                android:text="Semua"
+                                android:textAllCaps="false"
+                                android:textColor="#FFFFFF"
+                                android:textSize="12sp"
+                                app:backgroundTint="#2DA0F5"
+                                app:cornerRadius="20dp" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btn_filter_wisata"
+                                android:layout_width="wrap_content"
+                                android:layout_height="40dp"
+                                android:layout_marginEnd="8dp"
+                                android:text="Wisata"
+                                android:textAllCaps="false"
+                                android:textColor="#333333"
+                                android:textSize="12sp"
+                                app:backgroundTint="#F0F0F0"
+                                app:cornerRadius="20dp" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btn_filter_kereta"
+                                android:layout_width="wrap_content"
+                                android:layout_height="40dp"
+                                android:layout_marginEnd="8dp"
+                                android:text="Kereta Api"
+                                android:textAllCaps="false"
+                                android:textColor="#333333"
+                                android:textSize="12sp"
+                                app:backgroundTint="#F0F0F0"
+                                app:cornerRadius="20dp" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btn_filter_pesawat"
+                                android:layout_width="wrap_content"
+                                android:layout_height="40dp"
+                                android:layout_marginEnd="8dp"
+                                android:text="Pesawat"
+                                android:textAllCaps="false"
+                                android:textColor="#333333"
+                                android:textSize="12sp"
+                                app:backgroundTint="#F0F0F0"
+                                app:cornerRadius="20dp" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btn_filter_bus"
+                                android:layout_width="wrap_content"
+                                android:layout_height="40dp"
+                                android:layout_marginEnd="16dp"
+                                android:text="Bus"
+                                android:textAllCaps="false"
+                                android:textColor="#333333"
+                                android:textSize="12sp"
+                                app:backgroundTint="#F0F0F0"
+                                app:cornerRadius="20dp" />
+
+                        </LinearLayout>
+                    </HorizontalScrollView>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_filter_bulan"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        android:layout_width="45dp"
+                        android:layout_height="45dp"
+                        android:layout_marginEnd="16dp"
+                        android:padding="0dp"
+                        app:backgroundTint="#FFFFFF"
+                        app:cornerRadius="12dp"
+                        app:icon="@drawable/ic_filter_list"
+                        app:iconGravity="textStart"
+                        app:iconPadding="0dp"
+                        app:iconSize="24dp"
+                        app:iconTint="#333333"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:strokeColor="#E0E0E0"
+                        app:strokeWidth="1dp" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rv_admin_all_orders"
                     android:layout_width="match_parent"
@@ -299,11 +407,13 @@
             android:background="#752674AE"
             android:paddingLeft="60dp"
             android:layout_marginBottom="13dp"
-            android:orientation="horizontal"> <LinearLayout
-            android:id="@+id/navbarIndicatorAdmin"
-            android:layout_width="80dp"
-            android:layout_height="7dp"
-            android:orientation="horizontal" android:background="@drawable/bg_navbar2"/>
+            android:orientation="horizontal">
+            <LinearLayout
+                android:id="@+id/navbarIndicatorAdmin"
+                android:layout_width="80dp"
+                android:layout_height="7dp"
+                android:orientation="horizontal"
+                android:background="@drawable/bg_navbar2"/>
         </LinearLayout>
 
         <LinearLayout

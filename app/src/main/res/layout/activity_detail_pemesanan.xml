@@ -51,8 +51,10 @@
 
                 <TextView
                     android:id="@+id/tvDetailName"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_toStartOf="@id/tvDetailStatus"
+                    android:layout_marginEnd="12dp"
                     android:text="Nama Produk"
                     android:textColor="#1E1E1E"
                     android:textSize="18sp"
