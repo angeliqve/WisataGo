@@ -1,4 +1,4 @@
-package com.app.wisatago // Sesuaikan jika Anda menaruhnya di dalam folder khusus seperti com.app.wisatago.models
+package com.app.wisatago // Sesuaikan jika Anda menaruhnya di dalam folder khusus
 
 import com.google.gson.annotations.SerializedName
 
@@ -11,7 +11,12 @@ data class AdminStatsData(
     val ringkasan: StatsRingkasan,
     val status: List<StatsStatus>,
     val bulanan: List<StatsBulanan>,
-    val populer: List<StatsPopuler>
+    val populer: List<StatsPopuler>,
+
+    // 🟢 TAMBAHAN 3 WADAH BARU UNTUK CHART
+    @SerializedName("transport") val transport: List<StatsKategori>? = null,
+    @SerializedName("daerah") val daerah: List<StatsDaerahResponse>? = null,
+    @SerializedName("wisata") val wisata: List<StatsKategori>? = null
 )
 
 data class StatsRingkasan(
@@ -24,3 +29,30 @@ data class StatsRingkasan(
 data class StatsStatus(val status: String, val jumlah: String)
 data class StatsBulanan(val bulan: String, val total: String)
 data class StatsPopuler(val produk: String, val jumlah: String)
+
+// ==========================================
+// 🟢 MODEL DATA BARU UNTUK CHART KATEGORI
+// ==========================================
+
+data class StatsKategori(
+    @SerializedName("kategori") val kategori: String,
+    @SerializedName("jumlah") val jumlah: String
+)
+
+data class StatsDaerahResponse(
+    @SerializedName("daerah") val daerah: String,
+    @SerializedName("jumlah") val jumlah: String
+)
+
+data class ActivityLogResponse(
+    val success: Boolean,
+    val data: List<ActivityLog>
+)
+
+data class ActivityLog(
+    val log_id: Int,
+    val action_type: String,
+    val description: String,
+    val time_formatted: String,
+    val user_name: String
+)

@@ -17,6 +17,7 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Query
+import com.app.wisatago.ActivityLogResponse
 
 interface ApiService {
     // Menghubungkan langsung ke app.post('/login') di Node.js
@@ -105,4 +106,7 @@ interface ApiService {
     fun cancelBooking(@Body request: CancelRequest): Call<CancelResponse>
     @GET("admin/dashboard-stats")
     fun getAdminStats(): Call<AdminStatsResponse>
+
+    @GET("admin/activity-logs")
+    fun getActivityLogs(): Call<ActivityLogResponse>
 }

@@ -39,12 +39,12 @@ class AdminPesananActivity : AppCompatActivity() {
     private var listSemuaPesananRaw: List<HistoryResponse> = ArrayList()
     private var listPesananFilter: MutableList<HistoryResponse> = ArrayList()
 
-    // 🟢 Variabel State Filter
+    // Variabel State Filter
     private var selectedKategori = "Semua"
     private var selectedBulanLabel = "Semua"
-    private var selectedBulanKode = "" // Kosong = Semua bulan
+    private var selectedBulanKode = ""
 
-    // 🟢 Deklarasi Tombol Chip
+    // Deklarasi Tombol Chip
     private lateinit var btnFilterBulan: MaterialButton
     private lateinit var btnFilterSemua: MaterialButton
     private lateinit var btnFilterWisata: MaterialButton
@@ -78,34 +78,35 @@ class AdminPesananActivity : AppCompatActivity() {
         findViewById<View>(R.id.layout_tab_statistik).visibility = View.GONE
         findViewById<View>(R.id.layout_tab_pesanan).visibility = View.VISIBLE
 
+        // Mengatur Warna Ikon dan Teks
         btnAdminStats.setImageResource(R.drawable.icon_home_blue)
         btnAdminOrders.setImageResource(R.drawable.icon_order_white)
         tvAdminStats.setTextColor(Color.parseColor("#0A4181"))
         tvAdminOrders.setTextColor(Color.parseColor("#FFFFFF"))
+
+        // 🟢 INI KUNCI PERBAIKANNYA:
+        // Mematikan garis di Statistik, Menyalakan garis di Pemesanan
+        findViewById<View>(R.id.indicatorStats).setBackgroundColor(Color.TRANSPARENT)
+        findViewById<View>(R.id.indicatorOrders).setBackgroundResource(R.drawable.bg_navbar2)
 
         val sharedPref = getSharedPreferences("USER_SESSION", MODE_PRIVATE)
         tvAdminWelcome.text = "Selamat Datang, ${sharedPref.getString("USERNAME", "Admin")}!"
 
         ambilDataTransaksi()
 
+        // Tombol Kembali ke Dashboard (Animasi Halus)
         btnAdminStats.setOnClickListener {
             startActivity(Intent(this, AdminDashboardActivity::class.java))
-            overridePendingTransition(0, 0)
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
             finish()
         }
 
-        // ==========================================
-        // 🟢 LOGIKA ON-CLICK FILTER KATEGORI
-        // ==========================================
+        // Logika Klik Filter
         btnFilterSemua.setOnClickListener { setChipAktif(it as MaterialButton, "Semua") }
         btnFilterWisata.setOnClickListener { setChipAktif(it as MaterialButton, "Wisata") }
         btnFilterKereta.setOnClickListener { setChipAktif(it as MaterialButton, "Kereta Api") }
         btnFilterPesawat.setOnClickListener { setChipAktif(it as MaterialButton, "Pesawat") }
         btnFilterBus.setOnClickListener { setChipAktif(it as MaterialButton, "Bus") }
-
-        // ==========================================
-        // 🟢 LOGIKA ON-CLICK BOTTOM SHEET BULAN
-        // ==========================================
         btnFilterBulan.setOnClickListener { showFilterBulan() }
 
         etAdminSearch.addTextChangedListener(object : TextWatcher {
@@ -126,7 +127,7 @@ class AdminPesananActivity : AppCompatActivity() {
                 withContext(Dispatchers.Main) {
                     if (response.isSuccessful && response.body() != null) {
                         listSemuaPesananRaw = response.body()!!
-                        applyCombinedFilter() // Terapkan filter di awal
+                        applyCombinedFilter()
                     }
                 }
             } catch (e: Exception) {
@@ -135,25 +136,20 @@ class AdminPesananActivity : AppCompatActivity() {
         }
     }
 
-    // Mengubah warna chip yang sedang dipilih
     private fun setChipAktif(btnAktif: MaterialButton, kategori: String) {
         selectedKategori = kategori
         val semuaBtn = listOf(btnFilterSemua, btnFilterWisata, btnFilterKereta, btnFilterPesawat, btnFilterBus)
 
-        // Reset semua tombol menjadi abu-abu
         for (btn in semuaBtn) {
             btn.setBackgroundColor(Color.parseColor("#F0F0F0"))
             btn.setTextColor(Color.parseColor("#333333"))
         }
 
-        // Set tombol yang diklik menjadi biru
         btnAktif.setBackgroundColor(Color.parseColor("#2DA0F5"))
         btnAktif.setTextColor(Color.parseColor("#FFFFFF"))
-
         applyCombinedFilter()
     }
 
-    // Memunculkan Dialog Bottom Sheet
     private fun showFilterBulan() {
         val bottomSheetDialog = BottomSheetDialog(this)
         val view = layoutInflater.inflate(R.layout.layout_filter_bulan, null)
@@ -168,13 +164,8 @@ class AdminPesananActivity : AppCompatActivity() {
         val setBulan = { label: String, kode: String ->
             selectedBulanLabel = label
             selectedBulanKode = kode
-
-            // 🟢 Teks dihapus total agar murni hanya menampilkan ikon
             btnFilterBulan.text = ""
-
-            // 🟢 Ubah warna background menjadi Abu-abu muda saat filter aktif
             btnFilterBulan.setBackgroundColor(if (label == "Semua Bulan") Color.parseColor("#FFFFFF") else Color.parseColor("#E0E0E0"))
-
             applyCombinedFilter()
             bottomSheetDialog.dismiss()
         }
@@ -183,28 +174,24 @@ class AdminPesananActivity : AppCompatActivity() {
         optFeb.setOnClickListener { setBulan("Februari", "Feb") }
         optMar.setOnClickListener { setBulan("Maret", "Mar") }
         optApr.setOnClickListener { setBulan("April", "Apr") }
-        optMei.setOnClickListener { setBulan("Mei", "May") } // May di PostgreSQL
+        optMei.setOnClickListener { setBulan("Mei", "May") }
         optJun.setOnClickListener { setBulan("Juni", "Jun") }
 
         bottomSheetDialog.setContentView(view)
         bottomSheetDialog.show()
     }
 
-    // 🟢 Logika Sentral Penggabungan 3 Filter (Teks, Kategori, Bulan)
     private fun applyCombinedFilter() {
         val query = etAdminSearch.text.toString().lowercase().trim()
         listPesananFilter.clear()
 
         for (item in listSemuaPesananRaw) {
-
-            // 1. Filter Pencarian Teks
             val isSearchMatch = query.isEmpty() ||
                     item.booking_code?.lowercase()?.contains(query) == true ||
                     item.transport_name?.lowercase()?.contains(query) == true ||
                     item.origin_city?.lowercase()?.contains(query) == true ||
-                    item.full_name?.lowercase()?.contains(query) == true // Bisa dicari dengan nama pemesan
+                    item.full_name?.lowercase()?.contains(query) == true
 
-            // 2. Filter Kategori (Mendeteksi armada dari namanya)
             val nameTransport = item.transport_name ?: ""
             val isCategoryMatch = when(selectedKategori) {
                 "Semua" -> true
@@ -218,14 +205,12 @@ class AdminPesananActivity : AppCompatActivity() {
                 else -> true
             }
 
-            // 3. Filter Bulan (Mencari singkatan bahasa inggris di tanggal SQL: '11 Jun 2026')
             val isMonthMatch = if (selectedBulanKode.isEmpty()) {
                 true
             } else {
                 item.booking_date?.contains(selectedBulanKode, ignoreCase = true) == true
             }
 
-            // Jika lulus semua kriteria filter, tampilkan!
             if (isSearchMatch && isCategoryMatch && isMonthMatch) {
                 listPesananFilter.add(item)
             }
