@@ -1,4 +1,4 @@
-package com.app.wisatago // Sesuaikan jika Anda menaruhnya di dalam folder khusus
+package com.app.wisatago.admin // Sesuaikan jika Anda menaruhnya di dalam folder khusus
 
 import com.google.gson.annotations.SerializedName
 

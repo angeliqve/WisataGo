@@ -1,4 +1,4 @@
-package com.app.wisatago
+package com.app.wisatago.admin
 
 import android.content.Intent
 import android.graphics.Color
@@ -9,10 +9,12 @@ import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.app.wisatago.Login
+import com.app.wisatago.R
 
 import com.app.wisatago.api.ApiClient
 import com.github.mikephil.charting.charts.BarChart
@@ -126,7 +128,7 @@ class AdminDashboardActivity : AppCompatActivity() {
 
         // Logika Logout
         btnAdminLogout.setOnClickListener {
-            androidx.appcompat.app.AlertDialog.Builder(this)
+            AlertDialog.Builder(this)
                 .setTitle("Logout Admin")
                 .setMessage("Yakin ingin keluar dari panel admin WisataGO?")
                 .setPositiveButton("Ya") { _, _ ->

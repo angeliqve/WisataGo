@@ -6,7 +6,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object ApiClient {
     // Jika IP laptop server berubah, CUKUP GANTI DI SINI SATU KALI SAJA
-    private const val BASE_URL = "http://10.0.2.2:3000/"
+    private const val BASE_URL = "http://192.168.8.212:3000/"
 
     val instance: ApiService by lazy {
         Retrofit.Builder()

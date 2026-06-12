@@ -47,7 +47,14 @@ class BusActivity : AppCompatActivity() {
 
         val calendarPergi = Calendar.getInstance()
         val calendarPulang = Calendar.getInstance()
-        val dateFormat = SimpleDateFormat("EEE, dd MMM yyyy", Locale("id", "ID"))
+        val dateFormat = SimpleDateFormat("EEEE, dd MMMM yyyy", Locale("id", "ID"))
+
+        // =================================================================
+        // 🟢 ISI OTOMATIS TANGGAL PERGI DENGAN HARI INI
+        // =================================================================
+        val tanggalHariIni = dateFormat.format(calendarPergi.time)
+        tvTanggalPergi.text = tanggalHariIni
+        // =================================================================
 
         val daftarKotaBus = arrayOf(
             "Jakarta - Terminal Pulo Gebang",
@@ -130,9 +137,23 @@ class BusActivity : AppCompatActivity() {
             datePickerDialog.show()
         }
 
+        // =================================================================
+        // LOGIKA SWITCH PULANG PERGI
+        // =================================================================
         switchPulangPergi.setOnCheckedChangeListener { _, isChecked ->
-            btnTanggalPulang.visibility = if (isChecked) View.VISIBLE else View.GONE
-            if (!isChecked) {
+            if (isChecked) {
+                // Tampilkan kotak tanggal pulang
+                btnTanggalPulang.visibility = View.VISIBLE
+
+                // Set default tanggal pulang (Tanggal Pergi + 1 Hari) agar tidak kosong
+                // Menggunakan waktu dari calendarPergi saat ini, lalu ditambah 1 hari
+                calendarPulang.timeInMillis = calendarPergi.timeInMillis
+                calendarPulang.add(Calendar.DAY_OF_MONTH, 1) // Tambah 1 hari
+
+                tvTanggalPulang.text = dateFormat.format(calendarPulang.time)
+            } else {
+                // Sembunyikan dan reset ke placeholder
+                btnTanggalPulang.visibility = View.GONE
                 tvTanggalPulang.text = "DD, 00 0000 0000"
             }
         }

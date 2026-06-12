@@ -39,3 +39,13 @@ data class ResponseBooking(
     val booking_code: String,
     val error: String? = null
 )
+
+data class Seat(
+    val id: String,
+    var isSelected: Boolean = false,
+    var isBooked: Boolean = false,
+    val type: SeatType
+)
+
+// 🟢 TAMBAHKAN ROW_LABEL DI SINI
+enum class SeatType { SEAT, AISLE, ROW_LABEL }

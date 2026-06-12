@@ -1,6 +1,6 @@
 package com.app.wisatago.api
 
-import com.app.wisatago.AdminStatsResponse
+import com.app.wisatago.admin.AdminStatsResponse
 import com.app.wisatago.attraction.Wisata
 import com.app.wisatago.booking.BookingRequest
 import com.app.wisatago.booking.ResponseBooking
@@ -17,7 +17,7 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Query
-import com.app.wisatago.ActivityLogResponse
+import com.app.wisatago.admin.ActivityLogResponse
 
 interface ApiService {
     // Menghubungkan langsung ke app.post('/login') di Node.js
@@ -104,9 +104,9 @@ interface ApiService {
     suspend fun getAllBookingsAdmin(): Response<List<HistoryResponse>>
     @POST("cancel-booking")
     fun cancelBooking(@Body request: CancelRequest): Call<CancelResponse>
-    @GET("admin/dashboard-stats")
+    @GET("com/app/wisatago/admin/dashboard-stats")
     fun getAdminStats(): Call<AdminStatsResponse>
 
-    @GET("admin/activity-logs")
+    @GET("com/app/wisatago/admin/activity-logs")
     fun getActivityLogs(): Call<ActivityLogResponse>
 }

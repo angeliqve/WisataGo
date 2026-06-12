@@ -1,4 +1,4 @@
-package com.app.wisatago
+package com.app.wisatago.admin
 
 import android.content.Intent
 import android.graphics.Color
@@ -10,9 +10,12 @@ import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.app.wisatago.Login
+import com.app.wisatago.R
 import com.app.wisatago.api.ApiClient
 import com.app.wisatago.api.HistoryResponse
 import com.app.wisatago.booking.HistoryAdapter
@@ -226,7 +229,7 @@ class AdminPesananActivity : AppCompatActivity() {
     }
 
     private fun logoutAdmin() {
-        androidx.appcompat.app.AlertDialog.Builder(this)
+        AlertDialog.Builder(this)
             .setTitle("Logout Admin").setMessage("Yakin ingin keluar?")
             .setPositiveButton("Ya") { _, _ ->
                 getSharedPreferences("USER_SESSION", MODE_PRIVATE).edit().clear().apply()

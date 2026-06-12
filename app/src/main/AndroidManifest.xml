@@ -16,6 +16,11 @@
         android:theme="@style/Theme.WisataGo"
         android:usesCleartextTraffic="true"
         tools:targetApi="m">
+
+        <activity
+            android:name=".booking.PilihKursiActivity"
+            android:exported="false" />
+
         <activity
             android:name=".booking.PaymentSuccessActivity"
             android:exported="false" />
@@ -76,11 +81,12 @@
             android:name=".DetailPemesananActivity"
             android:exported="false" />
         <activity
-            android:name=".AdminDashboardActivity"
+            android:name=".admin.AdminDashboardActivity"
             android:exported="false" />
         <activity
-            android:name=".AdminPesananActivity"
+            android:name=".admin.AdminPesananActivity"
             android:exported="false" />
+
         <activity
             android:name=".SplashActivity"
             android:exported="true"
