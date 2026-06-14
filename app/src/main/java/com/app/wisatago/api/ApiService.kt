@@ -104,9 +104,10 @@ interface ApiService {
     suspend fun getAllBookingsAdmin(): Response<List<HistoryResponse>>
     @POST("cancel-booking")
     fun cancelBooking(@Body request: CancelRequest): Call<CancelResponse>
-    @GET("com/app/wisatago/admin/dashboard-stats")
+    @GET("/admin/dashboard-stats")
     fun getAdminStats(): Call<AdminStatsResponse>
 
-    @GET("com/app/wisatago/admin/activity-logs")
+    // 🟢 PERBAIKAN: Ubah URL-nya menjadi rute backend yang benar
+    @GET("/admin/activity-logs")
     fun getActivityLogs(): Call<ActivityLogResponse>
 }
