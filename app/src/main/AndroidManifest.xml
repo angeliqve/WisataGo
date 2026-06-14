@@ -16,11 +16,15 @@
         android:theme="@style/Theme.WisataGo"
         android:usesCleartextTraffic="true"
         tools:targetApi="m">
-
+        <activity
+            android:name=".DetailTransportActivity"
+            android:exported="false" />
+        <activity
+            android:name=".DetailWisataActivity"
+            android:exported="false" />
         <activity
             android:name=".booking.PilihKursiActivity"
             android:exported="false" />
-
         <activity
             android:name=".booking.PaymentSuccessActivity"
             android:exported="false" />
@@ -51,7 +55,6 @@
         <activity
             android:name=".attraction.CheckoutWisataActivity"
             android:exported="false" />
-
         <activity
             android:name=".Dashboard"
             android:exported="false" />
@@ -70,12 +73,14 @@
         <activity
             android:name=".BantuanPanduan"
             android:exported="false" />
-        <activity android:name=".UbahPassword"
+        <activity
+            android:name=".UbahPassword"
             android:exported="false" />
         <activity
             android:name=".EditProfile"
             android:exported="false" />
-        <activity android:name=".HistoryActivity"
+        <activity
+            android:name=".HistoryActivity"
             android:exported="false" />
         <activity
             android:name=".DetailPemesananActivity"
@@ -86,13 +91,13 @@
         <activity
             android:name=".admin.AdminPesananActivity"
             android:exported="false" />
-
         <activity
             android:name=".SplashActivity"
             android:exported="true"
             android:theme="@style/Theme.WisataGo">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
