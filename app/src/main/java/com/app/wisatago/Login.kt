@@ -76,7 +76,8 @@ class Login : AppCompatActivity() {
 
                         Toast.makeText(this@Login, "Selamat datang, ${hasilData.full_name}!", Toast.LENGTH_SHORT).show()
 
-                        if (hasilData.role.equals("com/app/wisatago/admin", ignoreCase = true)) {
+                        // 🟢 Ubah pengecekan menjadi "admin" (sesuai isi database Anda)
+                        if (hasilData.role.equals("admin", ignoreCase = true)) {
                             val intent = Intent(this@Login, AdminDashboardActivity::class.java)
                             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                             startActivity(intent)
