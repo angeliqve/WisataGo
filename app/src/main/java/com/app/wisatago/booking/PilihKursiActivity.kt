@@ -46,20 +46,16 @@ class PilihKursiActivity : AppCompatActivity() {
         // =======================================================
         // 🟢 1. LOGIKA PENENTUAN JENIS KENDARAAN & SUSUNAN
         // =======================================================
-        var spanCount = 6 // Default 2-2 (Nomor, A, B, Lorong, C, D)
+        var spanCount = 6 // Default 2-2
         var layoutType = "2-2"
         var tabCount = 8
         var prefixTab = "EKS"
+        var judulHalaman = "Pilih Kursi Kereta"
 
         if (transportType.contains("Bus", ignoreCase = true)) {
-            tabCount = 1 // Bus biasanya hanya 1 lantai/gerbong
+            judulHalaman = "Pilih Kursi Bus"
+            tabCount = 1 // Bus biasanya hanya 1 lantai
             prefixTab = "BUS"
-            findViewById<TextView>(R.id.btnBack).text = "❮ Batal"
-
-            // Ubah Judul Header Atas
-            (btnBack.parent as? android.widget.RelativeLayout)?.getChildAt(1)?.let {
-                (it as TextView).text = "Pilih Kursi Bus"
-            }
 
             if (transportClass.contains("Ekonomi", ignoreCase = true)) {
                 spanCount = 7 // 3-2 (Nomor, A, B, C, Lorong, D, E)
@@ -68,14 +64,27 @@ class PilihKursiActivity : AppCompatActivity() {
                 spanCount = 6 // 2-2 Premium
                 layoutType = "2-2"
             }
-        } else {
-            // Logika Kereta (Sudah disempurnakan)
+        }
+        else if (transportType.contains("Pesawat", ignoreCase = true) || transportType.contains("Flight", ignoreCase = true)) {
+            judulHalaman = "Pilih Kursi Pesawat"
+            tabCount = 5 // Bagi 835 kursi ke 5 Zona (Tab)
+            prefixTab = "ZONA"
+            spanCount = 8 // Nomor, A, B, C, Lorong, D, E, F (3-3)
+            layoutType = "3-3"
+        }
+        else {
+            judulHalaman = "Pilih Kursi Kereta"
             prefixTab = when {
                 transportClass.contains("Ekonomi", ignoreCase = true) -> "EKO"
                 transportClass.contains("Luxury", ignoreCase = true) -> "LUX"
                 transportClass.contains("Bisnis", ignoreCase = true) -> "BIS"
                 else -> "EKS"
             }
+        }
+
+        // Ubah Judul Header Atas secara dinamis
+        (btnBack.parent as? android.widget.RelativeLayout)?.getChildAt(1)?.let {
+            (it as TextView).text = judulHalaman
         }
 
         // =======================================================
@@ -100,7 +109,7 @@ class PilihKursiActivity : AppCompatActivity() {
 
         // 5. Buat Tab
         for (i in 1..tabCount) {
-            val tabName = if (transportType.contains("Bus", true)) "Lantai Utama" else "$prefixTab-$i"
+            val tabName = if (transportType.contains("Bus", true)) "Kursi Bis" else "$prefixTab-$i"
             tabLayoutGerbong.addTab(tabLayoutGerbong.newTab().setText(tabName))
         }
 
@@ -150,6 +159,10 @@ class PilihKursiActivity : AppCompatActivity() {
             addTextView("A"); addTextView("B"); addTextView("C")
             addTextView("") // Lorong
             addTextView("D"); addTextView("E")
+        } else if (layoutType == "3-3") {
+            addTextView("A"); addTextView("B"); addTextView("C")
+            addTextView("") // Lorong
+            addTextView("D"); addTextView("E"); addTextView("F")
         } else {
             addTextView("A"); addTextView("B")
             addTextView("") // Lorong
@@ -158,23 +171,42 @@ class PilihKursiActivity : AppCompatActivity() {
     }
 
     private fun initDataKendaraan(tabCount: Int, layoutType: String) {
+        var totalKursiPesawatTercetak = 0 // Penghitung khusus untuk batasan 835
+
         for (ruangan in 1..tabCount) {
             val seatList = mutableListOf<Seat>()
-            val totalRows = if (layoutType == "3-2") 10 else 23 // Bus = 10 Baris, Kereta = 23 Baris
+            val totalRows = when(layoutType) {
+                "3-3" -> 28 // 28 baris x 6 = 168 kursi per Zona. 5 Zona = 840 kapasitas max
+                "3-2" -> 10 // Bus
+                else -> 23  // Kereta
+            }
 
             for (row in 1..totalRows) {
                 seatList.add(Seat(id = row.toString(), type = SeatType.ROW_LABEL))
 
-                if (layoutType == "3-2") {
-                    // Susunan Bus Ekonomi 3-2
+                if (layoutType == "3-3") { // 🟢 PESAWAT (3-3)
+                    val cols = listOf("A", "B", "C", "D", "E", "F")
+                    for (col in cols) {
+                        if (totalKursiPesawatTercetak < 835) { // Batas ketat 835 kursi!
+                            seatList.add(Seat(id = "${ruangan}-${row}$col", type = SeatType.SEAT, isBooked = Math.random() > 0.5))
+                            totalKursiPesawatTercetak++
+                        } else {
+                            // Jika sudah lewat 835, sisa tempat digambar sebagai lorong kosong agar tidak error
+                            seatList.add(Seat(id = "EMPTY", type = SeatType.AISLE))
+                        }
+                        // Sisipkan lorong setelah huruf C
+                        if (col == "C") seatList.add(Seat(id = "AISLE_${ruangan}_${row}", type = SeatType.AISLE))
+                    }
+                }
+                else if (layoutType == "3-2") { // 🟢 BUS EKONOMI (3-2)
                     seatList.add(Seat(id = "${ruangan}-${row}A", type = SeatType.SEAT, isBooked = Math.random() > 0.5))
                     seatList.add(Seat(id = "${ruangan}-${row}B", type = SeatType.SEAT, isBooked = Math.random() > 0.5))
                     seatList.add(Seat(id = "${ruangan}-${row}C", type = SeatType.SEAT, isBooked = Math.random() > 0.5))
                     seatList.add(Seat(id = "AISLE_${ruangan}_${row}", type = SeatType.AISLE))
                     seatList.add(Seat(id = "${ruangan}-${row}D", type = SeatType.SEAT, isBooked = Math.random() > 0.5))
                     seatList.add(Seat(id = "${ruangan}-${row}E", type = SeatType.SEAT, isBooked = Math.random() > 0.5))
-                } else {
-                    // Susunan 2-2 (Kereta / Bus Premium)
+                }
+                else { // 🟢 KERETA & BUS PREMIUM (2-2)
                     seatList.add(Seat(id = "${ruangan}-${row}A", type = SeatType.SEAT, isBooked = Math.random() > 0.5))
                     seatList.add(Seat(id = "${ruangan}-${row}B", type = SeatType.SEAT, isBooked = Math.random() > 0.5))
                     seatList.add(Seat(id = "AISLE_${ruangan}_${row}", type = SeatType.AISLE))
