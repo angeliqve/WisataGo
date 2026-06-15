@@ -459,6 +459,14 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="8dp" />
 
+                <ProgressBar
+                    android:id="@+id/pb_admin_loading"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_margin="16dp"
+                    android:visibility="gone" />
+
                 <View android:layout_width="match_parent" android:layout_height="80dp" />
             </LinearLayout>
 

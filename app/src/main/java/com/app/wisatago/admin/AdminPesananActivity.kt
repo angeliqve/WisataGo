@@ -9,9 +9,11 @@ import android.view.View
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.widget.NestedScrollView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.app.wisatago.Login
@@ -21,30 +23,35 @@ import com.app.wisatago.api.HistoryResponse
 import com.app.wisatago.booking.HistoryAdapter
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.button.MaterialButton
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 
 class AdminPesananActivity : AppCompatActivity() {
 
     private lateinit var tvAdminWelcome: TextView
     private lateinit var btnAdminLogout: ImageButton
-
     private lateinit var btnAdminStats: ImageView
     private lateinit var btnAdminOrders: ImageView
     private lateinit var tvAdminStats: TextView
     private lateinit var tvAdminOrders: TextView
-
     private lateinit var etAdminSearch: EditText
+
+    // UI List & Loading
     private lateinit var rvAdminAllOrders: RecyclerView
+    private lateinit var scrollViewAdmin: NestedScrollView
+    private lateinit var pbLoading: ProgressBar
+
+    // Pagination & State
     private lateinit var adminAdapter: HistoryAdapter
-    private var listSemuaPesananRaw: List<HistoryResponse> = ArrayList()
-    private var listPesananFilter: MutableList<HistoryResponse> = ArrayList()
+    private var listPesananData: MutableList<HistoryResponse> = ArrayList()
+
+    private var currentPage = 1
+    private val limitPerPage = 10
+    private var isLoading = false
+    private var isLastPage = false
+    private var searchJob: Job? = null
 
     // Variabel State Filter
     private var selectedKategori = "Semua"
-    private var selectedBulanLabel = "Semua"
     private var selectedBulanKode = ""
 
     // Deklarasi Tombol Chip
@@ -68,9 +75,11 @@ class AdminPesananActivity : AppCompatActivity() {
 
         etAdminSearch = findViewById(R.id.et_admin_search)
         rvAdminAllOrders = findViewById(R.id.rv_admin_all_orders)
+        scrollViewAdmin = findViewById(R.id.scrollViewAdmin)
+        pbLoading = findViewById(R.id.pb_admin_loading)
+
         rvAdminAllOrders.layoutManager = LinearLayoutManager(this)
 
-        // Hubungkan Chip UI
         btnFilterBulan = findViewById(R.id.btn_filter_bulan)
         btnFilterSemua = findViewById(R.id.btn_filter_semua)
         btnFilterWisata = findViewById(R.id.btn_filter_wisata)
@@ -81,30 +90,32 @@ class AdminPesananActivity : AppCompatActivity() {
         findViewById<View>(R.id.layout_tab_statistik).visibility = View.GONE
         findViewById<View>(R.id.layout_tab_pesanan).visibility = View.VISIBLE
 
-        // Mengatur Warna Ikon dan Teks
         btnAdminStats.setImageResource(R.drawable.icon_home_blue)
         btnAdminOrders.setImageResource(R.drawable.icon_order_white)
         tvAdminStats.setTextColor(Color.parseColor("#0A4181"))
         tvAdminOrders.setTextColor(Color.parseColor("#FFFFFF"))
-
-        // 🟢 INI KUNCI PERBAIKANNYA:
-        // Mematikan garis di Statistik, Menyalakan garis di Pemesanan
         findViewById<View>(R.id.indicatorStats).setBackgroundColor(Color.TRANSPARENT)
         findViewById<View>(R.id.indicatorOrders).setBackgroundResource(R.drawable.bg_navbar2)
 
         val sharedPref = getSharedPreferences("USER_SESSION", MODE_PRIVATE)
         tvAdminWelcome.text = "Selamat Datang, ${sharedPref.getString("USERNAME", "Admin")}!"
 
-        ambilDataTransaksi()
+        // 🟢 MENDETEKSI SAAT ADMIN MENGGESER SAMPAI BAWAH (INFINITE SCROLL)
+        scrollViewAdmin.setOnScrollChangeListener(NestedScrollView.OnScrollChangeListener { v, _, scrollY, _, _ ->
+            if (scrollY >= v.getChildAt(0).measuredHeight - v.measuredHeight) {
+                if (!isLoading && !isLastPage) {
+                    currentPage++
+                    fetchDataDariServer()
+                }
+            }
+        })
 
-        // Tombol Kembali ke Dashboard (Animasi Halus)
         btnAdminStats.setOnClickListener {
             startActivity(Intent(this, AdminDashboardActivity::class.java))
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
             finish()
         }
 
-        // Logika Klik Filter
         btnFilterSemua.setOnClickListener { setChipAktif(it as MaterialButton, "Semua") }
         btnFilterWisata.setOnClickListener { setChipAktif(it as MaterialButton, "Wisata") }
         btnFilterKereta.setOnClickListener { setChipAktif(it as MaterialButton, "Kereta Api") }
@@ -112,37 +123,30 @@ class AdminPesananActivity : AppCompatActivity() {
         btnFilterBus.setOnClickListener { setChipAktif(it as MaterialButton, "Bus") }
         btnFilterBulan.setOnClickListener { showFilterBulan() }
 
+        // 🟢 DEBOUNCED SEARCH: Hanya mencari jika admin berhenti mengetik selama 0.5 detik
         etAdminSearch.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                applyCombinedFilter()
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                searchJob?.cancel()
+                searchJob = CoroutineScope(Dispatchers.Main).launch {
+                    delay(500)
+                    resetPagination()
+                }
             }
-            override fun afterTextChanged(s: Editable?) {}
         })
 
         btnAdminLogout.setOnClickListener { logoutAdmin() }
-    }
 
-    private fun ambilDataTransaksi() {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val response = ApiClient.instance.getAllBookingsAdmin()
-                withContext(Dispatchers.Main) {
-                    if (response.isSuccessful && response.body() != null) {
-                        listSemuaPesananRaw = response.body()!!
-                        applyCombinedFilter()
-                    }
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
+        // Load data pertama kali
+        resetPagination()
     }
 
     private fun setChipAktif(btnAktif: MaterialButton, kategori: String) {
+        if (selectedKategori == kategori) return
         selectedKategori = kategori
-        val semuaBtn = listOf(btnFilterSemua, btnFilterWisata, btnFilterKereta, btnFilterPesawat, btnFilterBus)
 
+        val semuaBtn = listOf(btnFilterSemua, btnFilterWisata, btnFilterKereta, btnFilterPesawat, btnFilterBus)
         for (btn in semuaBtn) {
             btn.setBackgroundColor(Color.parseColor("#F0F0F0"))
             btn.setTextColor(Color.parseColor("#333333"))
@@ -150,81 +154,89 @@ class AdminPesananActivity : AppCompatActivity() {
 
         btnAktif.setBackgroundColor(Color.parseColor("#2DA0F5"))
         btnAktif.setTextColor(Color.parseColor("#FFFFFF"))
-        applyCombinedFilter()
+
+        resetPagination()
     }
 
     private fun showFilterBulan() {
         val bottomSheetDialog = BottomSheetDialog(this)
         val view = layoutInflater.inflate(R.layout.layout_filter_bulan, null)
 
-        val optJan = view.findViewById<TextView>(R.id.opt_jan)
-        val optFeb = view.findViewById<TextView>(R.id.opt_feb)
-        val optMar = view.findViewById<TextView>(R.id.opt_mar)
-        val optApr = view.findViewById<TextView>(R.id.opt_apr)
-        val optMei = view.findViewById<TextView>(R.id.opt_mei)
-        val optJun = view.findViewById<TextView>(R.id.opt_jun)
-
         val setBulan = { label: String, kode: String ->
-            selectedBulanLabel = label
-            selectedBulanKode = kode
-            btnFilterBulan.text = ""
-            btnFilterBulan.setBackgroundColor(if (label == "Semua Bulan") Color.parseColor("#FFFFFF") else Color.parseColor("#E0E0E0"))
-            applyCombinedFilter()
+            if (selectedBulanKode != kode) {
+                selectedBulanKode = kode
+                btnFilterBulan.text = ""
+                btnFilterBulan.setBackgroundColor(if (label == "Semua Bulan") Color.parseColor("#FFFFFF") else Color.parseColor("#E0E0E0"))
+                resetPagination()
+            }
             bottomSheetDialog.dismiss()
         }
 
-        optJan.setOnClickListener { setBulan("Januari", "Jan") }
-        optFeb.setOnClickListener { setBulan("Februari", "Feb") }
-        optMar.setOnClickListener { setBulan("Maret", "Mar") }
-        optApr.setOnClickListener { setBulan("April", "Apr") }
-        optMei.setOnClickListener { setBulan("Mei", "May") }
-        optJun.setOnClickListener { setBulan("Juni", "Jun") }
+        view.findViewById<TextView>(R.id.opt_jan).setOnClickListener { setBulan("Januari", "Jan") }
+        view.findViewById<TextView>(R.id.opt_feb).setOnClickListener { setBulan("Februari", "Feb") }
+        view.findViewById<TextView>(R.id.opt_mar).setOnClickListener { setBulan("Maret", "Mar") }
+        view.findViewById<TextView>(R.id.opt_apr).setOnClickListener { setBulan("April", "Apr") }
+        view.findViewById<TextView>(R.id.opt_mei).setOnClickListener { setBulan("Mei", "May") }
+        view.findViewById<TextView>(R.id.opt_jun).setOnClickListener { setBulan("Juni", "Jun") }
 
         bottomSheetDialog.setContentView(view)
         bottomSheetDialog.show()
     }
 
-    private fun applyCombinedFilter() {
-        val query = etAdminSearch.text.toString().lowercase().trim()
-        listPesananFilter.clear()
-
-        for (item in listSemuaPesananRaw) {
-            val isSearchMatch = query.isEmpty() ||
-                    item.booking_code?.lowercase()?.contains(query) == true ||
-                    item.transport_name?.lowercase()?.contains(query) == true ||
-                    item.origin_city?.lowercase()?.contains(query) == true ||
-                    item.full_name?.lowercase()?.contains(query) == true
-
-            val nameTransport = item.transport_name ?: ""
-            val isCategoryMatch = when(selectedKategori) {
-                "Semua" -> true
-                "Wisata" -> item.booking_code?.startsWith("WS-") == true
-                "Kereta Api" -> item.booking_code?.startsWith("TR-") == true &&
-                        (nameTransport.contains("KAI", true) || nameTransport.contains("Jaya", true) || nameTransport.contains("Argo", true) || nameTransport.contains("Express", true))
-                "Pesawat" -> item.booking_code?.startsWith("TR-") == true &&
-                        (nameTransport.contains("Air", true) || nameTransport.contains("Garuda", true) || nameTransport.contains("Citilink", true) || nameTransport.contains("Batik", true))
-                "Bus" -> item.booking_code?.startsWith("TR-") == true &&
-                        (nameTransport.contains("Bus", true) || nameTransport.contains("PO", true) || nameTransport.contains("Trans", true) || nameTransport.contains("Rosalia", true) || nameTransport.contains("Sinar", true))
-                else -> true
-            }
-
-            val isMonthMatch = if (selectedBulanKode.isEmpty()) {
-                true
-            } else {
-                item.booking_date?.contains(selectedBulanKode, ignoreCase = true) == true
-            }
-
-            if (isSearchMatch && isCategoryMatch && isMonthMatch) {
-                listPesananFilter.add(item)
-            }
-        }
-
+    private fun resetPagination() {
+        currentPage = 1
+        isLastPage = false
+        listPesananData.clear()
         if (::adminAdapter.isInitialized) {
-            adminAdapter = HistoryAdapter(listPesananFilter)
-            rvAdminAllOrders.adapter = adminAdapter
-        } else {
-            adminAdapter = HistoryAdapter(listPesananFilter)
-            rvAdminAllOrders.adapter = adminAdapter
+            adminAdapter.notifyDataSetChanged()
+        }
+        fetchDataDariServer()
+    }
+
+    // 🟢 TARIK DATA CERDAS (PAGE PER PAGE)
+    private fun fetchDataDariServer() {
+        isLoading = true
+        pbLoading.visibility = View.VISIBLE
+        val searchTxt = etAdminSearch.text.toString().trim()
+
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val response = ApiClient.instance.getAllBookingsAdmin(
+                    search = searchTxt,
+                    category = selectedKategori,
+                    month = selectedBulanKode,
+                    limit = limitPerPage,
+                    page = currentPage
+                )
+
+                withContext(Dispatchers.Main) {
+                    pbLoading.visibility = View.GONE
+                    isLoading = false
+
+                    if (response.isSuccessful && response.body() != null) {
+                        val newData = response.body()!!
+
+                        // Jika data yang ditarik kurang dari limit, artinya ini halaman terakhir
+                        if (newData.size < limitPerPage) isLastPage = true
+
+                        val startSize = listPesananData.size
+                        listPesananData.addAll(newData)
+
+                        if (::adminAdapter.isInitialized && currentPage > 1) {
+                            adminAdapter.notifyItemRangeInserted(startSize, newData.size)
+                        } else {
+                            adminAdapter = HistoryAdapter(listPesananData)
+                            rvAdminAllOrders.adapter = adminAdapter
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    pbLoading.visibility = View.GONE
+                    isLoading = false
+                    e.printStackTrace()
+                }
+            }
         }
     }
 

@@ -101,7 +101,13 @@ interface ApiService {
     @GET("api/admin/dashboard-stats")
     suspend fun getAdminDashboardStats(): Response<AdminStatsResponse>
     @GET("api/admin/bookings")
-    suspend fun getAllBookingsAdmin(): Response<List<HistoryResponse>>
+    suspend fun getAllBookingsAdmin(
+        @Query("search") search: String = "",
+        @Query("category") category: String = "Semua",
+        @Query("month") month: String = "",
+        @Query("limit") limit: Int = 10,
+        @Query("page") page: Int = 1
+    ): Response<List<HistoryResponse>>
     @POST("cancel-booking")
     fun cancelBooking(@Body request: CancelRequest): Call<CancelResponse>
     @GET("/admin/dashboard-stats")
