@@ -242,28 +242,44 @@ class AdminDashboardActivity : AppCompatActivity() {
 
         val dataSet = LineDataSet(entries, "Pendapatan").apply {
             color = Color.parseColor("#35A1F8")
-            lineWidth = 3f
-            circleRadius = 5f
+            lineWidth = 4f // 🟢 Garis ditebalkan sedikit agar lebih menonjol
+            circleRadius = 6f
             setCircleColor(Color.parseColor("#35A1F8"))
+            circleHoleColor = Color.WHITE // 🟢 Membuat titik terlihat berlubang (efek modern)
             mode = LineDataSet.Mode.CUBIC_BEZIER
             setDrawValues(false)
+
+            // 🟢 Trik Efek Kedalaman (Gradient Fill)
+            setDrawFilled(true)
+            val drawable = androidx.core.content.ContextCompat.getDrawable(this@AdminDashboardActivity, R.drawable.bg_chart_gradient)
+            fillDrawable = drawable
         }
 
         lineChartPendapatan.apply {
             data = LineData(dataSet)
             description.isEnabled = false
-            legend.textColor = Color.parseColor("#1E1E1E")
+            legend.isEnabled = false // 🟢 Menyembunyikan kotak legenda "Pendapatan" di bawah agar lebih bersih
+
+            // Pengaturan Sumbu X (Bawah)
             xAxis.valueFormatter = IndexAxisValueFormatter(labels)
             xAxis.position = XAxis.XAxisPosition.BOTTOM
             xAxis.textColor = Color.parseColor("#757575")
-            xAxis.setDrawGridLines(false)
+            xAxis.setDrawGridLines(false) // 🟢 Hilangkan garis vertikal agar lebih elegan
             xAxis.granularity = 1f
+            xAxis.axisLineWidth = 1f
+
+            // Pengaturan Sumbu Y (Kiri & Kanan)
             axisLeft.textColor = Color.parseColor("#757575")
+            axisLeft.setDrawGridLines(true)
+            axisLeft.gridColor = Color.parseColor("#E0E0E0") // Warna garis horizontal lebih samar
+            axisLeft.axisLineWidth = 0f // Hilangkan garis pinggir sumbu Y
             axisRight.isEnabled = false
 
+            // Tambahan Animasi dan Refresh
+            setExtraOffsets(0f, 0f, 0f, 10f) // Beri sedikit jarak di bawah
             notifyDataSetChanged()
             invalidate()
-            if (isFirstLoad) animateY(1000)
+            if (isFirstLoad) animateY(1500) // 🟢 Animasi sedikit diperlambat agar lebih dramatis
         }
     }
 
