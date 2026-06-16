@@ -144,8 +144,8 @@ class DetailPemesananActivity : AppCompatActivity() {
                 tvDetailRoute.text = "$origin ➔ $destination"
             }
         } else {
-            labelRute.text = "Destinasi Wisata"
-            tvDetailRoute.text = origin // Otomatis berisi nama tempat wisata hasil query SQL Admin
+            labelRute.text = "Lokasi Wisata" // 🟢 Diubah menjadi Lokasi Wisata
+            tvDetailRoute.text = origin
         }
 
         try {

@@ -54,7 +54,7 @@ class HistoryAdapter(private val listHistory: List<HistoryResponse>) :
 
         // 🟢 TAMBAHAN LOGIKA: Ubah Label Rute Menjadi Destinasi jika itu tiket Wisata
         if (item.booking_code.startsWith("WS-")) {
-            holder.tvLabelRoute.text = "Destinasi Wisata"
+            holder.tvLabelRoute.text = "Lokasi Wisata" // 🟢 Diubah menjadi Lokasi Wisata
         } else {
             holder.tvLabelRoute.text = "Rute Perjalanan"
         }
