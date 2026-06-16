@@ -23,7 +23,11 @@ data class StatsRingkasan(
     @SerializedName("total_transaksi") val totalTransaksi: String?,
     @SerializedName("total_pendapatan") val totalPendapatan: String?,
     @SerializedName("pemesanan_baru") val pemesananBaru: String?,
-    @SerializedName("pendapatan_hari_ini") val pendapatanHariIni: String?
+    @SerializedName("pendapatan_hari_ini") val pendapatanHariIni: String?,
+    val total_kereta: String?,
+    val total_bus: String?,
+    val total_pesawat: String?,
+    val total_wisata: String?
 )
 
 data class StatsStatus(val status: String, val jumlah: String)

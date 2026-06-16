@@ -9,6 +9,7 @@ import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -57,6 +58,12 @@ class AdminDashboardActivity : AppCompatActivity() {
     private lateinit var tvAdminPendapatanHari: TextView
     private lateinit var tvAdminPendapatanBulan: TextView
 
+    // 🟢 TAMBAHAN: Rincian Kategori Transport & Wisata
+    private lateinit var tvAdminTotalKereta: TextView
+    private lateinit var tvAdminTotalBus: TextView
+    private lateinit var tvAdminTotalPesawat: TextView
+    private lateinit var tvAdminTotalWisata: TextView
+
     // Diagram Utama
     private lateinit var lineChartPendapatan: LineChart
     private lateinit var pieChartStatus: PieChart
@@ -69,13 +76,13 @@ class AdminDashboardActivity : AppCompatActivity() {
     private lateinit var rvAdminLogs: RecyclerView
     private lateinit var logAdapter: AdminLogAdapter
 
-    // 🟢 MESIN REFRESH OTOMATIS (REAL-TIME UNTUK KESELURUHAN)
+    // MESIN REFRESH OTOMATIS (REAL-TIME UNTUK KESELURUHAN)
     private val autoRefreshHandler = Handler(Looper.getMainLooper())
     private val autoRefreshRunnable = object : Runnable {
         override fun run() {
-            ambilDataStatistik()  // Refresh Angka & Grafik
-            ambilDataLogs()       // Refresh Daftar Log Aktivitas
-            autoRefreshHandler.postDelayed(this, 10000) // Ulangi tiap 10 detik
+            ambilDataStatistik()
+            ambilDataLogs()
+            autoRefreshHandler.postDelayed(this, 10000)
         }
     }
 
@@ -94,6 +101,12 @@ class AdminDashboardActivity : AppCompatActivity() {
         tvAdminPemesananBaru = findViewById(R.id.tvAdminPemesananBaru)
         tvAdminPendapatanHari = findViewById(R.id.tvAdminPendapatanHari)
         tvAdminPendapatanBulan = findViewById(R.id.tvAdminPendapatanBulan)
+
+        // 🟢 TAMBAHAN: Inisialisasi ID Kotak Kategori
+        tvAdminTotalKereta = findViewById(R.id.tvAdminTotalKereta)
+        tvAdminTotalBus = findViewById(R.id.tvAdminTotalBus)
+        tvAdminTotalPesawat = findViewById(R.id.tvAdminTotalPesawat)
+        tvAdminTotalWisata = findViewById(R.id.tvAdminTotalWisata)
 
         lineChartPendapatan = findViewById(R.id.lineChartPendapatan)
         pieChartStatus = findViewById(R.id.pieChartStatus)
@@ -119,14 +132,12 @@ class AdminDashboardActivity : AppCompatActivity() {
         val adminName = sharedPref.getString("USERNAME", "Admin")
         tvAdminWelcome.text = "Selamat Datang, $adminName!"
 
-        // Navigasi Pindah ke Halaman Pesanan
         btnAdminOrders.setOnClickListener {
             startActivity(Intent(this, AdminPesananActivity::class.java))
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
             finish()
         }
 
-        // Logika Logout
         btnAdminLogout.setOnClickListener {
             AlertDialog.Builder(this)
                 .setTitle("Logout Admin")
@@ -142,13 +153,11 @@ class AdminDashboardActivity : AppCompatActivity() {
         }
     }
 
-    // 🟢 NYALAKAN REFRESH OTOMATIS SAAT HALAMAN DIBUKA
     override fun onResume() {
         super.onResume()
         autoRefreshHandler.post(autoRefreshRunnable)
     }
 
-    // 🟢 MATIKAN REFRESH OTOMATIS SAAT APLIKASI DITUTUP (Hemat Baterai)
     override fun onPause() {
         super.onPause()
         autoRefreshHandler.removeCallbacks(autoRefreshRunnable)
@@ -174,17 +183,27 @@ class AdminDashboardActivity : AppCompatActivity() {
                             val bulanIni = statsData.ringkasan.totalPendapatan?.toDoubleOrNull() ?: 0.0
                             tvAdminPendapatanBulan.text = formatRp.format(bulanIni).replace(",00", "")
 
+                            // 🟢 TAMBAHAN: Suntikkan data kategori transportasi dan wisata ke UI
+                            tvAdminTotalKereta.text = statsData.ringkasan.total_kereta ?: "0"
+                            tvAdminTotalBus.text = statsData.ringkasan.total_bus ?: "0"
+                            tvAdminTotalPesawat.text = statsData.ringkasan.total_pesawat ?: "0"
+                            tvAdminTotalWisata.text = statsData.ringkasan.total_wisata ?: "0"
+
                             // Update Semua Grafik Secara Halus
-                            setupLineChart(statsData.bulanan)
-                            setupPieChart(statsData.status)
-                            setupBarChart(statsData.populer)
+                            setupLineChart(statsData.bulanan ?: emptyList())
+                            setupPieChart(statsData.status ?: emptyList())
+                            setupBarChart(statsData.populer ?: emptyList())
                             setupBarChartWisata(statsData.wisata ?: emptyList())
                             setupBarChartTransport(statsData.transport ?: emptyList())
                             setupBarChartDaerah(statsData.daerah ?: emptyList())
                         }
+                    } else {
+                        Toast.makeText(this@AdminDashboardActivity, "Gagal memuat statistik. Kode: ${response.code()}", Toast.LENGTH_SHORT).show()
                     }
                 }
-            } catch (e: Exception) { e.printStackTrace() }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 
@@ -197,7 +216,7 @@ class AdminDashboardActivity : AppCompatActivity() {
                         val logData = response.body()!!.data
                         if (logData.isNotEmpty()) {
                             if (::logAdapter.isInitialized) {
-                                logAdapter.updateData(logData) // Update List secara halus
+                                logAdapter.updateData(logData)
                             } else {
                                 logAdapter = AdminLogAdapter(logData)
                                 rvAdminLogs.adapter = logAdapter
@@ -209,11 +228,9 @@ class AdminDashboardActivity : AppCompatActivity() {
         }
     }
 
-    // =========================================================
-    // FUNGSI SETUP DIAGRAM (Dengan Logika "Anti-Berkedip")
-    // =========================================================
-
     private fun setupLineChart(dataBulanan: List<StatsBulanan>) {
+        if (dataBulanan.isEmpty()) { lineChartPendapatan.clear(); return }
+
         val isFirstLoad = lineChartPendapatan.data == null
         val entries = ArrayList<Entry>()
         val labels = ArrayList<String>()
@@ -243,12 +260,16 @@ class AdminDashboardActivity : AppCompatActivity() {
             xAxis.granularity = 1f
             axisLeft.textColor = Color.parseColor("#757575")
             axisRight.isEnabled = false
-            if (isFirstLoad) animateY(1000) // Animasi hanya saat pertama buka
+
+            notifyDataSetChanged()
             invalidate()
+            if (isFirstLoad) animateY(1000)
         }
     }
 
     private fun setupPieChart(dataStatus: List<StatsStatus>) {
+        if (dataStatus.isEmpty()) { pieChartStatus.clear(); return }
+
         val isFirstLoad = pieChartStatus.data == null
         val entries = ArrayList<PieEntry>()
         for (item in dataStatus) entries.add(PieEntry(item.jumlah.toFloatOrNull() ?: 0f, item.status))
@@ -271,12 +292,16 @@ class AdminDashboardActivity : AppCompatActivity() {
             legend.textColor = Color.parseColor("#1E1E1E")
             setUsePercentValues(true)
             setDrawEntryLabels(false)
-            if (isFirstLoad) animateY(1000)
+
+            notifyDataSetChanged()
             invalidate()
+            if (isFirstLoad) animateY(1000)
         }
     }
 
     private fun setupBarChart(dataPopuler: List<StatsPopuler>) {
+        if (dataPopuler.isEmpty()) { barChartProduk.clear(); return }
+
         val isFirstLoad = barChartProduk.data == null
         val entries = ArrayList<BarEntry>()
         val labels = ArrayList<String>()
@@ -304,13 +329,16 @@ class AdminDashboardActivity : AppCompatActivity() {
             xAxis.granularity = 1f
             axisLeft.textColor = Color.parseColor("#757575")
             axisRight.isEnabled = false
-            if (isFirstLoad) animateY(1000)
+
+            notifyDataSetChanged()
             invalidate()
+            if (isFirstLoad) animateY(1000)
         }
     }
 
     private fun setupBarChartWisata(dataList: List<StatsKategori>) {
         if (dataList.isEmpty()) { barChartWisata.clear(); return }
+
         val isFirstLoad = barChartWisata.data == null
         val entries = ArrayList<BarEntry>()
         val labels = ArrayList<String>()
@@ -338,13 +366,16 @@ class AdminDashboardActivity : AppCompatActivity() {
             xAxis.granularity = 1f
             axisLeft.textColor = Color.parseColor("#757575")
             axisRight.isEnabled = false
-            if (isFirstLoad) animateY(1000)
+
+            notifyDataSetChanged()
             invalidate()
+            if (isFirstLoad) animateY(1000)
         }
     }
 
     private fun setupBarChartTransport(dataList: List<StatsKategori>) {
         if (dataList.isEmpty()) { barChartTransport.clear(); return }
+
         val isFirstLoad = barChartTransport.data == null
         val entries = ArrayList<BarEntry>()
         val labels = ArrayList<String>()
@@ -372,13 +403,16 @@ class AdminDashboardActivity : AppCompatActivity() {
             xAxis.granularity = 1f
             axisLeft.textColor = Color.parseColor("#757575")
             axisRight.isEnabled = false
-            if (isFirstLoad) animateY(1000)
+
+            notifyDataSetChanged()
             invalidate()
+            if (isFirstLoad) animateY(1000)
         }
     }
 
     private fun setupBarChartDaerah(dataList: List<StatsDaerahResponse>) {
         if (dataList.isEmpty()) { barChartDaerah.clear(); return }
+
         val isFirstLoad = barChartDaerah.data == null
         val entries = ArrayList<BarEntry>()
         val labels = ArrayList<String>()
@@ -406,8 +440,10 @@ class AdminDashboardActivity : AppCompatActivity() {
             xAxis.granularity = 1f
             axisLeft.textColor = Color.parseColor("#757575")
             axisRight.isEnabled = false
-            if (isFirstLoad) animateY(1000)
+
+            notifyDataSetChanged()
             invalidate()
+            if (isFirstLoad) animateY(1000)
         }
     }
 }
