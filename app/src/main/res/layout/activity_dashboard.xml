@@ -84,44 +84,13 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/searchBarContainer"
-                android:layout_width="match_parent"
-                android:layout_height="54dp"
-                android:layout_marginHorizontal="24dp"
-                android:background="@drawable/bg_search_bar"
-                android:elevation="8dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingHorizontal="18dp"
-                app:layout_constraintBottom_toBottomOf="@id/header_view"
-                app:layout_constraintTop_toBottomOf="@id/header_view">
-
-                <ImageView
-                    android:id="@+id/searchIcon"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:layout_marginEnd="12dp"
-                    android:src="@drawable/search_icon_magnifier_white"
-                    app:tint="#757575" />
-
-                <TextView
-                    android:id="@+id/searchText"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Cari destinasi impianmu..."
-                    android:textColor="#757575"
-                    android:textSize="14sp" />
-            </LinearLayout>
-
-            <LinearLayout
                 android:id="@+id/menu_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="24dp"
                 android:layout_marginTop="24dp"
                 android:orientation="horizontal"
-                app:layout_constraintTop_toBottomOf="@id/searchBarContainer">
+                app:layout_constraintTop_toBottomOf="@id/header_view">
 
                 <LinearLayout
                     android:id="@+id/wisataButton"
@@ -252,95 +221,17 @@
             </com.google.android.material.card.MaterialCardView>
 
             <TextView
-                android:id="@+id/transportTitleText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="24dp"
-                android:layout_marginTop="28dp"
-                android:text="Pilih Transportasi di Kotamu"
-                android:textColor="#1E1E1E"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/promoCard" />
-
-            <HorizontalScrollView
-                android:id="@+id/scroll_filters"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:clipToPadding="false"
-                android:paddingBottom="12dp"
-                android:scrollbars="none"
-                app:layout_constraintTop_toBottomOf="@id/transportTitleText">
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:paddingHorizontal="24dp">
-
-                    <TextView
-                        android:id="@+id/keretaFilterButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="16dp"
-                        android:background="@drawable/bg_pill_pastel"
-                        android:clickable="true"
-                        android:elevation="2dp"
-                        android:focusable="true"
-                        android:paddingHorizontal="24dp"
-                        android:paddingVertical="10dp"
-                        android:text="Kereta"
-                        android:textColor="#3E3551"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/pesawatFilterButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="16dp"
-                        android:background="@drawable/bg_pill_pastel"
-                        android:clickable="true"
-                        android:elevation="2dp"
-                        android:focusable="true"
-                        android:paddingHorizontal="24dp"
-                        android:paddingVertical="10dp"
-                        android:text="Pesawat"
-                        android:textColor="#3E3551"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/busFilterButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/bg_pill_pastel"
-                        android:clickable="true"
-                        android:elevation="2dp"
-                        android:focusable="true"
-                        android:paddingHorizontal="24dp"
-                        android:paddingVertical="10dp"
-                        android:text="Bus"
-                        android:textColor="#3E3551"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-            </HorizontalScrollView>
-
-            <TextView
                 android:id="@+id/recommendationsTitleText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="28dp"
                 android:text="Rekomendasi Wisata Terbaik"
                 android:textColor="#1E1E1E"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/scroll_filters" />
+                app:layout_constraintTop_toBottomOf="@id/promoCard" />  <!-- langsung ke promoCard -->
 
             <HorizontalScrollView
                 android:id="@+id/wisataScroll"
@@ -463,14 +354,14 @@
                 </LinearLayout>
             </HorizontalScrollView>
 
-            <!--Rekomendasi Kereta-->
+            <!--Rekomendasi Transportasi-->
             <TextView
-                android:id="@+id/keretaTitleText"
+                android:id="@+id/transportasiTitleText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
                 android:layout_marginTop="28dp"
-                android:text="Rekomendasi Kereta"
+                android:text="Rekomendasi Transportasi Terbaik"
                 android:textColor="#1E1E1E"
                 android:textSize="16sp"
                 android:textStyle="bold"
@@ -478,15 +369,15 @@
                 app:layout_constraintTop_toBottomOf="@id/wisataScroll" />
 
             <HorizontalScrollView
-                android:id="@+id/keretaScroll"
+                android:id="@+id/transportasiScroll"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:scrollbars="none"
-                app:layout_constraintTop_toBottomOf="@id/keretaTitleText">
+                app:layout_constraintTop_toBottomOf="@id/transportasiTitleText">
 
                 <LinearLayout
-                    android:id="@+id/keretaListContainer"
+                    android:id="@+id/transportasiListContainer"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
@@ -494,7 +385,7 @@
                     android:paddingBottom="10dp">
 
                     <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/keretaCard1"
+                        android:id="@+id/transportasiCard1"
                         android:layout_width="200dp"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="16dp"
@@ -509,11 +400,11 @@
                             android:orientation="vertical">
 
                             <ImageView
-                                android:id="@+id/keretaImage1"
+                                android:id="@+id/transportasiImage1"
                                 android:layout_width="match_parent"
                                 android:layout_height="120dp"
                                 android:scaleType="centerCrop"
-                                android:src="@drawable/ic_parahyangan" />
+                                android:src="@drawable/ic_anggrek" />
 
                             <LinearLayout
                                 android:layout_width="match_parent"
@@ -522,22 +413,22 @@
                                 android:padding="12dp">
 
                                 <TextView
-                                    android:id="@+id/keretaTitle1Text"
+                                    android:id="@+id/transportasiTitle1Text"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:maxLines="1"
                                     android:ellipsize="end"
-                                    android:text="KA Parahyangan"
+                                    android:text="KA Anggrek"
                                     android:textColor="#1E1E1E"
                                     android:textSize="14sp"
                                     android:textStyle="bold" />
 
                                 <TextView
-                                    android:id="@+id/keretaRating1Text"
+                                    android:id="@+id/transportasiRating1Text"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="4dp"
-                                    android:text="⭐ 4.9 | Gambir - Bandung"
+                                    android:text="⭐ 4.8 | Gambir - Surabaya Pasar Turi"
                                     android:textColor="#FFB300"
                                     android:textSize="11sp"
                                     android:textStyle="bold" />
@@ -546,9 +437,10 @@
                     </com.google.android.material.card.MaterialCardView>
 
                     <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/keretaCard2"
+                        android:id="@+id/transportasiCard2"
                         android:layout_width="200dp"
                         android:layout_height="wrap_content"
+                        android:layout_marginEnd="16dp"
                         app:cardBackgroundColor="#FFFFFF"
                         app:cardCornerRadius="16dp"
                         app:cardElevation="4dp"
@@ -560,11 +452,11 @@
                             android:orientation="vertical">
 
                             <ImageView
-                                android:id="@+id/keretaImage2"
+                                android:id="@+id/transportasiImage2"
                                 android:layout_width="match_parent"
                                 android:layout_height="120dp"
                                 android:scaleType="centerCrop"
-                                android:src="@drawable/ic_anggrek" />
+                                android:src="@drawable/ic_garuda" />
 
                             <LinearLayout
                                 android:layout_width="match_parent"
@@ -578,7 +470,7 @@
                                     android:layout_height="wrap_content"
                                     android:maxLines="1"
                                     android:ellipsize="end"
-                                    android:text="KA Anggrek"
+                                    android:text="Garuda Indonesia"
                                     android:textColor="#1E1E1E"
                                     android:textSize="14sp"
                                     android:textStyle="bold" />
@@ -588,91 +480,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="4dp"
-                                    android:text="⭐ 4.8 | Gambir - Surabaya Pasar Turi"
-                                    android:textColor="#FFB300"
-                                    android:textSize="11sp"
-                                    android:textStyle="bold" />
-                            </LinearLayout>
-                        </LinearLayout>
-                    </com.google.android.material.card.MaterialCardView>
-                </LinearLayout>
-            </HorizontalScrollView>
-
-            <!--Rekomendasi Pesawat-->
-            <TextView
-                android:id="@+id/pesawatTitleText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="24dp"
-                android:layout_marginTop="28dp"
-                android:text="Rekomendasi Pesawat"
-                android:textColor="#1E1E1E"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/keretaScroll" />
-
-            <HorizontalScrollView
-                android:id="@+id/pesawatScroll"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:scrollbars="none"
-                app:layout_constraintTop_toBottomOf="@id/pesawatTitleText">
-
-                <LinearLayout
-                    android:id="@+id/pesawatListContainer"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:paddingHorizontal="24dp"
-                    android:paddingBottom="10dp">
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/pesawatCard1"
-                        android:layout_width="200dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="16dp"
-                        app:cardBackgroundColor="#FFFFFF"
-                        app:cardCornerRadius="16dp"
-                        app:cardElevation="4dp"
-                        app:strokeWidth="0dp">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical">
-
-                            <ImageView
-                                android:id="@+id/pesawatImage1"
-                                android:layout_width="match_parent"
-                                android:layout_height="120dp"
-                                android:scaleType="centerCrop"
-                                android:src="@drawable/ic_garuda" />
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:orientation="vertical"
-                                android:padding="12dp">
-
-                                <TextView
-                                    android:id="@+id/pesawatTitle1Text"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:maxLines="1"
-                                    android:ellipsize="end"
-                                    android:text="Garuda Indonesia"
-                                    android:textColor="#1E1E1E"
-                                    android:textSize="14sp"
-                                    android:textStyle="bold" />
-
-                                <TextView
-                                    android:id="@+id/pesawatRating1Text"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="4dp"
-                                    android:text="⭐ 4.9 | Jakarta (CGK) - Denpasar (DPS)"
+                                    android:text="⭐ 4.8 | Jakarta (CGK) - Denpasar (DPS)"
                                     android:textColor="#FFB300"
                                     android:textSize="11sp"
                                     android:textStyle="bold" />
@@ -681,7 +489,7 @@
                     </com.google.android.material.card.MaterialCardView>
 
                     <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/pesawatCard2"
+                        android:id="@+id/transportasiCard3"
                         android:layout_width="200dp"
                         android:layout_height="wrap_content"
                         app:cardBackgroundColor="#FFFFFF"
@@ -695,91 +503,7 @@
                             android:orientation="vertical">
 
                             <ImageView
-                                android:id="@+id/pesawatImage2"
-                                android:layout_width="match_parent"
-                                android:layout_height="120dp"
-                                android:scaleType="centerCrop"
-                                android:src="@drawable/ic_citilink" />
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:orientation="vertical"
-                                android:padding="12dp">
-
-                                <TextView
-                                    android:id="@+id/pesawatTitle2Text"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:maxLines="1"
-                                    android:ellipsize="end"
-                                    android:text="Citilink Indonesia"
-                                    android:textColor="#1E1E1E"
-                                    android:textSize="14sp"
-                                    android:textStyle="bold" />
-
-                                <TextView
-                                    android:id="@+id/pesawatRating2Text"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="4dp"
-                                    android:text="⭐ 4.8 | Jakarta (CGK) - Surabaya (SUB)"
-                                    android:textColor="#FFB300"
-                                    android:textSize="11sp"
-                                    android:textStyle="bold" />
-                            </LinearLayout>
-                        </LinearLayout>
-                    </com.google.android.material.card.MaterialCardView>
-                </LinearLayout>
-            </HorizontalScrollView>
-
-            <!--Rekomendasi Bus-->
-            <TextView
-                android:id="@+id/busTitleText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="24dp"
-                android:layout_marginTop="28dp"
-                android:text="Rekomendasi Bus"
-                android:textColor="#1E1E1E"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/pesawatScroll" />
-
-            <HorizontalScrollView
-                android:id="@+id/BusScroll"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:scrollbars="none"
-                app:layout_constraintTop_toBottomOf="@id/busTitleText">
-
-                <LinearLayout
-                    android:id="@+id/busListContainer"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:paddingHorizontal="24dp"
-                    android:paddingBottom="10dp">
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/busCard1"
-                        android:layout_width="200dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="16dp"
-                        app:cardBackgroundColor="#FFFFFF"
-                        app:cardCornerRadius="16dp"
-                        app:cardElevation="4dp"
-                        app:strokeWidth="0dp">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical">
-
-                            <ImageView
-                                android:id="@+id/busImage1"
+                                android:id="@+id/transportasiImage3"
                                 android:layout_width="match_parent"
                                 android:layout_height="120dp"
                                 android:scaleType="centerCrop"
@@ -792,7 +516,7 @@
                                 android:padding="12dp">
 
                                 <TextView
-                                    android:id="@+id/busTitle1Text"
+                                    android:id="@+id/transportasiTitle3Text"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:maxLines="1"
@@ -803,62 +527,11 @@
                                     android:textStyle="bold" />
 
                                 <TextView
-                                    android:id="@+id/busRating1Text"
+                                    android:id="@+id/transportasiRating3Text"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="4dp"
                                     android:text="⭐ 4.9 | Jakarta - Surabaya"
-                                    android:textColor="#FFB300"
-                                    android:textSize="11sp"
-                                    android:textStyle="bold" />
-                            </LinearLayout>
-                        </LinearLayout>
-                    </com.google.android.material.card.MaterialCardView>
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/busCard2"
-                        android:layout_width="200dp"
-                        android:layout_height="wrap_content"
-                        app:cardBackgroundColor="#FFFFFF"
-                        app:cardCornerRadius="16dp"
-                        app:cardElevation="4dp"
-                        app:strokeWidth="0dp">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical">
-
-                            <ImageView
-                                android:id="@+id/busImage2"
-                                android:layout_width="match_parent"
-                                android:layout_height="120dp"
-                                android:scaleType="centerCrop"
-                                android:src="@drawable/ic_bus_sinarjaya" />
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:orientation="vertical"
-                                android:padding="12dp">
-
-                                <TextView
-                                    android:id="@+id/busTitle2Text"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:maxLines="1"
-                                    android:ellipsize="end"
-                                    android:text="PO Sinar jaya"
-                                    android:textColor="#1E1E1E"
-                                    android:textSize="14sp"
-                                    android:textStyle="bold" />
-
-                                <TextView
-                                    android:id="@+id/busRating2Text"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="4dp"
-                                    android:text="⭐ 4.8 | Jakarta - Bandung"
                                     android:textColor="#FFB300"
                                     android:textSize="11sp"
                                     android:textStyle="bold" />
