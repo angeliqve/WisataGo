@@ -178,7 +178,7 @@ class Profile : AppCompatActivity() {
     // 🟢 FUNGSI PEMBUAT BANYAK NOTIFIKASI DENGAN JEDA
     // ==========================================
     private fun munculkanNotifikasiWisataGO() {
-        val channelId = "wisatago_notif_beruntun_07"
+        val channelId = "wisatago_notif_beruntun_08"
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         // Mengambil MP3 dari res/raw
