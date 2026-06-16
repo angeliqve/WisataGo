@@ -21,7 +21,6 @@ class Dashboard : AppCompatActivity() {
         val greetingText = findViewById<TextView>(R.id.greetingText)
         val wisataButton = findViewById<LinearLayout>(R.id.wisataButton)
         val transportButton = findViewById<LinearLayout>(R.id.transportButton)
-        val searchBar = findViewById<LinearLayout>(R.id.searchBarContainer)
 
         val btnHome = findViewById<ImageView>(R.id.btnHome)
         val btnPemesanan = findViewById<ImageView>(R.id.btnPemesanan)
@@ -45,10 +44,6 @@ class Dashboard : AppCompatActivity() {
 
         transportButton.setOnClickListener {
             startActivity(Intent(this, TrainActivity::class.java))
-        }
-
-        searchBar.setOnClickListener {
-            Toast.makeText(this, "Membuka pencarian...", Toast.LENGTH_SHORT).show()
         }
 
         btnHome.setOnClickListener {
@@ -98,21 +93,8 @@ class Dashboard : AppCompatActivity() {
             startActivity(intent)
         }
 
-        // Card Kereta
-        findViewById<MaterialCardView>(R.id.keretaCard1).setOnClickListener {
-            val intent = Intent(this, DetailTransportActivity::class.java)
-            intent.putExtra("jenis", "Kereta")
-            intent.putExtra("nama", "KA Parahyangan")
-            intent.putExtra("rating", "4.9")
-            intent.putExtra("rute", "Gambir - Bandung")
-            intent.putExtra("deskripsi", "Kereta Api (KA) Parahyangan adalah layanan kereta api penumpang legendaris yang " +
-                    "melayani rute utama Jakarta (Gambir) - Bandung (PP). Menempuh jarak sekitar 166 km hingga 169 km, perjalanan ini memakan " +
-                    "waktu rata-rata 3 jam dan menyuguhkan pemandangan indah pegunungan Priangan.")
-            intent.putExtra("gambar", R.drawable.ic_parahyangan)
-            startActivity(intent)
-        }
-
-        findViewById<MaterialCardView>(R.id.keretaCard2).setOnClickListener {
+        // Card Transportasi
+        findViewById<MaterialCardView>(R.id.transportasiCard1).setOnClickListener {
             val intent = Intent(this, DetailTransportActivity::class.java)
             intent.putExtra("jenis", "Kereta")
             intent.putExtra("nama", "KA Anggrek")
@@ -124,8 +106,7 @@ class Dashboard : AppCompatActivity() {
             startActivity(intent)
         }
 
-        // Card Pesawat
-        findViewById<MaterialCardView>(R.id.pesawatCard1).setOnClickListener {
+        findViewById<MaterialCardView>(R.id.transportasiCard2).setOnClickListener {
             val intent = Intent(this, DetailTransportActivity::class.java)
             intent.putExtra("jenis", "Pesawat")
             intent.putExtra("nama", "Garuda Indonesia")
@@ -137,21 +118,7 @@ class Dashboard : AppCompatActivity() {
             startActivity(intent)
         }
 
-        findViewById<MaterialCardView>(R.id.pesawatCard2).setOnClickListener {
-            val intent = Intent(this, DetailTransportActivity::class.java)
-            intent.putExtra("jenis", "Pesawat")
-            intent.putExtra("nama", "Citilink Indonesia")
-            intent.putExtra("rating", "4.8")
-            intent.putExtra("rute", "Jakarta (CGK) - Surabaya (SUB)")
-            intent.putExtra("deskripsi", "PT Citilink Indonesia adalah maskapai penerbangan berbiaya hemat (LCC) terkemuka dan anak perusahaan dari Garuda Indonesia Group. " +
-                    "Sejak resmi pada tahun 2012, Citilink beroperasi dengan armada pesawat Airbus A320, melayani berbagai rute penerbangan domestik maupun regional dengan fokus pada kecepatan, " +
-                    "kenyamanan, dan harga yang terjangkau.")
-            intent.putExtra("gambar", R.drawable.ic_citilink)
-            startActivity(intent)
-        }
-
-        // Card Bus
-        findViewById<MaterialCardView>(R.id.busCard1).setOnClickListener {
+        findViewById<MaterialCardView>(R.id.transportasiCard3).setOnClickListener {
             val intent = Intent(this, DetailTransportActivity::class.java)
             intent.putExtra("jenis", "Bus")
             intent.putExtra("nama", "Rosalia Indah")
@@ -161,18 +128,6 @@ class Dashboard : AppCompatActivity() {
                     "Terkenal dengan rekor MURI armada Double Decker terbanyak, PO ini mengutamakan kenyamanan dan keselamatan melalui fasilitas premium, " +
                     "layanan pramugara/i, dan servis makan di restoran eksklusif.")
             intent.putExtra("gambar", R.drawable.ic_bus_rosalia)
-            startActivity(intent)
-        }
-
-        findViewById<MaterialCardView>(R.id.busCard2).setOnClickListener {
-            val intent = Intent(this, DetailTransportActivity::class.java)
-            intent.putExtra("jenis", "Bus")
-            intent.putExtra("nama", "PO Sinar Jaya")
-            intent.putExtra("rating", "4.8")
-            intent.putExtra("rute", "Jakarta - Bandung")
-            intent.putExtra("deskripsi", "PO Sinar Jaya adalah salah satu perusahaan otobus (PO) terbesar di Indonesia yang didirikan pada 1982. " +
-                    "Dikenal dengan julukan bus \"sejuta umat\", PO ini sangat populer karena menawarkan layanan premium, keamanan, dan ketepatan waktu dengan tarif yang terjangkau.")
-            intent.putExtra("gambar", R.drawable.ic_bus_sinarjaya)
             startActivity(intent)
         }
     }
