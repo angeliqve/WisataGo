@@ -22,6 +22,99 @@
             android:textStyle="bold" />
     </LinearLayout>
 
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginVertical="8dp"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_user_filter_bulan"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                app:icon="@android:drawable/ic_menu_month"
+                app:iconTint="#333333"
+                app:backgroundTint="#FFFFFF"
+                app:cornerRadius="20dp"
+                android:minWidth="0dp"
+                android:paddingHorizontal="12dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="#DDDDDD" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_user_filter_semua"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:text="Semua"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp"
+                android:textAllCaps="false"
+                app:backgroundTint="#2DA0F5"
+                app:cornerRadius="20dp"
+                android:minHeight="40dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_user_filter_wisata"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:text="Wisata"
+                android:textColor="#333333"
+                android:textSize="12sp"
+                android:textAllCaps="false"
+                app:backgroundTint="#F0F0F0"
+                app:cornerRadius="20dp"
+                android:minHeight="40dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_user_filter_kereta"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:text="Kereta"
+                android:textColor="#333333"
+                android:textSize="12sp"
+                android:textAllCaps="false"
+                app:backgroundTint="#F0F0F0"
+                app:cornerRadius="20dp"
+                android:minHeight="40dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_user_filter_pesawat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:text="Pesawat"
+                android:textColor="#333333"
+                android:textSize="12sp"
+                android:textAllCaps="false"
+                app:backgroundTint="#F0F0F0"
+                app:cornerRadius="20dp"
+                android:minHeight="40dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_user_filter_bus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:text="Bus"
+                android:textColor="#333333"
+                android:textSize="12sp"
+                android:textAllCaps="false"
+                app:backgroundTint="#F0F0F0"
+                app:cornerRadius="20dp"
+                android:minHeight="40dp" />
+        </LinearLayout>
+    </HorizontalScrollView>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvHistory"
         android:layout_width="match_parent"

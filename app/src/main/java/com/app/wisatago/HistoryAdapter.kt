@@ -175,5 +175,15 @@ class HistoryAdapter(private val listHistory: List<HistoryResponse>) :
         }
     }
 
+    fun updateDataList(newList: List<HistoryResponse>) {
+        try {
+            val field = HistoryAdapter::class.java.getDeclaredField("listHistory")
+            field.isAccessible = true
+            field.set(this, newList)
+            notifyDataSetChanged()
+        } catch (e: Exception) {
+            notifyDataSetChanged()
+        }
+    }
     override fun getItemCount(): Int = listHistory.size
 }
