@@ -1,10 +1,9 @@
 package com.app.wisatago
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.widget.ImageView
+import android.widget.VideoView
 import androidx.appcompat.app.AppCompatActivity
 
 class SplashActivity : AppCompatActivity() {
@@ -13,25 +12,35 @@ class SplashActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
 
-        val logo = findViewById<ImageView>(R.id.imgLogo)
+        val videoSplash = findViewById<VideoView>(R.id.videoSplash)
 
-        logo.alpha = 0f
+        val videoPath = "android.resource://" + packageName + "/" + R.raw.splash_video
+        val uri = Uri.parse(videoPath)
+        videoSplash.setVideoURI(uri)
 
-        logo.animate()
-            .alpha(1f)
-            .setDuration(1500)
-            .start()
+        // 🟢 PERBAIKAN: Trik untuk membuat video penuh (Center Crop)
+        videoSplash.setOnPreparedListener { mp ->
+            val videoRatio = mp.videoWidth.toFloat() / mp.videoHeight.toFloat()
+            val screenRatio = videoSplash.width.toFloat() / videoSplash.height.toFloat()
+            val scale = videoRatio / screenRatio
 
-        // Handler untuk menahan layar splash selama 4 detik
-        Handler(Looper.getMainLooper()).postDelayed({
+            // Lakukan zoom pada video agar menyentuh seluruh ujung layar
+            if (scale >= 1f) {
+                videoSplash.scaleX = scale
+                videoSplash.scaleY = scale
+            } else {
+                videoSplash.scaleX = 1f / scale
+                videoSplash.scaleY = 1f / scale
+            }
 
-            // PERBAIKAN UTAMA: Arahkan ke Login::class.java, BUKAN MainActivity
+            // Mulai putar video setelah ukurannya dipaskan
+            mp.start()
+        }
+
+        videoSplash.setOnCompletionListener {
             val intentKeLogin = Intent(this, Login::class.java)
             startActivity(intentKeLogin)
-
-            // Tutup SplashActivity agar tidak bisa kembali ke halaman loading saat tombol back ditekan
             finish()
-
-        }, 4000)
+        }
     }
 }
