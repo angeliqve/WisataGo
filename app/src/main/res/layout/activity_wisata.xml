@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:background="#2DA0F5"
         android:orientation="vertical"
-        android:paddingTop="16dp"
+        android:paddingTop="48dp"
         android:paddingBottom="16dp">
 
         <RelativeLayout

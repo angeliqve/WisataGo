@@ -12,13 +12,16 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
+        <!-- HEADER BIRU YANG SUDAH DIPERBAIKI -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="80dp"
+            android:layout_height="wrap_content"
             android:background="#2DA0F5"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:paddingHorizontal="20dp">
+            android:paddingHorizontal="20dp"
+            android:paddingTop="48dp"
+            android:paddingBottom="16dp">
 
             <ImageView
                 android:id="@+id/btnBack"
