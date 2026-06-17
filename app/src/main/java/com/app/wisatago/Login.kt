@@ -3,6 +3,7 @@ package com.app.wisatago
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -25,7 +26,6 @@ class Login : AppCompatActivity() {
         val etUsername = findViewById<EditText>(R.id.etUsername)
         val etPassword = findViewById<EditText>(R.id.etPassword)
         val btnLogin = findViewById<LinearLayout>(R.id.rl822png1s6q)
-
         val tvSignUpDirect = findViewById<TextView>(R.id.rmbtfuctunlg)
 
         btnLogin.setOnClickListener {
@@ -38,6 +38,22 @@ class Login : AppCompatActivity() {
             }
 
             jalankanFungsiLogin(emailInput, passwordInput)
+        }
+
+        etPassword.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                val emailInput = etUsername.text.toString().trim()
+                val passwordInput = etPassword.text.toString().trim()
+
+                if (emailInput.isEmpty() || passwordInput.isEmpty()) {
+                    Toast.makeText(this, "Email dan Password tidak boleh kosong!", Toast.LENGTH_SHORT).show()
+                } else {
+                    jalankanFungsiLogin(emailInput, passwordInput)
+                }
+                true
+            } else {
+                false
+            }
         }
 
         tvSignUpDirect.setOnClickListener {
@@ -76,7 +92,6 @@ class Login : AppCompatActivity() {
 
                         Toast.makeText(this@Login, "Selamat datang, ${hasilData.full_name}!", Toast.LENGTH_SHORT).show()
 
-                        // 🟢 Ubah pengecekan menjadi "admin" (sesuai isi database Anda)
                         if (hasilData.role.equals("admin", ignoreCase = true)) {
                             val intent = Intent(this@Login, AdminDashboardActivity::class.java)
                             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -96,11 +111,7 @@ class Login : AppCompatActivity() {
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(
-                        this@Login,
-                        "ERROR: ${e.message}",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    Toast.makeText(this@Login, "ERROR: ${e.message}", Toast.LENGTH_LONG).show()
                 }
             }
         }
